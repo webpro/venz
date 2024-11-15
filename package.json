@@ -1,0 +1,18 @@
+{
+  "name": "@venz/root",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250327.0",
+    "@types/bun": "latest",
+    "@types/node": "^22.13.14",
+    "knip": "^5.46.2",
+    "typescript": "^5.8.2",
+    "wrangler": "^4.5.1"
+  },
+  "scripts": {
+    "knip": "knip-bun"
+  }
+}

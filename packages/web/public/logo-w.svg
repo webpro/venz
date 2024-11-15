@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 256">
+  <title>Venz logo</title>
+  <rect width="488" height="256" fill="#f56e0f" />
+  <g stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="13">
+    <line x1="48" y1="48" x2="80" y2="80" />
+    <line x1="80" y1="80" x2="48" y2="112" />
+    <line x1="92" y1="116" x2="128" y2="116" />
+    <line x1="180" y1="172" x2="180" y2="212" />
+    <line x1="212" y1="152" x2="212" y2="212" />
+    <line x1="244" y1="160" x2="244" y2="212" />
+    <line x1="276" y1="112" x2="276" y2="212" />
+    <line x1="308" y1="72" x2="308" y2="212" />
+  </g>
+</svg>

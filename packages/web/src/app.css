@@ -1,0 +1,66 @@
+@import 'tailwindcss';
+
+@config '../tailwind.config.cjs';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+:root,
+.dark {
+  --background-rgb: 21, 20, 25;
+  --foreground-rgb: 255, 255, 255;
+  transition:
+    color 0.5s ease,
+    background-color 0.5s ease;
+}
+
+.light {
+  --background-rgb: 214, 219, 220;
+  --foreground-rgb: 0, 0, 0;
+}
+
+.high-contrast {
+  --background-rgb: 0, 0, 0;
+  --foreground-rgb: 255, 255, 0;
+}
+
+body {
+  background: rgb(var(--background-rgb));
+  color: rgb(var(--foreground-rgb));
+  transition:
+    color 0.5s ease,
+    background-color 0.5s ease;
+}
+
+h1 svg {
+  rect {
+    transition: fill 1s ease;
+  }
+  line {
+    transition: stroke 1s ease;
+  }
+}
+
+.high-contrast h1 svg {
+  rect {
+    fill: rgb(var(--foreground-rgb));
+  }
+  line {
+    stroke: rgb(var(--background-rgb));
+  }
+}
