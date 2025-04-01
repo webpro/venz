@@ -1,6 +1,7 @@
 import { A, useLocation, useParams } from '@solidjs/router';
 import ThemeSwitch from './ThemeSwitch';
 import { Logo } from './icons/Logo';
+import { GitHub } from './icons/GitHub';
 
 export default ({ children }) => {
   const { pathname } = useLocation();
@@ -24,11 +25,27 @@ export default ({ children }) => {
 
       <main role="main">{children}</main>
 
-      <footer role="contentinfo" class="mt-24 mx-auto text-center flex flex-col items-center gap-8">
+      <footer role="contentinfo" class="mt-24 mb-12 mx-auto text-center flex flex-col items-center gap-8">
         <p class="text-xs high-contrast:text-base">No worries, your data won't leave your browser.</p>
-        <a href="https://webpro.nl" title="webpro.nl" class="text-gray-500 hover:text-gray-700">
-          <img src="/webpro-logo.svg" alt="WebPro logo" class="w-8 h-8 inline mr-2" />
-        </a>
+        <p class="flex gap-4">
+          <span class="flex gap-2 items-center">
+            Made by
+            <a href="https://webpro.nl" title="webpro.nl" class="text-gray-500 hover:text-gray-700">
+              <img src="/webpro-logo.svg" alt="WebPro logo" class="w-8 h-8 inline" />
+            </a>
+          </span>
+          <span class="flex gap-2 items-center">
+            Code on
+            <a
+              href="https://github.com/webpro/venz"
+              title="Venz on GitHub"
+              class="w-8 h-8 text-gray-500 hover:text-gray-700"
+            >
+              {/* <img src="/github-mark-white.svg" alt="GitHub logo" class="w-8 h-8 inline ml-2" /> */}
+              <GitHub />
+            </a>
+          </span>
+        </p>
       </footer>
     </div>
   );
