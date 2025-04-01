@@ -15,11 +15,11 @@ importers:
         specifier: latest
         version: 1.2.8
       '@types/node':
-        specifier: ^22.13.15
-        version: 22.13.15
+        specifier: ^22.13.16
+        version: 22.13.16
       knip:
         specifier: ^5.46.4
-        version: 5.46.4(@types/node@22.13.15)(typescript@5.8.2)
+        version: 5.46.4(@types/node@22.13.16)(typescript@5.8.2)
       typescript:
         specifier: ^5.8.2
         version: 5.8.2
@@ -36,7 +36,7 @@ importers:
         version: 0.15.3(solid-js@1.9.5)
       '@solidjs/start':
         specifier: ^1.1.3
-        version: 1.1.3(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(solid-js@1.9.5)(terser@5.39.0)(vinxi@0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))(vite@6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
+        version: 1.1.3(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(solid-js@1.9.5)(terser@5.39.0)(vinxi@0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))(vite@6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
       '@tailwindcss/postcss':
         specifier: ^4.0.17
         version: 4.0.17
@@ -72,11 +72,8 @@ importers:
         version: 4.0.17
       vinxi:
         specifier: 0.5.3
-        version: 0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+        version: 0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
     devDependencies:
-      '@types/bun':
-        specifier: latest
-        version: 1.2.8
       '@types/d3-array':
         specifier: ^3.2.1
         version: 3.2.1
@@ -1334,8 +1331,8 @@ packages:
   '@types/micromatch@4.0.9':
     resolution: {integrity: sha512-7V+8ncr22h4UoYRLnLXSpTxjQrNUXtWHGeMPRJt1nULXI57G9bIcpyrHlmrQ7QK24EyyuXvYcSSWAM8GA9nqCg==}
 
-  '@types/node@22.13.15':
-    resolution: {integrity: sha512-imAbQEEbVni6i6h6Bd5xkCRwLqFc8hihCsi2GbtDoAtUcAFQ6Zs4pFXTZUUbroTkXdImczWM9AI8eZUuybXE3w==}
+  '@types/node@22.13.16':
+    resolution: {integrity: sha512-15tM+qA4Ypml/N7kyRdvfRjBQT2RL461uF1Bldn06K0Nzn1lY3nAPgHlsVrJxdZ9WhZiW0Fmc1lOYMtDsAuB3w==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -4162,11 +4159,11 @@ snapshots:
     dependencies:
       solid-js: 1.9.5
 
-  '@solidjs/start@1.1.3(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(solid-js@1.9.5)(terser@5.39.0)(vinxi@0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))(vite@6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))':
+  '@solidjs/start@1.1.3(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(solid-js@1.9.5)(terser@5.39.0)(vinxi@0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))(vite@6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))':
     dependencies:
-      '@tanstack/server-functions-plugin': 1.114.30(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
-      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
-      '@vinxi/server-components': 0.5.0(vinxi@0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
+      '@tanstack/server-functions-plugin': 1.114.30(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
+      '@vinxi/server-components': 0.5.0(vinxi@0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
       defu: 6.1.4
       error-stack-parser: 2.1.4
       html-to-image: 1.11.13
@@ -4177,8 +4174,8 @@ snapshots:
       source-map-js: 1.2.1
       terracotta: 1.0.6(solid-js@1.9.5)
       tinyglobby: 0.2.12
-      vinxi: 0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
-      vite-plugin-solid: 2.11.6(solid-js@1.9.5)(vite@6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
+      vinxi: 0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+      vite-plugin-solid: 2.11.6(solid-js@1.9.5)(vite@6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
     transitivePeerDependencies:
       - '@testing-library/jest-dom'
       - '@types/node'
@@ -4261,7 +4258,7 @@ snapshots:
       postcss: 8.5.3
       tailwindcss: 4.0.17
 
-  '@tanstack/directive-functions-plugin@1.114.30(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)':
+  '@tanstack/directive-functions-plugin@1.114.30(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)':
     dependencies:
       '@babel/code-frame': 7.26.2
       '@babel/core': 7.26.10
@@ -4274,7 +4271,7 @@ snapshots:
       babel-dead-code-elimination: 1.0.10
       dedent: 1.5.3
       tiny-invariant: 1.3.3
-      vite: 6.1.2(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+      vite: 6.1.2(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
     transitivePeerDependencies:
       - '@types/node'
       - babel-plugin-macros
@@ -4297,7 +4294,7 @@ snapshots:
       ansis: 3.17.0
       diff: 7.0.0
 
-  '@tanstack/server-functions-plugin@1.114.30(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)':
+  '@tanstack/server-functions-plugin@1.114.30(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)':
     dependencies:
       '@babel/code-frame': 7.26.2
       '@babel/core': 7.26.10
@@ -4306,7 +4303,7 @@ snapshots:
       '@babel/template': 7.27.0
       '@babel/traverse': 7.27.0
       '@babel/types': 7.27.0
-      '@tanstack/directive-functions-plugin': 1.114.30(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+      '@tanstack/directive-functions-plugin': 1.114.30(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
       babel-dead-code-elimination: 1.0.10
       dedent: 1.5.3
       tiny-invariant: 1.3.3
@@ -4386,7 +4383,7 @@ snapshots:
     dependencies:
       '@types/braces': 3.0.5
 
-  '@types/node@22.13.15':
+  '@types/node@22.13.16':
     dependencies:
       undici-types: 6.20.0
 
@@ -4398,7 +4395,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.13.15
+      '@types/node': 22.13.16
 
   '@ungap/structured-clone@1.3.0': {}
 
@@ -4441,7 +4438,7 @@ snapshots:
       untun: 0.1.3
       uqr: 0.1.2
 
-  '@vinxi/plugin-directives@0.5.0(vinxi@0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))':
+  '@vinxi/plugin-directives@0.5.0(vinxi@0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))':
     dependencies:
       '@babel/parser': 7.27.0
       acorn: 8.14.1
@@ -4452,18 +4449,18 @@ snapshots:
       magicast: 0.2.11
       recast: 0.23.11
       tslib: 2.8.1
-      vinxi: 0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+      vinxi: 0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
 
-  '@vinxi/server-components@0.5.0(vinxi@0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))':
+  '@vinxi/server-components@0.5.0(vinxi@0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))':
     dependencies:
-      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
+      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
       acorn: 8.14.1
       acorn-loose: 8.4.0
       acorn-typescript: 1.4.13(acorn@8.14.1)
       astring: 1.9.0
       magicast: 0.2.11
       recast: 0.23.11
-      vinxi: 0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+      vinxi: 0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
 
   abbrev@3.0.0: {}
 
@@ -4635,7 +4632,7 @@ snapshots:
 
   bun-types@1.2.7:
     dependencies:
-      '@types/node': 22.13.15
+      '@types/node': 22.13.16
       '@types/ws': 8.18.1
 
   c12@3.0.2(magicast@0.3.5):
@@ -5327,11 +5324,11 @@ snapshots:
 
   klona@2.0.6: {}
 
-  knip@5.46.4(@types/node@22.13.15)(typescript@5.8.2):
+  knip@5.46.4(@types/node@22.13.16)(typescript@5.8.2):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@snyk/github-codeowners': 1.1.0
-      '@types/node': 22.13.15
+      '@types/node': 22.13.16
       easy-table: 1.2.0
       enhanced-resolve: 5.18.1
       fast-glob: 3.3.3
@@ -6342,7 +6339,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vinxi@0.5.3(@types/node@22.13.15)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0):
+  vinxi@0.5.3(@types/node@22.13.16)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0):
     dependencies:
       '@babel/core': 7.26.10
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.10)
@@ -6376,7 +6373,7 @@ snapshots:
       unctx: 2.4.1
       unenv: 1.10.0
       unstorage: 1.15.0(db0@0.3.1)(ioredis@5.6.0)
-      vite: 6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+      vite: 6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
       zod: 3.24.2
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -6420,7 +6417,7 @@ snapshots:
       - xml2js
       - yaml
 
-  vite-plugin-solid@2.11.6(solid-js@1.9.5)(vite@6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)):
+  vite-plugin-solid@2.11.6(solid-js@1.9.5)(vite@6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)):
     dependencies:
       '@babel/core': 7.26.10
       '@types/babel__core': 7.20.5
@@ -6428,38 +6425,38 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.5
       solid-refresh: 0.6.3(solid-js@1.9.5)
-      vite: 6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
-      vitefu: 1.0.6(vite@6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
+      vite: 6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+      vitefu: 1.0.6(vite@6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0))
     transitivePeerDependencies:
       - supports-color
 
-  vite@6.1.2(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0):
+  vite@6.1.2(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.5.3
       rollup: 4.38.0
     optionalDependencies:
-      '@types/node': 22.13.15
+      '@types/node': 22.13.16
       fsevents: 2.3.3
       jiti: 2.4.2
       lightningcss: 1.29.2
       terser: 5.39.0
 
-  vite@6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0):
+  vite@6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0):
     dependencies:
       esbuild: 0.25.2
       postcss: 8.5.3
       rollup: 4.38.0
     optionalDependencies:
-      '@types/node': 22.13.15
+      '@types/node': 22.13.16
       fsevents: 2.3.3
       jiti: 2.4.2
       lightningcss: 1.29.2
       terser: 5.39.0
 
-  vitefu@1.0.6(vite@6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)):
+  vitefu@1.0.6(vite@6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)):
     optionalDependencies:
-      vite: 6.2.4(@types/node@22.13.15)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
+      vite: 6.2.4(@types/node@22.13.16)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)
 
   wcwidth@1.0.1:
     dependencies:
