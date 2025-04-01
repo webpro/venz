@@ -204,6 +204,7 @@ export default function Commands() {
       const files = e.clipboardData?.files;
       if (files?.length) {
         await handleDrop({ preventDefault: () => {}, dataTransfer: { files } } as DragEvent);
+        setIsRealData(true);
       }
 
       const input = e.clipboardData?.getData('text');
@@ -215,13 +216,14 @@ export default function Commands() {
             setSeries(incomingConfig.series);
             setSelectedSeries(prev => incomingConfig.series.map(w => w.id));
             setData(prev => [...prev, ...incomingData]);
+            setIsRealData(true);
+          } else {
+            addToast('Received invalid data', 'error');
           }
         } catch (error) {
           addToast('Invalid JSON format', 'error');
         }
       }
-
-      setIsRealData(true);
     };
 
     document.addEventListener('paste', handleGlobalPaste);
