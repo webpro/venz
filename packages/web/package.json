@@ -20,7 +20,7 @@
     "@solidjs/router": "^0.15.3",
     "@solidjs/start": "^1.1.3",
     "@tailwindcss/postcss": "^4.0.17",
-    "@venz/shared": "*",
+    "@venz/shared": "workspace:*",
     "d3-array": "^3.2.4",
     "d3-axis": "^3.0.0",
     "d3-scale": "^4.0.2",

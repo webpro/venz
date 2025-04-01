@@ -41,7 +41,7 @@ const buttonLinkInvertedColorStyles = [
 
 export const Button = (props: ParentProps<ButtonProps>) => {
   const [own, rest] = splitProps(props, ['children', 'className']);
-  const classNames = ['p-2', buttonLinkColorStyles, own.className ?? ''].join(' ');
+  const classNames = ['p-2 cursor-pointer', buttonLinkColorStyles, own.className ?? ''].join(' ');
   return (
     <button type="button" class={classNames} {...rest}>
       {own.children}

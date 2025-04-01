@@ -159,7 +159,7 @@ const DropdownItem: ParentComponent<DropdownItemProps> = props => {
   return (
     <button
       type="button"
-      class="flex items-center gap-3 w-full px-4 py-2 text-left text-foreground hover:text-background hover:bg-foreground focus:bg-foreground focus:text-background focus:outline-hidden bg-background"
+      class="flex items-center gap-3 w-full px-4 py-2 cursor-pointer text-left text-foreground hover:text-background hover:bg-foreground focus:bg-foreground focus:text-background focus:outline-hidden bg-background"
       role="option"
       aria-selected={props.selected}
       onClick={() => {

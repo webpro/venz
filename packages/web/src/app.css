@@ -55,12 +55,3 @@ h1 svg {
     transition: stroke 1s ease;
   }
 }
-
-.high-contrast h1 svg {
-  rect {
-    fill: rgb(var(--foreground-rgb));
-  }
-  line {
-    stroke: rgb(var(--background-rgb));
-  }
-}

@@ -1,8 +1,7 @@
-import { Navigate, Router } from '@solidjs/router';
+import { Router } from '@solidjs/router';
 import { FileRoutes } from '@solidjs/start/router';
 import { ErrorBoundary, Suspense, For, Show } from 'solid-js';
 import './app.css';
-import { Down, Unauthorized } from './errors';
 import { ToastContext, createToastStore } from './stores/toast';
 import Toast from './components/Toast';
 import { ThemeProvider } from './stores/theme';
