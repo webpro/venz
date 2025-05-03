@@ -122,7 +122,7 @@ export default function Commands() {
           const seriesId = Number(match.groups.seriesId);
 
           if (configId !== Number(params.id)) {
-            addToast(`Wrong benchmark? Mismatch for ${file.name}`, 'error');
+            addToast(`Wrong configuration? Mismatch for ${file.name}`, 'error');
             continue;
           }
 

@@ -13,12 +13,6 @@ module.exports = {
       },
     },
   },
-  variants: {
-    extend: {
-      // light: '.light &',
-      // 'high-contrast': '.high-contrast &',
-    },
-  },
   plugins: [
     function ({ addVariant }) {
       addVariant('light', '.light &');

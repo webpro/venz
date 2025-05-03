@@ -87,7 +87,7 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
       addToast('Saved');
     } catch (error) {
       addToast(error.message, 'error');
-      console.error('Failed to save benchmark:', error);
+      console.error('Failed to save configuration:', error);
     }
   };
 
@@ -620,16 +620,16 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
             <div class="self-end">
               <DangerButton
                 onClick={async () => {
-                  if (!confirm('Are you sure you want to delete this benchmark?')) return;
+                  if (!confirm('Are you sure you want to delete this configuration?')) return;
 
                   await storage.deleteConfig(selectedConfig().id);
                   mutate(configs().filter((c: any) => c.id !== selectedConfig().id));
                   setSelectedConfig(null);
                   navigate('/config');
-                  addToast('Benchmark deleted');
+                  addToast('Configuration deleted');
                 }}
               >
-                Delete benchmark
+                Delete configuration
               </DangerButton>
             </div>
           </Show>
