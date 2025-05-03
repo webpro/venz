@@ -1,10 +1,13 @@
 import { isHyperfineJSON, transformHyperfineData } from './hyperfine';
 import {
+  isLabeledColumnsRawData,
   isLabeledRawData,
   isLabelValueTuple,
   isRawNumericData,
+  parseLabeledColumnValues,
   parseLabeledValues,
   transformData,
+  transformLabeledColumnsData,
   transformLabeledData,
   transformRawData,
 } from './standard';
@@ -28,8 +31,15 @@ export function transform(
         return transformData(json, id, seriesId);
     }
   } catch {
-    if (isLabeledRawData(input)) return transformLabeledData(parseLabeledValues(input), id, seriesId, config);
-    if (isRawNumericData(input)) return transformRawData(input, id, seriesId, config);
+    if (isLabeledRawData(input)) {
+      return transformLabeledData(parseLabeledValues(input), id, seriesId, config);
+    }
+    if (isRawNumericData(input)) {
+      return transformRawData(input, id, seriesId, config);
+    }
+    if (isLabeledColumnsRawData(input)) {
+      return transformLabeledColumnsData(parseLabeledColumnValues(input), id, seriesId, config);
+    }
   }
 
   return { config: undefined, data: [] };

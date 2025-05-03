@@ -41,6 +41,20 @@ const createSeries = (id: number, configId: number, seriesNumber: number, existi
   color: getNextAvailableColor(existingSeries),
 });
 
+export function isLabeledColumnsRawData(input: string): boolean {
+  try {
+    const lines = input
+      .trim()
+      .split('\n')
+      .filter(line => line.trim());
+    const labels = lines[0].split(/[\s,;]+/).filter(label => label.trim());
+    const values = lines[2].split(/[\s,;]+/).filter(value => value.trim());
+    return labels.every(value => /\w/.test(value)) && values.every(value => /^[\d\.]+$/.test(value));
+  } catch {
+    return false;
+  }
+}
+
 export function isLabeledRawData(input: string): boolean {
   try {
     const lines = input
@@ -53,6 +67,22 @@ export function isLabeledRawData(input: string): boolean {
   } catch {
     return false;
   }
+}
+
+export function parseLabeledColumnValues(input: string): [string[], number[][]] {
+  const lines = input.split('\n').filter(line => line.trim());
+  const labels = lines[0].split(/[\s,;]+/).map(col => col.trim());
+  const valuess = Array.from({ length: labels.length }, () => [] as number[]);
+  for (let i = 1; i < lines.length; i++) {
+    const numbers = lines[i]
+      .split(/[\s,;]+/)
+      .map(v => Number.parseFloat(v))
+      .filter(n => !isNaN(n));
+    if (numbers.length === labels.length) {
+      numbers.forEach((num, colIndex) => valuess[colIndex].push(num));
+    }
+  }
+  return [labels, valuess];
 }
 
 export function parseLabeledValues(input: string): Array<[string, number]> {
@@ -104,6 +134,47 @@ export function transformRawData(input: string, configId: number, seriesId?: num
 
 export const isLabelValueTuple = (arr: JsonValue) =>
   Array.isArray(arr) && arr.length === 2 && typeof arr[0] === 'string' && typeof arr[1] === 'number';
+
+export function transformLabeledColumnsData(
+  input: [string[], number[][]],
+  configId: number,
+  seriesId?: number,
+  existingConfig?: Configuration,
+) {
+  const now = new Date();
+  const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+  const series: Series[] = [];
+
+  const data: SeriesData[] = [];
+
+  const [headers, values] = input;
+
+  for (let i = 0; i < headers.length; i++) {
+    series.push({
+      id: i,
+      configId,
+      label: headers[i],
+      color: getNextAvailableColor(series),
+    });
+
+    data.push({
+      ...calculateStats(values[i]),
+      id: i,
+      seriesId: i,
+      values: values[i],
+    });
+  }
+
+  const config: Configuration = {
+    id: configId,
+    series,
+    type: 'standard',
+    title: `New labeled data series (${timestamp})`,
+  };
+
+  return { config, data };
+}
 
 export function transformLabeledData(
   input: Array<[string, number]>,
