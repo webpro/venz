@@ -11,7 +11,7 @@ import { Download } from './icons/Download';
 import { BoxPlot } from './icons/BoxPlot';
 import { MedianChart } from './icons/Median';
 import { ScatterPlot } from './icons/ScatterPlot';
-import { useNavigate, useParams } from '@solidjs/router';
+import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { getStorageAdapter } from '../storage';
 import { type Series, type Configuration, transform, type SeriesData } from '@venz/shared';
 import { useToast } from '../stores/toast';
@@ -27,8 +27,15 @@ import { Bar } from './icons/Bar';
 
 const storage = getStorageAdapter();
 
+type ChartType = 'box' | 'median' | 'scatter' | 'line' | 'bar';
+const getChartType = (providedType?: string | string[]): ChartType =>
+  typeof providedType === 'string' && ['box', 'median', 'scatter', 'line', 'bar'].includes(providedType)
+    ? (providedType as ChartType)
+    : 'median';
+
 export default function Commands() {
   const params = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addToast } = useToast();
   const { theme } = useTheme();
@@ -38,12 +45,13 @@ export default function Commands() {
   const [selectedSeries, setSelectedSeries] = createSignal<number[]>([]);
   const [data, setData] = createSignal<SeriesData[]>([]);
   const [fullRange, setFullRange] = createSignal(config()?.type !== 'list');
-  const [isConnected, setIsConnected] = createSignal(true);
-  const [chartType, setChartType] = createSignal<'box' | 'median' | 'scatter' | 'line' | 'bar'>('median');
+  const [chartType, setChartType] = createSignal<ChartType>(getChartType(searchParams.type));
   const [sortMode, setSortMode] = createSignal<'original' | 'ascending' | 'descending'>('original');
   const [legendPosition, setLegendPosition] = createSignal<
     'none' | 'topRight' | 'bottomRight' | 'bottomLeft' | 'topLeft'
   >('topRight');
+  const [imgDownloadBgColor, setImgDownloadBgColor] = createSignal('none');
+  const [imgDownloadPadding, setImgDownloadPadding] = createSignal<0 | 12 | 24>(0);
   const [randomNumbers, setRandomNumbers] = createSignal<number[]>([]);
   const [isRealData, setIsRealData] = createSignal(series.length > 0);
 
@@ -156,7 +164,19 @@ export default function Commands() {
     if (format === 'svg') {
       const svgClone = svgRef.cloneNode(true) as SVGSVGElement;
       svgClone.setAttribute('class', 'venz-chart');
-      svgClone.setAttribute('viewBox', `0 0 ${svgRef.clientWidth} ${svgRef.clientHeight}`);
+      const padding = imgDownloadPadding();
+      svgClone.setAttribute(
+        'viewBox',
+        `-${padding} -${padding} ${svgRef.clientWidth + padding * 2} ${svgRef.clientHeight + padding * 2}`,
+      );
+      if (imgDownloadBgColor() !== 'none') {
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        rect.setAttribute('r', '1e5');
+        rect.setAttribute('fill', imgDownloadBgColor());
+        svgClone.insertBefore(rect, svgClone.firstChild);
+        if (imgDownloadBgColor() === '#000') svgClone.setAttribute('style', 'color: white');
+        debugger;
+      }
       const svgData = new XMLSerializer().serializeToString(svgClone);
       const a = document.createElement('a');
       a.download = 'venz-chart.svg';
@@ -169,17 +189,24 @@ export default function Commands() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
+    const padding = imgDownloadPadding();
 
-    canvas.width = svgRef.clientWidth * scale;
-    canvas.height = svgRef.clientHeight * scale;
+    canvas.width = (svgRef.clientWidth + padding * 2) * scale;
+    canvas.height = (svgRef.clientHeight + padding * 2) * scale;
 
     img.onload = () => {
-      ctx?.scale(scale, scale);
-      ctx?.drawImage(img, 0, 0);
-      const a = document.createElement('a');
-      a.download = `venz-chart.${format}`;
-      a.href = canvas.toDataURL(`image/${format}`);
-      a.click();
+      if (ctx) {
+        ctx.scale(scale, scale);
+        if (imgDownloadBgColor() !== 'none') {
+          ctx.fillStyle = imgDownloadBgColor();
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        ctx.drawImage(img, padding / scale, padding / scale);
+        const a = document.createElement('a');
+        a.download = `venz-chart.${format}`;
+        a.href = canvas.toDataURL(`image/${format}`);
+        a.click();
+      }
     };
 
     img.src = `data:image/svg+xml;base64,${btoa(svgData)}`;
@@ -386,7 +413,7 @@ export default function Commands() {
     svg
       .append('text')
       .attr('x', width / 2)
-      .attr('y', height + 15 + margin.bottom / 2)
+      .attr('y', height + 10 + margin.bottom / 2)
       .attr('text-anchor', 'middle')
       .style('fill', 'currentColor')
       .style('font-family', 'sans-serif')
@@ -859,10 +886,26 @@ export default function Commands() {
           label="Download image"
           icon={<Download />}
           options={[
-            { value: 'png', label: 'png', onClick: () => downloadChart('png', 2) },
-            { value: 'svg', label: 'svg', onClick: () => downloadChart('svg') },
-            { value: 'webp', label: 'webP', onClick: () => downloadChart('webp', 2) },
-            { value: 'avif', label: 'avif', onClick: () => downloadChart('avif', 2) },
+            { value: 'png', icon: <Download />, label: 'png', onClick: () => downloadChart('png', 2) },
+            { value: 'svg', icon: <Download />, label: 'svg', onClick: () => downloadChart('svg') },
+            { value: 'webp', icon: <Download />, label: 'webP', onClick: () => downloadChart('webp', 2) },
+            { value: 'avif', icon: <Download />, label: 'avif', onClick: () => downloadChart('avif', 2) },
+            {
+              value: 'bg-color',
+              label: `bg (${imgDownloadBgColor()})`,
+              icon: <div class={`w-full h-full`} style={`background-color: ${imgDownloadBgColor()}`} />,
+              onClick: () => {
+                const colors = ['none', '#000', '#fff'];
+                const currentIndex = colors.indexOf(imgDownloadBgColor());
+                const nextIndex = (currentIndex + 1) % colors.length;
+                setImgDownloadBgColor(colors[nextIndex]);
+              },
+            },
+            {
+              value: 'padding',
+              label: `padding: ${imgDownloadPadding()}`,
+              onClick: () => setImgDownloadPadding(prev => (prev === 0 ? 12 : prev === 12 ? 24 : 0)),
+            },
           ]}
         />
       </div>
