@@ -184,7 +184,10 @@ export default function Commands() {
       return;
     }
 
+    const originalColor = svgRef.style.color;
+    if (imgDownloadBgColor() === '#000') svgRef.style.color = 'white';
     const svgData = new XMLSerializer().serializeToString(svgRef);
+    if (imgDownloadBgColor() === '#000') svgRef.style.color = originalColor;
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
