@@ -175,7 +175,6 @@ export default function Commands() {
         rect.setAttribute('fill', imgDownloadBgColor());
         svgClone.insertBefore(rect, svgClone.firstChild);
         if (imgDownloadBgColor() === '#000') svgClone.setAttribute('style', 'color: white');
-        debugger;
       }
       const svgData = new XMLSerializer().serializeToString(svgClone);
       const a = document.createElement('a');
