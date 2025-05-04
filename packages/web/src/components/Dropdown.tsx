@@ -14,6 +14,7 @@ type DropdownOption = {
   icon?: JSX.Element;
   label: string;
   onClick?: () => void;
+  separator?: boolean;
 };
 
 export const Dropdown: ParentComponent<DropdownProps> = props => {
@@ -124,18 +125,25 @@ export const Dropdown: ParentComponent<DropdownProps> = props => {
             <Match when={props.options?.slice(1).some(opt => opt.label !== '')}>
               <For each={props.options?.slice(1)}>
                 {option => (
-                  <DropdownItem
-                    value={option.value}
-                    icon={option.icon}
-                    label={option.label}
-                    selected={option.value === props.value}
-                    onClick={() => props.onChange?.(option.value)}
-                    onKeySelect={closeDropdown => {
-                      option.onClick?.();
-                      props.onChange?.(option.value);
-                      if (closeDropdown) setIsOpen(false);
-                    }}
-                  />
+                  <Switch>
+                    <Match when={option.separator}>
+                      <div class="h-px bg-foreground/50" />
+                    </Match>
+                    <Match when={!option.separator}>
+                      <DropdownItem
+                        value={option.value}
+                        icon={option.icon}
+                        label={option.label}
+                        selected={option.value === props.value}
+                        onClick={() => props.onChange?.(option.value)}
+                        onKeySelect={closeDropdown => {
+                          option.onClick?.();
+                          props.onChange?.(option.value);
+                          if (closeDropdown) setIsOpen(false);
+                        }}
+                      />
+                    </Match>
+                  </Switch>
                 )}
               </For>
             </Match>

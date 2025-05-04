@@ -889,6 +889,7 @@ export default function Commands() {
             { value: 'svg', icon: <Download />, label: 'svg', onClick: () => downloadChart('svg') },
             { value: 'webp', icon: <Download />, label: 'webP', onClick: () => downloadChart('webp', 2) },
             { value: 'avif', icon: <Download />, label: 'avif', onClick: () => downloadChart('avif', 2) },
+            { separator: true, value: '', label: '' },
             {
               value: 'bg-color',
               label: `bg (${imgDownloadBgColor()})`,
