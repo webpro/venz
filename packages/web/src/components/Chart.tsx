@@ -4,37 +4,30 @@ import { scaleLinear, scalePoint } from 'd3-scale';
 import { max } from 'd3-array';
 import { axisLeft, axisBottom } from 'd3-axis';
 import { curveMonotoneX, line } from 'd3-shape';
-import { Button, ButtonLink, IconButton, Link } from './Button';
-import { Chart } from './icons/Chart';
-import { Scatter } from './icons/Scatter';
-import { Download } from './icons/Download';
-import { BoxPlot } from './icons/BoxPlot';
-import { MedianChart } from './icons/Median';
-import { ScatterPlot } from './icons/ScatterPlot';
+import { Button, ButtonLink, Link } from './Button';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { getStorageAdapter } from '../storage';
 import { type Series, type Configuration, transform, type SeriesData } from '@venz/shared';
 import { useToast } from '../stores/toast';
-import { LegendBottomLeft, LegendBottomRight, LegendNone, LegendTopLeft, LegendTopRight } from './icons/Legend';
 import { createStore } from 'solid-js/store';
-import { Line } from './icons/Line';
-import { SortAsc } from './icons/SortAsc';
-import { SortDesc } from './icons/SortDesc';
-import { Dropdown } from './Dropdown';
 import { compare } from 'semver';
 import { useTheme } from '../stores/theme';
-import { Bar } from './icons/Bar';
-import { download } from '../util/download';
 import { ChartSeries } from './ChartSeries';
 import { DropZone } from './DropZone';
+import { ChartControls } from './ChartControls';
 
 export const storage = getStorageAdapter();
 
-type ChartType = 'box' | 'median' | 'scatter' | 'line' | 'bar';
+export type ChartType = 'box' | 'median' | 'scatter' | 'line' | 'bar';
 const getChartType = (providedType?: string | string[]): ChartType =>
   typeof providedType === 'string' && ['box', 'median', 'scatter', 'line', 'bar'].includes(providedType)
     ? (providedType as ChartType)
     : 'median';
+
+export type SortMode = 'original' | 'ascending' | 'descending';
+export type LegendPosition = 'none' | 'topRight' | 'bottomRight' | 'bottomLeft' | 'topLeft';
+export type ImgBgColor = string;
+export type ImgBgPadding = 0 | 12 | 24;
 
 export default function Commands() {
   const params = useParams();
@@ -49,12 +42,10 @@ export default function Commands() {
   const [data, setData] = createSignal<SeriesData[]>([]);
   const [fullRange, setFullRange] = createSignal(config()?.type !== 'list');
   const [chartType, setChartType] = createSignal<ChartType>(getChartType(searchParams.type));
-  const [sortMode, setSortMode] = createSignal<'original' | 'ascending' | 'descending'>('original');
-  const [legendPosition, setLegendPosition] = createSignal<
-    'none' | 'topRight' | 'bottomRight' | 'bottomLeft' | 'topLeft'
-  >('topRight');
+  const [sortMode, setSortMode] = createSignal<SortMode>('original');
+  const [legendPosition, setLegendPosition] = createSignal<LegendPosition>('topRight');
   const [imgDownloadBgColor, setImgDownloadBgColor] = createSignal('none');
-  const [imgDownloadPadding, setImgDownloadPadding] = createSignal<0 | 12 | 24>(0);
+  const [imgDownloadPadding, setImgDownloadPadding] = createSignal<ImgBgPadding>(0);
   const [randomNumbers, setRandomNumbers] = createSignal<number[]>([]);
   const [isRealData, setIsRealData] = createSignal(series.length > 0);
 
@@ -715,80 +706,22 @@ export default function Commands() {
 
       <svg ref={svgRef} class={`h-96 w-full ${showDropZone() ? ' hidden' : ''}`} />
 
-      <div class="flex justify-end gap-4">
-        {config()?.type !== 'list' && (
-          <>
-            <Dropdown
-              label="Chart type"
-              value={chartType()}
-              options={[
-                { value: 'median', icon: <MedianChart />, label: 'median' },
-                { value: 'box', icon: <BoxPlot />, label: 'box plot' },
-                { value: 'scatter', icon: <ScatterPlot />, label: 'scatter' },
-                { value: 'line', icon: <Line />, label: 'line' },
-                { value: 'bar', icon: <Bar />, label: 'bar' },
-              ]}
-              onChange={setChartType}
-            />
-
-            <Dropdown
-              label="Sort mode"
-              value={sortMode()}
-              options={[
-                { value: 'original', icon: <Line />, label: 'original' },
-                { value: 'ascending', icon: <SortAsc />, label: 'ascending' },
-                { value: 'descending', icon: <SortDesc />, label: 'descending' },
-              ]}
-              onChange={setSortMode}
-            />
-          </>
-        )}
-
-        <Dropdown
-          label="Legend position"
-          value={legendPosition()}
-          options={[
-            { value: 'none', icon: <LegendNone />, label: 'legend' },
-            { value: 'topLeft', icon: <LegendTopLeft />, label: '' },
-            { value: 'topRight', icon: <LegendTopRight />, label: '' },
-            { value: 'bottomLeft', icon: <LegendBottomLeft />, label: '' },
-            { value: 'bottomRight', icon: <LegendBottomRight />, label: '' },
-          ]}
-          onChange={setLegendPosition}
-        />
-
-        <IconButton aria-label="Toggle chart break" onClick={() => setFullRange(prev => !prev)}>
-          {fullRange() ? <Chart /> : <Scatter />}
-        </IconButton>
-
-        <Dropdown
-          label="Download image"
-          icon={<Download />}
-          options={[
-            { value: 'png', icon: <Download />, label: 'png', onClick: () => download(svgRef, { format: 'png' }) },
-            { value: 'svg', icon: <Download />, label: 'svg', onClick: () => download(svgRef, { format: 'svg' }) },
-            { value: 'webp', icon: <Download />, label: 'webP', onClick: () => download(svgRef, { format: 'webp' }) },
-            { value: 'avif', icon: <Download />, label: 'avif', onClick: () => download(svgRef, { format: 'avif' }) },
-            { separator: true, value: '', label: '' },
-            {
-              value: 'bg-color',
-              label: `bg (${imgDownloadBgColor()})`,
-              icon: <div class={`w-full h-full`} style={`background-color: ${imgDownloadBgColor()}`} />,
-              onClick: () => {
-                const colors = ['none', '#000', '#fff'];
-                const currentIndex = colors.indexOf(imgDownloadBgColor());
-                const nextIndex = (currentIndex + 1) % colors.length;
-                setImgDownloadBgColor(colors[nextIndex]);
-              },
-            },
-            {
-              value: 'padding',
-              label: `padding: ${imgDownloadPadding()}`,
-              onClick: () => setImgDownloadPadding(prev => (prev === 0 ? 12 : prev === 12 ? 24 : 0)),
-            },
-          ]}
-        />
-      </div>
+      <ChartControls
+        svgRef={svgRef}
+        configType={config()?.type}
+        chartType={chartType}
+        setChartType={setChartType}
+        sortMode={sortMode}
+        setSortMode={setSortMode}
+        legendPosition={legendPosition}
+        setLegendPosition={setLegendPosition}
+        fullRange={fullRange}
+        setFullRange={setFullRange}
+        imgDownloadBgColor={imgDownloadBgColor}
+        setImgDownloadBgColor={setImgDownloadBgColor}
+        imgDownloadPadding={imgDownloadPadding}
+        setImgDownloadPadding={setImgDownloadPadding}
+      />
 
       {series.length > 0 && (
         <ChartSeries
