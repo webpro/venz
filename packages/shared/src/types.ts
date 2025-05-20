@@ -1,8 +1,10 @@
 export const configTypes = ['standard', 'hyperfine-default', 'hyperfine-parameter', 'list'] as const;
 
+export type ConfigType = (typeof configTypes)[number];
+
 export interface BaseConfig {
   title: string;
-  type: (typeof configTypes)[number];
+  type: ConfigType;
   labelX?: string;
   labelY?: string;
 }

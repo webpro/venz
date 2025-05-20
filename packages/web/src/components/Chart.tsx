@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
+import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
 import { select } from 'd3-selection';
 import { scaleLinear, scalePoint } from 'd3-scale';
 import { max } from 'd3-array';
@@ -25,8 +25,9 @@ import { compare } from 'semver';
 import { useTheme } from '../stores/theme';
 import { Bar } from './icons/Bar';
 import { download } from '../util/download';
+import { ChartSeries } from './ChartSeries';
 
-const storage = getStorageAdapter();
+export const storage = getStorageAdapter();
 
 type ChartType = 'box' | 'median' | 'scatter' | 'line' | 'bar';
 const getChartType = (providedType?: string | string[]): ChartType =>
@@ -65,8 +66,6 @@ export default function Commands() {
 
   const isGenericChart = () => !params.id || params.id === 'chart';
 
-  const getSeriesColor = (s: Series) => createMemo(() => (theme() === 'high-contrast' ? 'currentColor' : s.color));
-
   createEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const chartParam = params.get('type');
@@ -74,13 +73,6 @@ export default function Commands() {
       setChartType(chartParam as 'box' | 'median' | 'scatter' | 'line');
     }
   });
-
-  const handleSave = async () => {
-    if (!isGenericChart()) {
-      const config = await storage.getConfig(Number(params.id));
-      storage.updateConfig(Number(params.id), { ...config, series });
-    }
-  };
 
   const handleSaveAsNewConfiguration = async () => {
     const { id } = await storage.saveConfig(config());
@@ -708,40 +700,6 @@ export default function Commands() {
     }
   });
 
-  const seriesWithStats = createMemo(() => {
-    const allData = data();
-    const fastestStats = allData.reduce(
-      (fastest, current) => (current.median < fastest.median ? current : fastest),
-      allData[0],
-    );
-
-    return series
-      .toSorted((a, b) => {
-        const aStats = allData.find(d => d.seriesId === a.id);
-        const bStats = allData.find(d => d.seriesId === b.id);
-        return (aStats?.median || 0) - (bStats?.median || 0);
-      })
-      .map(s => {
-        const stats = allData.find(d => d.seriesId === s.id);
-        const isFastest = stats?.median === fastestStats?.median;
-        const ratio = stats?.median / fastestStats?.median;
-        const relativeStddev = !isFastest
-          ? Math.sqrt(
-              Math.pow(stats?.stddev / stats?.median, 2) + Math.pow(fastestStats?.stddev / fastestStats?.median, 2),
-            ) * ratio
-          : 0;
-
-        return {
-          ...s,
-          stats,
-          isFastest,
-          ratio,
-          relativeStddev,
-          fastestSeries: isFastest ? null : series.find(fs => fs.id === fastestStats?.seriesId),
-        };
-      });
-  });
-
   return (
     <div
       class="flex flex-col gap-8 max-w-[960px] m-auto"
@@ -861,83 +819,14 @@ export default function Commands() {
       </div>
 
       {series.length > 0 && (
-        <form
-          class="flex flex-col border border-foreground rounded-2"
-          onSubmit={event => {
-            event.preventDefault();
-            handleSave();
-          }}
-        >
-          <button type="submit" class="hidden" />
-
-          <For each={seriesWithStats()}>
-            {(s, i) => {
-              const fasterSeries = seriesWithStats()[0];
-
-              return (
-                <label
-                  for={`toggle-visibility-${i()}`}
-                  class="flex items-center gap-2 px-4 py-1 cursor-pointer hover:bg-foreground hover:text-background!"
-                  style={`color: ${getSeriesColor(s)()}`}
-                >
-                  <input
-                    type="checkbox"
-                    id={`toggle-visibility-${i()}`}
-                    aria-label="toggle series visibility"
-                    checked={selectedSeries().includes(s.id)}
-                    onChange={event => {
-                      setSelectedSeries(prev =>
-                        (event.currentTarget.checked ? [...prev, s.id] : prev.filter(id => id !== s.id)).sort(),
-                      );
-                    }}
-                    class="w-4 h-4 rounded-sm"
-                  />
-                  <div class="relative w-6 scale-50">
-                    <input
-                      type="color"
-                      aria-label="color"
-                      value={s.color}
-                      onChange={event => {
-                        setSeries(series => series.id === s.id, 'color', event.currentTarget.value);
-                        handleSave();
-                      }}
-                      class="w-full h-3 cursor-pointer appearance-none bg-transparent border-0"
-                    />
-                    <div
-                      class="pointer-events-none absolute inset-0 rounded-full"
-                      style={{ 'background-color': getSeriesColor(s)() }}
-                    />
-                  </div>
-                  <input
-                    type="text"
-                    aria-label="series label"
-                    value={s.label}
-                    onChange={event => {
-                      setSeries(series => series.id === s.id, 'label', event.currentTarget.value);
-                    }}
-                    onBlur={handleSave}
-                    class="bg-transparent border-none py-1"
-                  />
-
-                  {(config()?.type === 'hyperfine-default' || config()?.type === 'hyperfine-json') && (
-                    <code class="p-2 text-base text-gray-400 font-mono">{s.command}</code>
-                  )}
-
-                  {config()?.type !== 'list' &&
-                    seriesWithStats().length > 1 &&
-                    (!s.ratio || s.ratio === 1 || (
-                      <em class="text-right ml-auto text-gray-400">
-                        <span class="mr-2" style={`color: ${fasterSeries.color}`}>
-                          {fasterSeries.label}
-                        </span>
-                        is {s.ratio.toFixed(2)} ± {s.relativeStddev.toFixed(2)} times faster
-                      </em>
-                    ))}
-                </label>
-              );
-            }}
-          </For>
-        </form>
+        <ChartSeries
+          data={data}
+          series={series}
+          setSeries={setSeries}
+          selectedSeries={selectedSeries}
+          setSelectedSeries={setSelectedSeries}
+          type={config()?.type}
+        />
       )}
 
       {isGenericChart() && series.length > 0 ? (
