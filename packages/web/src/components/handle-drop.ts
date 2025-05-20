@@ -14,12 +14,12 @@ type HandleDropProps = {
   setData: Setter<SeriesData[]>;
 };
 
-export const handleDrop = (props: HandleDropProps) => async (e: DragEvent) => {
-  e.preventDefault();
+export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) => {
+  event.preventDefault();
 
   const { addToast } = useToast();
 
-  const files = Array.from(e.dataTransfer?.files || []);
+  const files = Array.from(event.dataTransfer?.files || []);
 
   for (const file of files) {
     if (!/\.(json|txt|csv)$/.test(file.name)) {
@@ -29,10 +29,9 @@ export const handleDrop = (props: HandleDropProps) => async (e: DragEvent) => {
 
     try {
       const input = await file.text();
-      const currentConfig = props.config();
 
       if (!props.chartId || props.chartId === 'chart') {
-        const { config: incomingConfig, data: incomingData } = transform(input, -1, undefined, currentConfig);
+        const { config: incomingConfig, data: incomingData } = transform(input, -1, undefined, props.config());
         if (incomingConfig) {
           props.setConfig(incomingConfig);
           props.setSeries(incomingConfig.series);
@@ -76,6 +75,32 @@ export const handleDrop = (props: HandleDropProps) => async (e: DragEvent) => {
     } catch (error: unknown) {
       if (error instanceof Error) addToast(`Unable to load ${file.name} (${error.message})`, 'error');
       addToast(`Unable to load ${file.name}`, 'error');
+    }
+  }
+};
+
+export const handleGlobalPaste = (props: HandleDropProps) => async (event: ClipboardEvent) => {
+  const { addToast } = useToast();
+
+  const files = event.clipboardData?.files;
+  if (files?.length) {
+    handleDrop(props)({ preventDefault: () => {}, dataTransfer: { files } } as DragEvent);
+  }
+
+  const input = event.clipboardData?.getData('text');
+  if (input) {
+    try {
+      const { config: incomingConfig, data: incomingData } = transform(input, -1, undefined, props.config());
+      if (incomingConfig) {
+        props.setConfig(incomingConfig);
+        props.setSeries(incomingConfig.series);
+        props.setSelectedSeries(prev => incomingConfig.series.map(s => s.id));
+        props.setData(prev => [...prev, ...incomingData]);
+      } else {
+        addToast('Received invalid data', 'error');
+      }
+    } catch (error) {
+      addToast('Invalid JSON format', 'error');
     }
   }
 };

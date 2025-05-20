@@ -15,7 +15,7 @@ import { useTheme } from '../stores/theme';
 import { ChartSeries } from './ChartSeries';
 import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
-import { handleDrop } from './handleDrop';
+import { handleDrop, handleGlobalPaste } from './handle-drop';
 
 export const storage = getStorageAdapter();
 
@@ -95,44 +95,19 @@ export default function Commands() {
   });
 
   createEffect(() => {
-    const handleGlobalPaste = async e => {
-      const files = e.clipboardData?.files;
-      if (files?.length) {
-        handleDrop({
-          chartId: params.id,
-          config,
-          setConfig,
-          setSeries,
-          selectedSeries,
-          setSelectedSeries,
-          data,
-          setData,
-        })({ preventDefault: () => {}, dataTransfer: { files } } as DragEvent);
+    const handler = handleGlobalPaste({
+      chartId: params.id,
+      config,
+      setConfig,
+      setSeries,
+      selectedSeries,
+      setSelectedSeries,
+      data,
+      setData,
+    });
 
-        setIsRealData(true);
-      }
-
-      const input = e.clipboardData?.getData('text');
-      if (input) {
-        try {
-          const { config: incomingConfig, data: incomingData } = transform(input, -1, undefined, config());
-          if (incomingConfig) {
-            setConfig(incomingConfig);
-            setSeries(incomingConfig.series);
-            setSelectedSeries(prev => incomingConfig.series.map(w => w.id));
-            setData(prev => [...prev, ...incomingData]);
-            setIsRealData(true);
-          } else {
-            addToast('Received invalid data', 'error');
-          }
-        } catch (error) {
-          addToast('Invalid JSON format', 'error');
-        }
-      }
-    };
-
-    document.addEventListener('paste', handleGlobalPaste);
-    onCleanup(() => document.removeEventListener('paste', handleGlobalPaste));
+    document.addEventListener('paste', handler);
+    onCleanup(() => document.removeEventListener('paste', handler));
   });
 
   createEffect(() => {
