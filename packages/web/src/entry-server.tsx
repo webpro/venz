@@ -10,8 +10,6 @@ export default createHandler(() => (
           <link rel="icon" href="/logo.svg" type="image/svg+xml" />
           <link rel="icon" href="/favicon.ico" sizes="48x48" />
 
-          <title>Venz</title>
-
           <meta name="title" content="Venz" />
           <meta name="description" content="Easy and accessible dataviz" />
 

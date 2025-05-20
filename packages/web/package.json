@@ -16,6 +16,7 @@
     "@types/semver": "^7.7.0"
   },
   "dependencies": {
+    "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.3",
     "@solidjs/start": "^1.1.4",
     "@tailwindcss/postcss": "^4.1.7",
