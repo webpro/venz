@@ -80,3 +80,16 @@ export const ButtonLinkInverted = (props: ParentProps<AnchorProps>) => {
 };
 
 export const Link = (props: ParentProps<AnchorProps>) => <A class="underline" {...props} />;
+
+export const Wink = (props: { url: URL }) => {
+  const href = props.url.toString();
+  const text = props.url.origin + '?' + decodeURIComponent(props.url.searchParams.toString());
+  return (
+    <A
+      class="underline decoration-neutral-400 underline-offset-6 hover:decoration-neutral-300 wrap-anywhere"
+      href={href}
+    >
+      {text}
+    </A>
+  );
+};

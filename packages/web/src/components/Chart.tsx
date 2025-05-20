@@ -11,7 +11,6 @@ import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
 import { renderSVG } from './render';
-import { GenerateNumbers } from './GenerateNumbers';
 
 export const storage = getStorageAdapter();
 
@@ -175,16 +174,6 @@ export default function Commands() {
           </ButtonLink>
         )
       )}
-
-      <Show when={!params.id}>
-        <GenerateNumbers
-          config={config}
-          setConfig={setConfig}
-          setData={setData}
-          setSeries={setSeries}
-          setSelectedSeries={setSelectedSeries}
-        />
-      </Show>
     </div>
   );
 }

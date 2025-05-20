@@ -7,7 +7,11 @@ export default ({ children }) => {
   const { pathname } = useLocation();
   const params = useParams();
   const logoLink =
-    pathname === '/config' ? '/' : pathname.startsWith('/chart') && params.id ? `/config/${params.id}` : '/config';
+    pathname === '/config' || pathname === '/about'
+      ? '/'
+      : pathname.startsWith('/chart') && params.id
+        ? `/config/${params.id}`
+        : '/config';
 
   return (
     <div class="p-4 flex flex-col gap-4 max-w-[960px] m-auto gap-8">
@@ -41,7 +45,6 @@ export default ({ children }) => {
               title="Venz on GitHub"
               class="w-8 h-8 text-gray-500 hover:text-gray-700"
             >
-              {/* <img src="/github-mark-white.svg" alt="GitHub logo" class="w-8 h-8 inline ml-2" /> */}
               <GitHub />
             </a>
           </span>
