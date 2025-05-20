@@ -24,6 +24,7 @@ import { Dropdown } from './Dropdown';
 import { compare } from 'semver';
 import { useTheme } from '../stores/theme';
 import { Bar } from './icons/Bar';
+import { download } from '../util/download';
 
 const storage = getStorageAdapter();
 
@@ -159,60 +160,6 @@ export default function Commands() {
   };
 
   let svgRef!: SVGSVGElement;
-
-  const downloadChart = (format: 'png' | 'svg' | 'webp' | 'avif', scale = 2) => {
-    if (format === 'svg') {
-      const svgClone = svgRef.cloneNode(true) as SVGSVGElement;
-      svgClone.setAttribute('class', 'venz-chart');
-      const padding = imgDownloadPadding();
-      svgClone.setAttribute(
-        'viewBox',
-        `-${padding} -${padding} ${svgRef.clientWidth + padding * 2} ${svgRef.clientHeight + padding * 2}`,
-      );
-      if (imgDownloadBgColor() !== 'none') {
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        rect.setAttribute('r', '1e5');
-        rect.setAttribute('fill', imgDownloadBgColor());
-        svgClone.insertBefore(rect, svgClone.firstChild);
-        if (imgDownloadBgColor() === '#000') svgClone.setAttribute('style', 'color: white');
-      }
-      const svgData = new XMLSerializer().serializeToString(svgClone);
-      const a = document.createElement('a');
-      a.download = 'venz-chart.svg';
-      a.href = `data:image/svg+xml;base64,${btoa(svgData)}`;
-      a.click();
-      return;
-    }
-
-    const originalColor = svgRef.style.color;
-    if (imgDownloadBgColor() === '#000') svgRef.style.color = 'white';
-    const svgData = new XMLSerializer().serializeToString(svgRef);
-    if (imgDownloadBgColor() === '#000') svgRef.style.color = originalColor;
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    const padding = imgDownloadPadding();
-
-    canvas.width = (svgRef.clientWidth + padding * 2) * scale;
-    canvas.height = (svgRef.clientHeight + padding * 2) * scale;
-
-    img.onload = () => {
-      if (ctx) {
-        ctx.scale(scale, scale);
-        if (imgDownloadBgColor() !== 'none') {
-          ctx.fillStyle = imgDownloadBgColor();
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-        ctx.drawImage(img, padding / scale, padding / scale);
-        const a = document.createElement('a');
-        a.download = `venz-chart.${format}`;
-        a.href = canvas.toDataURL(`image/${format}`);
-        a.click();
-      }
-    };
-
-    img.src = `data:image/svg+xml;base64,${btoa(svgData)}`;
-  };
 
   createEffect(() => {
     if (isGenericChart()) return;
@@ -888,10 +835,10 @@ export default function Commands() {
           label="Download image"
           icon={<Download />}
           options={[
-            { value: 'png', icon: <Download />, label: 'png', onClick: () => downloadChart('png', 2) },
-            { value: 'svg', icon: <Download />, label: 'svg', onClick: () => downloadChart('svg') },
-            { value: 'webp', icon: <Download />, label: 'webP', onClick: () => downloadChart('webp', 2) },
-            { value: 'avif', icon: <Download />, label: 'avif', onClick: () => downloadChart('avif', 2) },
+            { value: 'png', icon: <Download />, label: 'png', onClick: () => download(svgRef, { format: 'png' }) },
+            { value: 'svg', icon: <Download />, label: 'svg', onClick: () => download(svgRef, { format: 'svg' }) },
+            { value: 'webp', icon: <Download />, label: 'webP', onClick: () => download(svgRef, { format: 'webp' }) },
+            { value: 'avif', icon: <Download />, label: 'avif', onClick: () => download(svgRef, { format: 'avif' }) },
             { separator: true, value: '', label: '' },
             {
               value: 'bg-color',
