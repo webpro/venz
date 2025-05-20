@@ -1,6 +1,6 @@
 import type { ConfigType, Configuration, Series, SeriesData } from '@venz/shared';
 import { createMemo, For, type Accessor, type Setter } from 'solid-js';
-import { storage } from './Chart';
+import { isGenericChart, storage } from './Chart';
 import { useParams } from '@solidjs/router';
 import { useTheme } from '../stores/theme';
 
@@ -20,10 +20,8 @@ export const ChartSeries = (props: Props) => {
   const params = useParams();
   const { theme } = useTheme();
 
-  const isGenericChart = () => !params.id || params.id === 'chart';
-
   const handleSave = async () => {
-    if (!isGenericChart()) {
+    if (!isGenericChart(params.id)) {
       const config = await storage.getConfig(Number(params.id));
       storage.updateConfig(Number(params.id), { ...config, series: props.series() });
     }

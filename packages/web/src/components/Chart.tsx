@@ -15,6 +15,7 @@ import { useTheme } from '../stores/theme';
 import { ChartSeries } from './ChartSeries';
 import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
+import { handleDrop } from './handleDrop';
 
 export const storage = getStorageAdapter();
 
@@ -28,6 +29,8 @@ export type SortMode = 'original' | 'ascending' | 'descending';
 export type LegendPosition = 'none' | 'topRight' | 'bottomRight' | 'bottomLeft' | 'topLeft';
 export type ImgBgColor = string;
 export type ImgBgPadding = 0 | 12 | 24;
+
+export const isGenericChart = (id: string | undefined) => !id || id === 'chart';
 
 export default function Commands() {
   const params = useParams();
@@ -56,8 +59,6 @@ export default function Commands() {
     return numbers;
   };
 
-  const isGenericChart = () => !params.id || params.id === 'chart';
-
   createEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const chartParam = params.get('type');
@@ -75,78 +76,12 @@ export default function Commands() {
     }
   };
 
-  const showDropZone = () => isGenericChart() && data().length === 0;
-
-  const handleDrop = async (e: DragEvent) => {
-    e.preventDefault();
-
-    const files = Array.from(e.dataTransfer?.files || []);
-
-    for (const file of files) {
-      if (!/\.(json|txt|csv)$/.test(file.name)) {
-        addToast(`Unsupported file type (${file.name})`, 'error');
-        continue;
-      }
-
-      try {
-        const input = await file.text();
-        const currentConfig = config();
-
-        if (isGenericChart()) {
-          const { config: incomingConfig, data: incomingData } = transform(input, -1, undefined, currentConfig);
-          if (incomingConfig) {
-            setConfig(incomingConfig);
-            setSeries(incomingConfig.series);
-            setSelectedSeries(incomingConfig.series.map(s => s.id));
-            setData(prev => [...prev, ...incomingData]);
-          }
-        } else {
-          const match = file.name.match(/^venz-drop-(?<configId>[0-9]+)(?:-(?<seriesId>.+))?\.json$/);
-
-          if (!match?.groups) {
-            addToast(
-              `Filename must be "venz-drop-${params.id}.json" or "venz-drop-${params.id}-[seriesId].json"`,
-              'error',
-            );
-            continue;
-          }
-
-          const configId = Number(match.groups.configId);
-          const seriesId = Number(match.groups.seriesId);
-
-          if (configId !== Number(params.id)) {
-            addToast(`Wrong configuration? Mismatch for ${file.name}`, 'error');
-            continue;
-          }
-
-          if (seriesId) {
-            const { config: incomingConfig, data: incomingData } = transform(input, configId, seriesId);
-            if (incomingConfig) {
-              const s = new Set(selectedSeries()).add(seriesId);
-              const d = data().filter(d => d.seriesId !== seriesId);
-              setSelectedSeries([...s]);
-              setData([...d, ...incomingData]);
-            }
-          } else {
-            const { data: incomingData } = transform(input, configId);
-            setData(incomingData);
-          }
-
-          await storage.saveSeriesData(Number(params.id), data());
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) addToast(`Unable to load ${file.name} (${error.message})`, 'error');
-        addToast(`Unable to load ${file.name}`, 'error');
-      }
-    }
-
-    setIsRealData(true);
-  };
+  const showDropZone = () => isGenericChart(params.id) && data().length === 0;
 
   let svgRef!: SVGSVGElement;
 
   createEffect(() => {
-    if (isGenericChart()) return;
+    if (isGenericChart(params.id)) return;
 
     (async () => {
       const data = await storage.getSeriesData(Number(params.id));
@@ -163,7 +98,17 @@ export default function Commands() {
     const handleGlobalPaste = async e => {
       const files = e.clipboardData?.files;
       if (files?.length) {
-        await handleDrop({ preventDefault: () => {}, dataTransfer: { files } } as DragEvent);
+        handleDrop({
+          chartId: params.id,
+          config,
+          setConfig,
+          setSeries,
+          selectedSeries,
+          setSelectedSeries,
+          data,
+          setData,
+        })({ preventDefault: () => {}, dataTransfer: { files } } as DragEvent);
+
         setIsRealData(true);
       }
 
@@ -698,7 +643,16 @@ export default function Commands() {
       onDragOver={event => {
         event.preventDefault();
       }}
-      onDrop={handleDrop}
+      onDrop={handleDrop({
+        chartId: params.id,
+        config,
+        setConfig,
+        setSeries,
+        selectedSeries,
+        setSelectedSeries,
+        data,
+        setData,
+      })}
     >
       <Show when={showDropZone()}>
         <DropZone />
@@ -734,13 +688,13 @@ export default function Commands() {
         />
       )}
 
-      {isGenericChart() && series.length > 0 ? (
+      {isGenericChart(params.id) && series.length > 0 ? (
         <div class="self-end flex flex-col gap-2">
           <Button onClick={handleSaveAsNewConfiguration}>Save as new configuration with data ↻</Button>
           <p class="text-xs text-right italic high-contrast:text-base">To edit title, axis labels and more</p>
         </div>
       ) : (
-        !isGenericChart() && (
+        !isGenericChart(params.id) && (
           <ButtonLink href={config()?.id ? `/config/${config()?.id}` : '/config'} class="self-end">
             ← To configuration
           </ButtonLink>
