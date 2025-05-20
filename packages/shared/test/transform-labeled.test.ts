@@ -14,13 +14,31 @@ test('transform labeled data (datetime)', () => {
     config: {
       id: -1,
       title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
-      type: 'list',
+      type: 'standard',
       sort: 'datetime',
-      command: '',
       series: [
         {
           color: '#8b5cf6',
-          command: '',
+          configId: -1,
+          id: 0,
+          label: '2025-04',
+        },
+        {
+          color: '#ec4899',
+          configId: -1,
+          id: 1,
+          label: '2025-05',
+        },
+        {
+          color: '#14b8a6',
+          configId: -1,
+          id: 2,
+          label: '2025-06',
+        },
+      ],
+      labels: [
+        {
+          color: '#8b5cf6',
           configId: -1,
           id: 0,
           label: 'Series 1',
@@ -47,7 +65,7 @@ test('transform labeled data (datetime)', () => {
         min: 3,
         max: 3,
         id: 1,
-        seriesId: 0,
+        seriesId: 1,
         label: '2025-05',
       },
       {
@@ -58,7 +76,7 @@ test('transform labeled data (datetime)', () => {
         min: 1,
         max: 1,
         id: 2,
-        seriesId: 0,
+        seriesId: 2,
         label: '2025-06',
       },
     ],
@@ -78,13 +96,31 @@ test('transform labeled data (semver)', () => {
     config: {
       id: -1,
       title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
-      type: 'list',
+      type: 'standard',
       sort: 'semver',
-      command: '',
       series: [
         {
           color: '#8b5cf6',
-          command: '',
+          configId: -1,
+          id: 0,
+          label: '1.0.0',
+        },
+        {
+          color: '#ec4899',
+          configId: -1,
+          id: 1,
+          label: '1.0.1',
+        },
+        {
+          color: '#14b8a6',
+          configId: -1,
+          id: 2,
+          label: '1.0.2',
+        },
+      ],
+      labels: [
+        {
+          color: '#8b5cf6',
           configId: -1,
           id: 0,
           label: 'Series 1',
@@ -111,7 +147,7 @@ test('transform labeled data (semver)', () => {
         min: 3,
         max: 3,
         id: 1,
-        seriesId: 0,
+        seriesId: 1,
         label: '1.0.1',
       },
       {
@@ -122,7 +158,7 @@ test('transform labeled data (semver)', () => {
         min: 1,
         max: 1,
         id: 2,
-        seriesId: 0,
+        seriesId: 2,
         label: '1.0.2',
       },
     ],
