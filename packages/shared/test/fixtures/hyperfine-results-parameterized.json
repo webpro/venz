@@ -1,0 +1,34 @@
+{
+  "results": [
+    {
+      "command": "echo 0",
+      "parameters": {
+        "value": "0"
+      },
+      "mean": 0.22,
+      "stddev": 0,
+      "median": 0.22,
+      "user": 0.0001,
+      "system": 0.0001,
+      "min": 0.22,
+      "max": 0.22,
+      "times": [0.22, 0.22, 0.22],
+      "exit_codes": [0, 0, 0]
+    },
+    {
+      "command": "echo 1",
+      "parameters": {
+        "value": "1"
+      },
+      "mean": 0.23,
+      "stddev": 0,
+      "median": 0.23,
+      "user": 0.0001,
+      "system": 0.0001,
+      "min": 0.23,
+      "max": 0.23,
+      "times": [0.23, 0.23, 0.23],
+      "exit_codes": [0, 0, 0]
+    }
+  ]
+}

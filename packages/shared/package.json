@@ -2,5 +2,11 @@
   "name": "@venz/shared",
   "module": "src/index.ts",
   "types": "src/index.ts",
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^3.1.3"
+  }
 }
