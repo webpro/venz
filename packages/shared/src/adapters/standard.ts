@@ -1,5 +1,5 @@
-import type { Configuration, Statistics, Series, SeriesData, JsonValue } from '../types';
-import { getNextAvailableColor } from '../colors';
+import type { Configuration, Statistics, Series, SeriesData, JsonValue } from '../types.ts';
+import { getNextAvailableColor } from '../colors.ts';
 
 export function calculateStats(values: number[]): Statistics {
   const sorted = values.toSorted((a, b) => a - b);

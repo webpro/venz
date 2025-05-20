@@ -1,4 +1,4 @@
-import type { IncomingSeries } from './types';
+import type { IncomingSeries } from './types.ts';
 
 export const COLORS = [
   '#8b5cf6',

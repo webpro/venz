@@ -1,3 +1,3 @@
-export * from './colors';
-export * from './types';
-export * from './adapters/index';
+export * from './colors.ts';
+export * from './types.ts';
+export * from './adapters/index.ts';

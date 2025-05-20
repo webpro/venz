@@ -1,4 +1,4 @@
-import { isHyperfineJSON, transformHyperfineData } from './hyperfine';
+import { isHyperfineJSON, transformHyperfineData } from './hyperfine.ts';
 import {
   isLabeledColumnsRawData,
   isLabeledRawData,
@@ -10,8 +10,10 @@ import {
   transformLabeledColumnsData,
   transformLabeledData,
   transformRawData,
-} from './standard';
-import type { Configuration, SeriesData } from '../types';
+} from './standard.ts';
+import type { Configuration, SeriesData } from '../types.ts';
+
+export { generateCommand } from './hyperfine.ts';
 
 export function transform(
   input: string,
@@ -23,20 +25,32 @@ export function transform(
 
   try {
     const json = JSON.parse(input);
-    if (isHyperfineJSON(json)) return transformHyperfineData(json, id, seriesId);
+    if (isHyperfineJSON(json)) {
+      return transformHyperfineData(json, id, seriesId);
+    }
+
     if (Array.isArray(json)) {
-      if (json.every(isLabelValueTuple)) return transformLabeledData(json, id, seriesId);
-      if (json.every(v => typeof v === 'number')) return transformData([json], id, seriesId);
-      if (json.every(v => Array.isArray(v) && v.every(v => typeof v === 'number')))
+      if (json.every(isLabelValueTuple)) {
+        return transformLabeledData(json, id, seriesId);
+      }
+
+      if (json.every(v => typeof v === 'number')) {
+        return transformData([json], id, seriesId);
+      }
+
+      if (json.every(v => Array.isArray(v) && v.every(v => typeof v === 'number'))) {
         return transformData(json, id, seriesId);
+      }
     }
   } catch {
     if (isLabeledRawData(input)) {
       return transformLabeledData(parseLabeledValues(input), id, seriesId, config);
     }
+
     if (isRawNumericData(input)) {
       return transformRawData(input, id, seriesId, config);
     }
+
     if (isLabeledColumnsRawData(input)) {
       return transformLabeledColumnsData(parseLabeledColumnValues(input), id, seriesId, config);
     }
@@ -44,5 +58,3 @@ export function transform(
 
   return { config: undefined, data: [] };
 }
-
-export { generateCommand } from './hyperfine';

@@ -1,4 +1,4 @@
-import { getNextAvailableColor } from '../colors';
+import { getNextAvailableColor } from '../colors.ts';
 import type {
   HyperfineResults,
   HyperfineJSON,
@@ -8,7 +8,7 @@ import type {
   IncomingSeries,
   Statistics,
   SeriesData,
-} from '../types';
+} from '../types.ts';
 
 export function isHyperfineJSON(data: JsonValue): data is HyperfineJSON {
   return Boolean(
