@@ -5,14 +5,14 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250503.0",
-    "@types/node": "^22.15.3",
-    "knip": "^5.52.0",
+    "@cloudflare/workers-types": "^4.20250515.0",
+    "@types/node": "^22.15.18",
+    "knip": "^5.56.0",
     "typescript": "^5.8.3",
-    "wrangler": "^4.14.1"
+    "wrangler": "^4.15.2"
   },
   "scripts": {
     "knip": "knip"
   },
-  "packageManager": "pnpm@10.9.0"
+  "packageManager": "pnpm@10.11.0"
 }
