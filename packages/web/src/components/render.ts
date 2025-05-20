@@ -60,80 +60,39 @@ export const renderSVG = (props: RenderProps) => {
       }
     `);
 
+  const getXLinearScale = (props: RenderProps, width: number) => {
+    const maxLength = max(props.data().map(s => s.values.length ?? 0));
+    return scaleLinear()
+      .domain([0, maxLength ? maxLength - 1 : 0])
+      .range([0, width]);
+  };
+
+  const getXPointsScale = (props: RenderProps) => {
+    const sort = props.config()?.sort;
+
+    const domain =
+      sort === 'semver'
+        ? [...new Set(props.data().map(m => m.label))].sort(compare)
+        : sort === 'datetime'
+          ? [...new Set(props.data().map(m => m.label))].sort((a, b) => new Date(a) - new Date(b))
+          : props.sortMode() === 'original'
+            ? props.selectedSeries().sort()
+            : props.selectedSeries().sort((a, b) => {
+                const aMetric = props.data().find(m => m.seriesId === a)?.median ?? 0;
+                const bMetric = props.data().find(m => m.seriesId === b)?.median ?? 0;
+                return props.sortMode() === 'ascending' ? aMetric - bMetric : bMetric - aMetric;
+              });
+
+    return scalePoint().domain(domain).range([0, width]).padding(pad);
+  };
+
   const x =
     props.chartType() === 'scatter' || props.chartType() === 'line'
-      ? scaleLinear()
-          .domain([0, max(props.data().map(s => s.values.length ?? 0)) - 1])
-          .range([0, width])
-      : scalePoint()
-          .domain(
-            props.config()?.sort === 'semver'
-              ? [...new Set(props.data().map(m => m.label))].sort(compare)
-              : props.config()?.sort === 'datetime'
-                ? [...new Set(props.data().map(m => m.label))].sort((a, b) => new Date(a) - new Date(b))
-                : props.sortMode() === 'original'
-                  ? props.selectedSeries().sort()
-                  : props.selectedSeries().sort((a, b) => {
-                      const aMetric = props.data().find(m => m.seriesId === a)?.median ?? 0;
-                      const bMetric = props.data().find(m => m.seriesId === b)?.median ?? 0;
-                      return props.sortMode() === 'ascending' ? aMetric - bMetric : bMetric - aMetric;
-                    }),
-          )
-          .range([0, width])
-          .padding(pad);
+      ? getXLinearScale(props, width)
+      : getXPointsScale(props);
 
-  const y = (() => {
-    if (!props.fullRange()) {
-      const width = 8;
-      const start = height * 0.9;
-      const unit = (height * 0.1) / 5;
-
-      svg
-        .append('path')
-        .attr('d', `M 0,${start} v ${unit * 2},0`)
-        .style('stroke', 'currentColor')
-        .style('stroke-width', 1);
-
-      svg
-        .append('path')
-        .attr('d', `M -${width},${start + unit * 2} l ${width * 2},0`)
-        .attr('transform', `rotate(-10, 0, ${start + unit * 2})`)
-        .style('stroke', 'currentColor')
-        .style('stroke-width', 2);
-
-      svg
-        .append('path')
-        .attr('d', `M -${width},${start + unit * 3} l ${width * 2},0`)
-        .attr('transform', `rotate(-10, 0, ${start + unit * 3})`)
-        .style('stroke', 'currentColor')
-        .style('stroke-width', 2);
-
-      svg
-        .append('path')
-        .attr('d', `M 0,${start + unit * 3} v ${unit * 2},0`)
-        .style('stroke', 'currentColor')
-        .style('stroke-width', 1);
-
-      return scaleLinear()
-        .domain([
-          Math.min(
-            ...props
-              .data()
-              .filter(s => props.selectedSeries().includes(s.seriesId))
-              .flatMap(m => m.min),
-          ),
-          Math.max(
-            ...props
-              .data()
-              .filter(s => props.selectedSeries().includes(s.seriesId))
-              .flatMap(m => m.max),
-          ),
-        ])
-        .range([height * 0.9, 0])
-        .nice();
-    }
-
-    return scaleLinear()
+  const getYScale = () =>
+    scaleLinear()
       .domain([
         0,
         Math.max(
@@ -145,7 +104,58 @@ export const renderSVG = (props: RenderProps) => {
       ])
       .range([height, 0])
       .nice();
-  })();
+
+  const getYScaleWithBreak = () => {
+    const width = 8;
+    const start = height * 0.9;
+    const unit = (height * 0.1) / 5;
+
+    svg
+      .append('path')
+      .attr('d', `M 0,${start} v ${unit * 2},0`)
+      .style('stroke', 'currentColor')
+      .style('stroke-width', 1);
+
+    svg
+      .append('path')
+      .attr('d', `M -${width},${start + unit * 2} l ${width * 2},0`)
+      .attr('transform', `rotate(-10, 0, ${start + unit * 2})`)
+      .style('stroke', 'currentColor')
+      .style('stroke-width', 2);
+
+    svg
+      .append('path')
+      .attr('d', `M -${width},${start + unit * 3} l ${width * 2},0`)
+      .attr('transform', `rotate(-10, 0, ${start + unit * 3})`)
+      .style('stroke', 'currentColor')
+      .style('stroke-width', 2);
+
+    svg
+      .append('path')
+      .attr('d', `M 0,${start + unit * 3} v ${unit * 2},0`)
+      .style('stroke', 'currentColor')
+      .style('stroke-width', 1);
+
+    return scaleLinear()
+      .domain([
+        Math.min(
+          ...props
+            .data()
+            .filter(s => props.selectedSeries().includes(s.seriesId))
+            .flatMap(m => m.min),
+        ),
+        Math.max(
+          ...props
+            .data()
+            .filter(s => props.selectedSeries().includes(s.seriesId))
+            .flatMap(m => m.max),
+        ),
+      ])
+      .range([height * 0.9, 0])
+      .nice();
+  };
+
+  const y = props.fullRange() ? getYScale() : getYScaleWithBreak();
 
   svg
     .append('g')
