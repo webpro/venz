@@ -4,7 +4,7 @@ import { createContext, useContext } from 'solid-js';
 interface Toast {
   id: number;
   message: string;
-  type?: 'error' | 'success';
+  type: 'error' | 'success';
 }
 
 interface ToastStore {
@@ -21,6 +21,8 @@ export const ToastContext = createContext<ToastStore>({
   addToast: () => {},
   removeToast: () => {},
 });
+
+export type AddToast = (message: string, type?: Toast['type']) => void;
 
 export function createToastStore() {
   const addToast = (message: string, type: Toast['type'] = 'success') => {

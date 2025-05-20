@@ -2,7 +2,6 @@ import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
 import { Button, ButtonLink } from './Button';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { getStorageAdapter } from '../storage';
-import { type Series, type Configuration, type SeriesData } from '@venz/shared';
 import { useToast } from '../stores/toast';
 import { createStore } from 'solid-js/store';
 import { useTheme } from '../stores/theme';
@@ -11,45 +10,46 @@ import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
 import { renderSVG } from './render';
+import { transformFromSearchParams } from '../util/helpers';
+import type { ImgBgPadding, SortMode } from '../types';
 
 export const storage = getStorageAdapter();
 
-export type ChartType = 'box' | 'median' | 'scatter' | 'line' | 'bar';
-const getChartType = (providedType?: string | string[]): ChartType =>
-  typeof providedType === 'string' && ['box', 'median', 'scatter', 'line', 'bar'].includes(providedType)
-    ? (providedType as ChartType)
-    : 'median';
-
-export type SortMode = 'original' | 'ascending' | 'descending';
-export type LegendPosition = 'none' | 'topRight' | 'bottomRight' | 'bottomLeft' | 'topLeft';
-export type ImgBgColor = string;
-export type ImgBgPadding = 0 | 12 | 24;
-
 export const isGenericChart = (id: string | undefined) => !id || id === 'chart';
 
-export default function Commands() {
+export default function Chart() {
   const params = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addToast } = useToast();
   const { theme } = useTheme();
 
-  const [config, setConfig] = createSignal<Configuration | undefined>();
-  const [series, setSeries] = createStore<Series[]>(config()?.series ?? []);
-  const [selectedSeries, setSelectedSeries] = createSignal<number[]>([]);
-  const [data, setData] = createSignal<SeriesData[]>([]);
-  const [fullRange, setFullRange] = createSignal(config()?.type !== 'list');
-  const [chartType, setChartType] = createSignal<ChartType>(getChartType(searchParams.type));
+  const fromUrl = transformFromSearchParams(searchParams);
+
+  const [chartType, setChartType] = createSignal(fromUrl.type);
+  const [config, setConfig] = createSignal(fromUrl.config);
+  const [series, setSeries] = createStore(fromUrl.series);
+  const [selectedSeries, setSelectedSeries] = createSignal(fromUrl.selectedSeries);
+  const [data, setData] = createSignal(fromUrl.data);
+  const [fullRange, setFullRange] = createSignal(fromUrl.fullRange);
   const [sortMode, setSortMode] = createSignal<SortMode>('original');
-  const [legendPosition, setLegendPosition] = createSignal<LegendPosition>('topRight');
+  const [legendPosition, setLegendPosition] = createSignal(fromUrl.legendPosition);
   const [imgDownloadBgColor, setImgDownloadBgColor] = createSignal('none');
   const [imgDownloadPadding, setImgDownloadPadding] = createSignal<ImgBgPadding>(0);
 
   createEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const chartParam = params.get('type');
-    if (chartParam && ['box', 'median', 'scatter', 'line'].includes(chartParam)) {
-      setChartType(chartParam as 'box' | 'median' | 'scatter' | 'line');
+    if (!(!searchParams.type && chartType() === 'median')) setSearchParams({ type: chartType() });
+    if (!(!searchParams.lp && legendPosition() === 'tr')) setSearchParams({ lp: legendPosition() });
+    if (!(!searchParams.br && fullRange() === true)) setSearchParams({ br: fullRange() ? '0' : '1' });
+
+    if (config()?.type === 'standard') {
+      if (chartType() === 'pivot') {
+        setSeries(config()?.labels ?? config()?.series);
+        setSelectedSeries((config()?.labels ?? config()?.series).map(series => series.id) ?? []);
+      } else {
+        setSeries(config()?.series ?? []);
+        setSelectedSeries(config()?.series?.map(series => series.id) ?? []);
+      }
     }
   });
 
@@ -61,8 +61,6 @@ export default function Commands() {
       navigate(`/chart/${id}`, { state: { type: config()?.type } });
     }
   };
-
-  const showDropZone = () => isGenericChart(params.id) && data().length === 0;
 
   let svgRef!: SVGSVGElement;
 
@@ -90,6 +88,7 @@ export default function Commands() {
       setSelectedSeries,
       data,
       setData,
+      addToast,
     });
 
     document.addEventListener('paste', handler);
@@ -108,6 +107,8 @@ export default function Commands() {
       sortMode,
       fullRange,
       theme,
+      labelX: fromUrl.labelX,
+      labelY: fromUrl.labelY,
     });
   });
 
@@ -126,17 +127,18 @@ export default function Commands() {
         setSelectedSeries,
         data,
         setData,
+        addToast,
       })}
     >
-      <Show when={showDropZone()}>
-        <DropZone />
+      <Show when={data().length === 0}>
+        <DropZone config={config} />
       </Show>
 
-      <svg ref={svgRef} class={`h-96 w-full ${showDropZone() ? ' hidden' : ''}`} />
+      <svg ref={svgRef} class={`h-96 w-full ${data().length === 0 ? ' hidden' : ''}`} />
 
       <ChartControls
         svgRef={svgRef}
-        configType={config()?.type}
+        hasLabels={data().length === 0 || config()?.labels}
         chartType={chartType}
         setChartType={setChartType}
         sortMode={sortMode}

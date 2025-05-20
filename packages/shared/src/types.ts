@@ -12,7 +12,9 @@ export interface BaseConfig {
 export interface ConfigStandard extends BaseConfig {
   id: number;
   type: 'standard';
+  sort?: 'default' | 'semver' | 'data' | 'datetime';
   series: Series[];
+  labels?: Series[];
 }
 
 interface HyperfineConfigDefault extends BaseConfig {
@@ -33,7 +35,7 @@ export interface ConfigList extends BaseConfig {
   id: number;
   type: 'list';
   sort: 'default' | 'semver' | 'data' | 'datetime';
-  command: string;
+  command?: string;
   prepare?: SimpleCommand[];
   build?: SimpleCommand[];
   series: Series[];

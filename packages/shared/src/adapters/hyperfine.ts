@@ -18,7 +18,7 @@ export function isHyperfineJSON(data: JsonValue): data is HyperfineJSON {
       Array.isArray(data.results) &&
       data.results[0] &&
       typeof data.results[0] === 'object' &&
-      'exit_codes' in data.results[0],
+      'exit_codes' in data.results[0]
   );
 }
 
@@ -44,9 +44,17 @@ function transformHyperfineWorkload(data: HyperfineResults): Results {
   };
 }
 
-export function transformHyperfineData(json: HyperfineJSON, configId: number, seriesId?: number) {
+export function transformHyperfineData(
+  json: HyperfineJSON,
+  configId: number,
+  seriesId?: number,
+  existingConfig?: Configuration
+) {
   const now = new Date();
-  const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+  const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now
+    .getMinutes()
+    .toString()
+    .padStart(2, '0')}`;
 
   const results = json.results.map(transformHyperfineWorkload);
 
@@ -60,29 +68,41 @@ export function transformHyperfineData(json: HyperfineJSON, configId: number, se
     firstSeries.command &&
     firstSeries.command.replace(parameters[parameterName], `{${parameterName}}`);
 
-  const series: Series[] = [];
-  const data: SeriesData[] = [];
+  if (existingConfig) {
+    const data: SeriesData[] = [];
 
-  const baseConfig = {
-    id: configId,
-    series,
-    title: `New hyperfine benchmark (${timestamp})`,
-  };
+    for (let index = 0; index < results.length; index++) {
+      const result = results[index];
+      const id = existingConfig.series[index].id;
+      data.push({ ...result.data, id, seriesId: id });
+    }
 
-  const config: Configuration = hasParameters
-    ? { ...baseConfig, type: 'hyperfine-parameter', parameterName: parameterName ?? '', command: command ?? '' }
-    : { ...baseConfig, type: 'hyperfine-default' };
+    return { config: existingConfig, data };
+  } else {
+    const series: Series[] = [];
+    const data: SeriesData[] = [];
 
-  for (const result of results) {
-    const id = seriesId ?? series.length;
-    const label =
-      parameterName && result.series.parameters ? result.series.parameters[parameterName] : `Command ${id + 1}`;
+    const baseConfig = {
+      id: configId,
+      series,
+      title: `New hyperfine benchmark (${timestamp})`,
+    };
 
-    series.push({ ...result.series, id, configId, label, color: getNextAvailableColor(series) });
-    data.push({ ...result.data, id, seriesId: id });
+    const config: Configuration =
+      existingConfig ?? hasParameters
+        ? { ...baseConfig, type: 'hyperfine-parameter', parameterName: parameterName ?? '', command: command ?? '' }
+        : { ...baseConfig, type: 'hyperfine-default' };
+    for (const result of results) {
+      const id = seriesId ?? series.length;
+      const label =
+        parameterName && result.series.parameters ? result.series.parameters[parameterName] : `Command ${id + 1}`;
+
+      series.push({ ...result.series, id, configId, label, color: getNextAvailableColor(series) });
+      data.push({ ...result.data, id, seriesId: id });
+    }
+
+    return { config, data };
   }
-
-  return { config, data };
 }
 
 export const generateCommand = (config: Configuration) => {
@@ -90,7 +110,9 @@ export const generateCommand = (config: Configuration) => {
 
   switch (config.type) {
     case 'hyperfine-parameter':
-      return `hyperfine --warmup 3 --parameter-list ${config.parameterName} ${commands.map(cmd => cmd.label.split(','))} '${config.command}' --export-json venz-drop-${config.id}.json`;
+      return `hyperfine --warmup 3 --parameter-list ${config.parameterName} ${commands.map(cmd =>
+        cmd.label.split(',')
+      )} '${config.command}' --export-json venz-drop-${config.id}.json`;
     case 'hyperfine-default':
       return [
         'hyperfine --warmup 3',

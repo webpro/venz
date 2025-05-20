@@ -15,6 +15,7 @@ type DropdownOption = {
   label: string;
   onClick?: () => void;
   separator?: boolean;
+  disabled?: boolean;
 };
 
 export const Dropdown: ParentComponent<DropdownProps> = props => {
@@ -141,6 +142,7 @@ export const Dropdown: ParentComponent<DropdownProps> = props => {
                           props.onChange?.(option.value);
                           if (closeDropdown) setIsOpen(false);
                         }}
+                        disabled={option.disabled}
                       />
                     </Match>
                   </Switch>
@@ -161,20 +163,28 @@ type DropdownItemProps = {
   selected?: boolean;
   onClick: () => void;
   onKeySelect: (closeDropdown: boolean) => void;
+  disabled?: boolean;
 };
 
 const DropdownItem: ParentComponent<DropdownItemProps> = props => {
   return (
     <button
       type="button"
-      class="flex items-center gap-3 w-full px-4 py-2 cursor-pointer text-left text-foreground hover:text-background hover:bg-foreground focus:bg-foreground focus:text-background focus:outline-hidden bg-background"
+      class={`flex items-center gap-3 w-full px-4 py-2 cursor-pointer text-left bg-background ${
+        props.disabled
+          ? 'text-foreground/50 cursor-not-allowed'
+          : 'text-foreground hover:text-background hover:bg-foreground focus:bg-foreground focus:text-background focus:outline-hidden'
+      }`}
       role="option"
       aria-selected={props.selected}
+      disabled={props.disabled}
       onClick={() => {
-        props.onKeySelect(true);
+        if (!props.disabled) {
+          props.onKeySelect(true);
+        }
       }}
       onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (!props.disabled && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           props.onKeySelect(false);
         }

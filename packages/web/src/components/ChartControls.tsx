@@ -1,9 +1,10 @@
-import { Button, ButtonLink, IconButton, Link } from './Button';
+import { IconButton } from './Button';
 import { Chart } from './icons/Chart';
 import { Scatter } from './icons/Scatter';
 import { Download } from './icons/Download';
 import { BoxPlot } from './icons/BoxPlot';
 import { MedianChart } from './icons/Median';
+import { Pivot } from './icons/Pivot';
 import { ScatterPlot } from './icons/ScatterPlot';
 import { LegendBottomLeft, LegendBottomRight, LegendNone, LegendTopLeft, LegendTopRight } from './icons/Legend';
 import { Line } from './icons/Line';
@@ -12,13 +13,12 @@ import { SortDesc } from './icons/SortDesc';
 import { Dropdown } from './Dropdown';
 import { Bar } from './icons/Bar';
 import { download } from '../util/download';
-import type { ChartType, ImgBgColor, ImgBgPadding, LegendPosition, SortMode } from './Chart';
 import type { Accessor, Setter } from 'solid-js';
-import type { ConfigType } from '@venz/shared';
+import type { ChartType, ImgBgPadding, LegendPosition, SortMode } from '../types';
 
 type ChartControlsProps = {
   svgRef: SVGSVGElement;
-  configType: ConfigType | undefined;
+  hasLabels: boolean;
   chartType: Accessor<ChartType>;
   setChartType: Setter<ChartType>;
   sortMode: Accessor<SortMode>;
@@ -27,8 +27,8 @@ type ChartControlsProps = {
   setLegendPosition: Setter<LegendPosition>;
   fullRange: Accessor<boolean>;
   setFullRange: Setter<boolean>;
-  imgDownloadBgColor: Accessor<ImgBgColor>;
-  setImgDownloadBgColor: Setter<ImgBgColor>;
+  imgDownloadBgColor: Accessor<string>;
+  setImgDownloadBgColor: Setter<string>;
   imgDownloadPadding: Accessor<ImgBgPadding>;
   setImgDownloadPadding: Setter<ImgBgPadding>;
 };
@@ -36,43 +36,40 @@ type ChartControlsProps = {
 export const ChartControls = (props: ChartControlsProps) => {
   return (
     <div class="flex justify-end gap-4">
-      {props.configType !== 'list' && (
-        <>
-          <Dropdown
-            label="Chart type"
-            value={props.chartType()}
-            options={[
-              { value: 'median', icon: <MedianChart />, label: 'median' },
-              { value: 'box', icon: <BoxPlot />, label: 'box plot' },
-              { value: 'scatter', icon: <ScatterPlot />, label: 'scatter' },
-              { value: 'line', icon: <Line />, label: 'line' },
-              { value: 'bar', icon: <Bar />, label: 'bar' },
-            ]}
-            onChange={props.setChartType}
-          />
+      <Dropdown
+        label="Chart type"
+        value={props.chartType()}
+        options={[
+          { value: 'median', icon: <MedianChart />, label: 'median' },
+          { value: 'bar', icon: <Bar />, label: 'bar' },
+          { value: 'line', icon: <Line />, label: 'line' },
+          { value: 'pivot', icon: <Pivot />, label: 'pivot', disabled: !props.hasLabels },
+          { value: 'box', icon: <BoxPlot />, label: 'box plot' },
+          { value: 'scatter', icon: <ScatterPlot />, label: 'scatter' },
+        ]}
+        onChange={props.setChartType}
+      />
 
-          <Dropdown
-            label="Sort mode"
-            value={props.sortMode()}
-            options={[
-              { value: 'original', icon: <Line />, label: 'original' },
-              { value: 'ascending', icon: <SortAsc />, label: 'ascending' },
-              { value: 'descending', icon: <SortDesc />, label: 'descending' },
-            ]}
-            onChange={props.setSortMode}
-          />
-        </>
-      )}
+      <Dropdown
+        label="Sort mode"
+        value={props.sortMode()}
+        options={[
+          { value: 'original', icon: <Line />, label: 'original' },
+          { value: 'ascending', icon: <SortAsc />, label: 'ascending' },
+          { value: 'descending', icon: <SortDesc />, label: 'descending' },
+        ]}
+        onChange={props.setSortMode}
+      />
 
       <Dropdown
         label="Legend position"
         value={props.legendPosition()}
         options={[
-          { value: 'none', icon: <LegendNone />, label: 'legend' },
-          { value: 'topLeft', icon: <LegendTopLeft />, label: '' },
-          { value: 'topRight', icon: <LegendTopRight />, label: '' },
-          { value: 'bottomLeft', icon: <LegendBottomLeft />, label: '' },
-          { value: 'bottomRight', icon: <LegendBottomRight />, label: '' },
+          { value: 'n', icon: <LegendNone />, label: 'legend' },
+          { value: 'tl', icon: <LegendTopLeft />, label: '' },
+          { value: 'tr', icon: <LegendTopRight />, label: '' },
+          { value: 'bl', icon: <LegendBottomLeft />, label: '' },
+          { value: 'br', icon: <LegendBottomRight />, label: '' },
         ]}
         onChange={props.setLegendPosition}
       />
@@ -85,8 +82,8 @@ export const ChartControls = (props: ChartControlsProps) => {
         label="Download image"
         icon={<Download />}
         options={[
-          { value: 'png', icon: <Download />, label: 'png', onClick: () => download(props.svgRef, { format: 'png' }) },
           { value: 'svg', icon: <Download />, label: 'svg', onClick: () => download(props.svgRef, { format: 'svg' }) },
+          { value: 'png', icon: <Download />, label: 'png', onClick: () => download(props.svgRef, { format: 'png' }) },
           {
             value: 'webp',
             icon: <Download />,

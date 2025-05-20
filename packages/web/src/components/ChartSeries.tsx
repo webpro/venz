@@ -9,7 +9,7 @@ const getSeriesColor = (s: Series, theme: string) =>
 
 type Props = {
   data: Accessor<SeriesData[]>;
-  series: Accessor<Series[]>;
+  series: Series[];
   setSeries: Setter<Series[]>;
   selectedSeries: Accessor<number[]>;
   setSelectedSeries: Setter<number[]>;
@@ -23,7 +23,7 @@ export const ChartSeries = (props: Props) => {
   const handleSave = async () => {
     if (!isGenericChart(params.id)) {
       const config = await storage.getConfig(Number(params.id));
-      storage.updateConfig(Number(params.id), { ...config, series: props.series() });
+      storage.updateConfig(Number(params.id), { ...config, series: props.series });
     }
   };
 

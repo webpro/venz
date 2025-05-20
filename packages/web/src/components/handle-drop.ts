@@ -1,5 +1,5 @@
 import { transform, type Configuration, type Series, type SeriesData } from '@venz/shared';
-import { useToast } from '../stores/toast';
+import { type AddToast } from '../stores/toast';
 import { storage } from './Chart';
 import type { Accessor, Setter } from 'solid-js';
 
@@ -12,18 +12,17 @@ type HandleDropProps = {
   setSelectedSeries: Setter<number[]>;
   data: Accessor<SeriesData[]>;
   setData: Setter<SeriesData[]>;
+  addToast: AddToast;
 };
 
 export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) => {
   event.preventDefault();
 
-  const { addToast } = useToast();
-
   const files = Array.from(event.dataTransfer?.files || []);
 
   for (const file of files) {
     if (!/\.(json|txt|csv)$/.test(file.name)) {
-      addToast(`Unsupported file type (${file.name})`, 'error');
+      props.addToast(`Unsupported file type (${file.name})`, 'error');
       continue;
     }
 
@@ -31,18 +30,24 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
       const input = await file.text();
 
       if (!props.chartId || props.chartId === 'chart') {
-        const { config: incomingConfig, data: incomingData } = transform(input, -1, undefined, props.config());
+        const { config: incomingConfig, data: incomingData } = transform(
+          input,
+          -1,
+          undefined,
+          props.config(),
+          props.data(),
+        );
         if (incomingConfig) {
           props.setConfig(incomingConfig);
           props.setSeries(incomingConfig.series);
           props.setSelectedSeries(incomingConfig.series.map(s => s.id));
-          props.setData(prev => [...prev, ...incomingData]);
+          props.setData([...incomingData]);
         }
       } else {
         const match = file.name.match(/^venz-drop-(?<configId>[0-9]+)(?:-(?<seriesId>.+))?\.json$/);
 
         if (!match?.groups) {
-          addToast(
+          props.addToast(
             `Filename must be "venz-drop-${props.chartId}.json" or "venz-drop-${props.chartId}-[seriesId].json"`,
             'error',
           );
@@ -53,7 +58,7 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
         const seriesId = Number(match.groups.seriesId);
 
         if (configId !== Number(props.chartId)) {
-          addToast(`Wrong configuration? Mismatch for ${file.name}`, 'error');
+          props.addToast(`Wrong configuration? Mismatch for ${file.name}`, 'error');
           continue;
         }
 
@@ -61,9 +66,8 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
           const { config: incomingConfig, data: incomingData } = transform(input, configId, seriesId);
           if (incomingConfig) {
             const s = new Set(props.selectedSeries()).add(seriesId);
-            const d = props.data().filter(d => d.seriesId !== seriesId);
             props.setSelectedSeries([...s]);
-            props.setData([...d, ...incomingData]);
+            props.setData([...incomingData]);
           }
         } else {
           const { data: incomingData } = transform(input, configId);
@@ -73,15 +77,14 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
         await storage.saveSeriesData(Number(props.chartId), props.data());
       }
     } catch (error: unknown) {
-      if (error instanceof Error) addToast(`Unable to load ${file.name} (${error.message})`, 'error');
-      addToast(`Unable to load ${file.name}`, 'error');
+      if (error instanceof Error) props.addToast(`Unable to load ${file.name} (${error.message})`, 'error');
+      props.addToast(`Unable to load ${file.name}`, 'error');
+      console.error(error);
     }
   }
 };
 
 export const handleGlobalPaste = (props: HandleDropProps) => async (event: ClipboardEvent) => {
-  const { addToast } = useToast();
-
   const files = event.clipboardData?.files;
   if (files?.length) {
     handleDrop(props)({ preventDefault: () => {}, dataTransfer: { files } } as DragEvent);
@@ -90,17 +93,27 @@ export const handleGlobalPaste = (props: HandleDropProps) => async (event: Clipb
   const input = event.clipboardData?.getData('text');
   if (input) {
     try {
-      const { config: incomingConfig, data: incomingData } = transform(input, -1, undefined, props.config());
+      const { config: incomingConfig, data: incomingData } = transform(
+        input,
+        -1,
+        undefined,
+        props.config(),
+        props.data(),
+      );
       if (incomingConfig) {
+        const series: Series[] = incomingConfig.labels ?? incomingConfig.series;
         props.setConfig(incomingConfig);
-        props.setSeries(incomingConfig.series);
-        props.setSelectedSeries(prev => incomingConfig.series.map(s => s.id));
-        props.setData(prev => [...prev, ...incomingData]);
+        props.setSeries(series);
+        props.setSelectedSeries(series.map(s => s.id));
+        props.setData([...incomingData]);
+
+        if (props.chartId) await storage.saveSeriesData(Number(props.chartId), props.data());
       } else {
-        addToast('Received invalid data', 'error');
+        props.addToast('Received invalid data', 'error');
       }
     } catch (error) {
-      addToast('Invalid JSON format', 'error');
+      props.addToast('Invalid JSON format', 'error');
+      console.error(error);
     }
   }
 };
