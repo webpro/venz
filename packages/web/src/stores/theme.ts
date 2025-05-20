@@ -1,6 +1,6 @@
 import { createSignal, createContext, useContext, type ParentProps } from 'solid-js';
 
-type Theme = 'light' | 'dark' | 'high-contrast';
+export type Theme = 'light' | 'dark' | 'high-contrast';
 type ThemeContextType = { theme: () => Theme; setTheme: (t: Theme) => void };
 
 const ThemeContext = createContext<ThemeContextType>();
