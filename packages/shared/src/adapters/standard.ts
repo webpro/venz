@@ -206,13 +206,20 @@ export function transformLabeledData(
     mean: value,
   }));
 
+  const firstLabel = input[0][0];
+  const sort = /\d{2}-\d{2}/.test(firstLabel)
+    ? 'datetime'
+    : /\d{1}\.\d{1,}\.\d{1}/.test(firstLabel)
+      ? 'semver'
+      : undefined;
+
   const config: Configuration = existingConfig
     ? { ...existingConfig, series: [...existingConfig.series, ...series] }
     : {
         id: configId,
         title: `New labeled data series (${timestamp})`,
         type: 'list',
-        sort: 'datetime',
+        sort,
         command: '',
         series,
       };
