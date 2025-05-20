@@ -1,8 +1,8 @@
 import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
-import { Button, ButtonLink, Link } from './Button';
+import { Button, ButtonLink } from './Button';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { getStorageAdapter } from '../storage';
-import { type Series, type Configuration, transform, type SeriesData } from '@venz/shared';
+import { type Series, type Configuration, type SeriesData } from '@venz/shared';
 import { useToast } from '../stores/toast';
 import { createStore } from 'solid-js/store';
 import { useTheme } from '../stores/theme';
@@ -11,6 +11,7 @@ import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
 import { renderSVG } from './render';
+import { GenerateNumbers } from './GenerateNumbers';
 
 export const storage = getStorageAdapter();
 
@@ -44,15 +45,6 @@ export default function Commands() {
   const [legendPosition, setLegendPosition] = createSignal<LegendPosition>('topRight');
   const [imgDownloadBgColor, setImgDownloadBgColor] = createSignal('none');
   const [imgDownloadPadding, setImgDownloadPadding] = createSignal<ImgBgPadding>(0);
-  const [randomNumbers, setRandomNumbers] = createSignal<number[]>([]);
-  const [isRealData, setIsRealData] = createSignal(series.length > 0);
-
-  const generateNumbers = () => {
-    const numbers = Array.from({ length: 20 }, () => Math.floor(Math.random() * 100) + 1);
-    navigator.clipboard.writeText(numbers.join('\n'));
-    setRandomNumbers(numbers);
-    return numbers;
-  };
 
   createEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -184,45 +176,14 @@ export default function Commands() {
         )
       )}
 
-      <Show when={!params.id && !isRealData()}>
-        <div class="flex flex-col gap-8 items-center">
-          <p>Need some data to try it out?</p>
-          <Button
-            onClick={() => {
-              generateNumbers();
-              addToast('Numbers copied to clipboard');
-            }}
-          >
-            Generate 20 numbers
-          </Button>
-
-          <output class="block text-center text-balance">{randomNumbers().join(', ')}</output>
-
-          <Show when={randomNumbers().length > 0}>
-            <Button
-              onClick={() => {
-                const { config: incomingConfig, data: incomingData } = transform(
-                  randomNumbers().join('\n'),
-                  -1,
-                  undefined,
-                  config(),
-                );
-                if (incomingConfig) {
-                  setConfig(incomingConfig);
-                  setSeries(incomingConfig.series);
-                  setSelectedSeries(incomingConfig.series.map(w => w.id));
-                  setData(prev => [...prev, ...incomingData]);
-                }
-                setRandomNumbers([]);
-                addToast('Numbers added to chart');
-              }}
-            >
-              Paste numbers
-            </Button>
-          </Show>
-
-          <Link href="/config">← To configurations</Link>
-        </div>
+      <Show when={!params.id}>
+        <GenerateNumbers
+          config={config}
+          setConfig={setConfig}
+          setData={setData}
+          setSeries={setSeries}
+          setSelectedSeries={setSelectedSeries}
+        />
       </Show>
     </div>
   );
