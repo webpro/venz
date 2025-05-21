@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onCleanup, Show } from 'solid-js';
 import { Button, ButtonLink } from './Button';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { getStorageAdapter } from '../storage';
@@ -10,7 +10,7 @@ import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
 import { renderSVG } from './render-svg';
-import { transformFromSearchParams } from '../util/helpers';
+import { transformFromSearchParams, transpose } from '../util/helpers';
 import type { ImgBgPadding, SortMode } from '../types';
 
 export const storage = getStorageAdapter();
@@ -41,7 +41,9 @@ export default function Chart() {
     if (!(!searchParams.type && chartType() === 'median')) setSearchParams({ type: chartType() });
     if (!(!searchParams.lp && legendPosition() === 'tr')) setSearchParams({ lp: legendPosition() });
     if (!(!searchParams.br && fullRange() === true)) setSearchParams({ br: fullRange() ? '0' : '1' });
+  });
 
+  createEffect(() => {
     if (config()?.type === 'standard') {
       if (chartType() === 'pivot') {
         setSeries(config()?.labels ?? config()?.series);
@@ -159,6 +161,7 @@ export default function Chart() {
           selectedSeries={selectedSeries}
           setSelectedSeries={setSelectedSeries}
           type={config()?.type}
+          chartType={chartType}
         />
       )}
 

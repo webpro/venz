@@ -1,5 +1,6 @@
-import { transform, type ConfigStandard, type Configuration, type InitialConfig } from '@venz/shared';
+import { transform, type ConfigStandard, type Configuration, type InitialConfig, type SeriesData } from '@venz/shared';
 import type { ChartType, LegendPosition, SearchParams } from '../types';
+import { calculateStats } from '@venz/shared/src/adapters/standard';
 
 export const generateNumbers = () => Array.from({ length: 10 }, () => Math.floor(Math.random() * 100) + 1);
 
@@ -35,8 +36,16 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   const legendPosition = getLegendPosition(searchParams.lp);
   const fullRange = getFullRange(searchParams.br);
 
-  const series = Array.from(config?.series ?? []);
-  const selectedSeries = series?.map(series => series.id) ?? [];
+  const series = type === 'pivot' && config?.labels ? config.labels : Array.from(config?.series ?? []);
+  const selectedSeries = (type === 'pivot' && config?.labels ? config.labels : config.series).map(label => label.id);
 
   return { type, legendPosition, fullRange, config, data: seriesData, series, selectedSeries };
 }
+
+export const transpose = (data: SeriesData[]) => {
+  const result: SeriesData[] = [];
+  for (let i = 0; i < data[0].values.length; i++) {
+    result[i] = { id: i, seriesId: i, ...calculateStats(data.map(d => d.values[i])) };
+  }
+  return result;
+};

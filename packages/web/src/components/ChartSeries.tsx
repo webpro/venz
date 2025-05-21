@@ -1,8 +1,10 @@
-import type { ConfigType, Configuration, Series, SeriesData } from '@venz/shared';
+import type { ConfigType, Series, SeriesData } from '@venz/shared';
 import { createMemo, For, type Accessor, type Setter } from 'solid-js';
 import { isGenericChart, storage } from './Chart';
 import { useParams } from '@solidjs/router';
 import { useTheme } from '../stores/theme';
+import type { ChartType } from '../types';
+import { transpose } from '../util/helpers';
 
 const getSeriesColor = (s: Series, theme: string) =>
   createMemo(() => (theme === 'high-contrast' ? 'currentColor' : s.color));
@@ -14,6 +16,7 @@ type Props = {
   selectedSeries: Accessor<number[]>;
   setSelectedSeries: Setter<number[]>;
   type: ConfigType;
+  chartType: Accessor<ChartType>;
 };
 
 export const ChartSeries = (props: Props) => {
@@ -28,35 +31,32 @@ export const ChartSeries = (props: Props) => {
   };
 
   const seriesWithStats = createMemo(() => {
-    const allData = props.data();
-    const fastestStats = allData.reduce(
-      (fastest, current) => (current.median < fastest.median ? current : fastest),
-      allData[0],
-    );
+    const data = props.chartType() === 'pivot' ? transpose(props.data()) : props.data();
+    const lowestStats = data.reduce((lowest, current) => (current.median < lowest.median ? current : lowest), data[0]);
 
     return props.series
       .toSorted((a, b) => {
-        const aStats = allData.find(d => d.seriesId === a.id);
-        const bStats = allData.find(d => d.seriesId === b.id);
+        const aStats = data.find(d => d.seriesId === a.id);
+        const bStats = data.find(d => d.seriesId === b.id);
         return (aStats?.median || 0) - (bStats?.median || 0);
       })
       .map(s => {
-        const stats = allData.find(d => d.seriesId === s.id);
-        const isFastest = stats?.median === fastestStats?.median;
-        const ratio = stats?.median / fastestStats?.median;
-        const relativeStddev = !isFastest
+        const stats = data.find(d => d.seriesId === s.id);
+        const isLowest = stats?.median === lowestStats?.median;
+        const ratio = stats?.median / lowestStats?.median;
+        const relativeStddev = !isLowest
           ? Math.sqrt(
-              Math.pow(stats?.stddev / stats?.median, 2) + Math.pow(fastestStats?.stddev / fastestStats?.median, 2),
+              Math.pow(stats?.stddev / stats?.median, 2) + Math.pow(lowestStats?.stddev / lowestStats?.median, 2),
             ) * ratio
           : 0;
 
         return {
           ...s,
           stats,
-          isFastest,
+          isFastest: isLowest,
           ratio,
           relativeStddev,
-          fastestSeries: isFastest ? null : props.series.find(fs => fs.id === fastestStats?.seriesId),
+          fastestSeries: isLowest ? null : props.series.find(fs => fs.id === lowestStats?.seriesId),
         };
       });
   });

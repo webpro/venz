@@ -8,6 +8,7 @@ import type { Accessor } from 'solid-js';
 import type { Configuration, Series, SeriesData } from '@venz/shared';
 import type { Theme } from '../stores/theme';
 import type { ChartType, LegendPosition, SortMode } from '../types';
+import { transpose } from '../util/helpers';
 
 type RenderProps = {
   svgRef: SVGSVGElement;
@@ -245,15 +246,16 @@ export const renderSVG = (props: RenderProps) => {
 
     const legend = svg.append('g').attr('class', 'legend').attr('transform', `translate(${legendX}, ${legendY})`);
 
+    const topTen = props.selectedSeries().slice(0, 10);
+
     legend
       .selectAll('g')
-      .data(props.selectedSeries())
+      .data(topTen)
       .enter()
       .append('g')
       .attr(
         'transform',
-        (_, i) =>
-          `translate(0, ${props.legendPosition().includes('t') ? i * 25 : (i + 1 - props.selectedSeries().length) * 25})`,
+        (_, i) => `translate(0, ${props.legendPosition().includes('t') ? i * 25 : (i + 1 - topTen.length) * 25})`,
       )
       .each(function (selectedId) {
         const currentSeries = props.series.find(s => s.id === selectedId);
@@ -272,14 +274,15 @@ export const renderSVG = (props: RenderProps) => {
 
   for (const selectedId of props.selectedSeries()) {
     const currentSeries = props.series.find(s => s.id === selectedId);
-    const stats = props.data().find(d => d.seriesId === selectedId);
+    const stats = (props.chartType() === 'pivot' ? transpose(props.data()) : props.data()).find(
+      d => d.seriesId === selectedId,
+    );
 
-    if (!currentSeries) continue;
+    if (!currentSeries || !stats) continue;
 
     const color = props.theme() === 'high-contrast' ? 'currentColor' : currentSeries.color;
 
     if (props.chartType() === 'median') {
-      if (!stats) continue;
       const radius = Math.abs(y(stats.median) - y(stats.median + stats.stddev));
       const decimals = Math.min(3, Math.max(...stats.values.map(n => (n.toString().split('.')[1] || '').length)));
 
@@ -311,13 +314,12 @@ export const renderSVG = (props: RenderProps) => {
         .style('font-size', '12px')
         .text(stats.median.toFixed(decimals));
     } else if (props.chartType() === 'box') {
-      if (!stats) continue;
       const sortedValues = stats.values.toSorted((a, b) => a - b);
       const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
       const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
 
       const xPos = x(selectedId) || x(stats.label);
-      const boxWidth = Math.max(10, 50 - props.data().length);
+      const boxWidth = Math.max(10, 50 - props.data().length * 1.5);
       const halfWidth = boxWidth / 2;
 
       svg
@@ -380,7 +382,6 @@ export const renderSVG = (props: RenderProps) => {
           .attr('opacity', 0.6);
       }
     } else if (props.chartType() === 'scatter') {
-      if (!stats) continue;
       const dataLength = stats.values.length;
 
       svg
@@ -412,8 +413,6 @@ export const renderSVG = (props: RenderProps) => {
         .attr('fill', color)
         .attr('opacity', 0.6);
     } else if (props.chartType() === 'line') {
-      if (!stats) continue;
-
       const curve = line()
         .x((d, i) => x(i))
         .y(d => y(d))
@@ -479,16 +478,15 @@ export const renderSVG = (props: RenderProps) => {
         });
     } else if (props.chartType() === 'pivot') {
       const labels = props.data().map(d => d.label ?? d.seriesId);
-      const datum = labels.map((label, i) => [label, props.data()[i].values[selectedId]]);
 
       const curve = line()
-        .x(d => x(d[0]))
-        .y(d => y(d[1]))
+        .x((d, i) => x(labels[i]))
+        .y(d => y(d))
         .curve(curveMonotoneX);
 
       svg
         .append('path')
-        .datum(datum)
+        .datum(stats.values)
         .attr('class', 'line')
         .attr('fill', 'none')
         .attr('stroke', color)
@@ -497,17 +495,17 @@ export const renderSVG = (props: RenderProps) => {
 
       svg
         .selectAll(`circle-${selectedId}`)
-        .data(datum)
+        .data(stats.values)
         .enter()
         .append('g')
-        .attr('transform', d => `translate(${x(d[0])},${y(d[1])})`)
+        .attr('transform', (d, i) => `translate(${x(labels[i])},${y(d)})`)
         .each(function (d, i) {
           const g = select(this);
           g.append('circle').attr('r', 12).attr('fill', 'transparent').attr('class', 'hit-area');
           g.append('circle').attr('r', 3).attr('fill', color).attr('class', 'visible-dot');
 
           const isFirst = i === 0;
-          const isLast = i === datum.length - 1;
+          const isLast = i === stats.values.length - 1;
           const xOffset = isFirst ? 15 : isLast ? -15 : 0;
 
           const tooltipGroup = g.append('g').attr('class', 'tooltip-group');
@@ -520,7 +518,7 @@ export const renderSVG = (props: RenderProps) => {
             .attr('text-anchor', isFirst ? 'start' : isLast ? 'end' : 'middle')
             .style('font-size', '12px')
             .style('fill', 'white')
-            .text(d[1]);
+            .text(d);
 
           const textWidth = text.node().getBBox().width;
           const padding = 8;
@@ -539,7 +537,6 @@ export const renderSVG = (props: RenderProps) => {
           text.raise();
         });
     } else if (props.chartType() === 'bar') {
-      if (!stats) continue;
       const xPos = x(selectedId) || x(stats.label);
       const barWidth = Math.max(10, 50 - props.data().length * 1.5);
 
