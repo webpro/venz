@@ -89,6 +89,16 @@ export const CreateURL = () => {
           </ul>
         </li>
         <li>
+          <code>color</code>
+          <ul class="list-inside list-disc pl-8">
+            <li>color for the data series</li>
+            <li>can be repeated</li>
+            <li>
+              first <code>color</code> belongs to first <code>data</code> series, etc.
+            </li>
+          </ul>
+        </li>
+        <li>
           <code>lp</code>
           <ul class="list-inside list-disc pl-8">
             <li>legend position</li>

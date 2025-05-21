@@ -131,7 +131,8 @@ export const ChartSeries = (props: Props) => {
                     <span class="mr-2" style={`color: ${fasterSeries.color}`}>
                       {fasterSeries.label}
                     </span>
-                    is {s.ratio.toFixed(2)} ± {s.relativeStddev.toFixed(2)} times faster
+                    is {s.ratio.toFixed(2)} ± {s.relativeStddev.toFixed(2)} times{' '}
+                    {props.type === 'hyperfine-default' || props.type === 'hyperfine-parameter' ? 'faster' : 'lower'}
                   </em>
                 ))}
             </label>

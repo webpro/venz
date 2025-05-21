@@ -1,4 +1,4 @@
-import { transform } from '@venz/shared';
+import { transform, type ConfigStandard, type Configuration, type InitialConfig } from '@venz/shared';
 import type { ChartType, LegendPosition, SearchParams } from '../types';
 
 export const generateNumbers = () => Array.from({ length: 10 }, () => Math.floor(Math.random() * 100) + 1);
@@ -17,12 +17,19 @@ const getFullRange = (value?: string | string[]): boolean =>
   typeof value === 'string' && value === '1' ? false : true;
 
 export function transformFromSearchParams(searchParams: SearchParams) {
-  const { label, data, labelY: ly, labelX: lx } = searchParams;
+  const { label, data, labelY: ly, labelX: lx, l, color } = searchParams;
   const labels = typeof label === 'string' ? [label] : Array.isArray(label) ? label : [];
   const values = typeof data === 'string' ? [data] : Array.isArray(data) ? data : [];
-  const str = labels.length === values.length ? labels.map((label, i) => [label, values[i]].join(' ')) : values;
+  const input = labels.length === values.length ? labels.map((label, i) => [label, values[i]].join(' ')) : values;
 
-  const { config, data: seriesData } = transform(str.join('\n'), -1);
+  const initialConfig: InitialConfig = {
+    labelX: Array.isArray(lx) ? lx[0] : lx,
+    labelY: Array.isArray(ly) ? ly[0] : ly,
+    labels: typeof l === 'string' ? [l] : Array.isArray(l) ? l : [],
+    colors: typeof color === 'string' ? [color] : Array.isArray(color) ? color : [],
+  };
+
+  const { config, data: seriesData } = transform(input.join('\n'), { initialConfig });
 
   const type = getChartType(searchParams.type);
   const legendPosition = getLegendPosition(searchParams.lp);
@@ -31,10 +38,5 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   const series = Array.from(config?.series ?? []);
   const selectedSeries = series?.map(series => series.id) ?? [];
 
-  const labelX = Array.isArray(lx) ? lx[0] : lx;
-  const labelY = Array.isArray(ly) ? ly[0] : ly;
-  if (config) config.labelX = labelX;
-  if (config) config.labelY = labelX;
-
-  return { type, legendPosition, fullRange, config, data: seriesData, series, selectedSeries, labelX, labelY };
+  return { type, legendPosition, fullRange, config, data: seriesData, series, selectedSeries };
 }

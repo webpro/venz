@@ -63,14 +63,14 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
         }
 
         if (seriesId) {
-          const { config: incomingConfig, data: incomingData } = transform(input, configId, seriesId);
-          if (incomingConfig) {
+          const { data: incomingData } = transform(input, { configId, seriesId });
+          if (incomingData) {
             const s = new Set(props.selectedSeries()).add(seriesId);
             props.setSelectedSeries([...s]);
             props.setData([...incomingData]);
           }
         } else {
-          const { data: incomingData } = transform(input, configId);
+          const { data: incomingData } = transform(input, { configId });
           props.setData(incomingData);
         }
 
@@ -93,18 +93,14 @@ export const handleGlobalPaste = (props: HandleDropProps) => async (event: Clipb
   const input = event.clipboardData?.getData('text');
   if (input) {
     try {
-      const { config: incomingConfig, data: incomingData } = transform(
-        input,
-        -1,
-        undefined,
-        props.config(),
-        props.data(),
-      );
+      const { config: incomingConfig, data: incomingData } = transform(input, {
+        config: props.config(),
+        data: props.data(),
+      });
       if (incomingConfig) {
-        const series: Series[] = incomingConfig.labels ?? incomingConfig.series;
         props.setConfig(incomingConfig);
-        props.setSeries(series);
-        props.setSelectedSeries(series.map(s => s.id));
+        props.setSeries(incomingConfig.series);
+        props.setSelectedSeries(incomingConfig.series.map(s => s.id));
         props.setData([...incomingData]);
 
         if (props.chartId) await storage.saveSeriesData(Number(props.chartId), props.data());

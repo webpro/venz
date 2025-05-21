@@ -4,18 +4,16 @@ import { transform } from '../src/adapters/index.ts';
 test('transform numeric data (single)', () => {
   const input = JSON.stringify([1, 1, 1]);
 
-  const output = transform(input, -1);
+  const output = transform(input);
 
   expect(output).toEqual({
     config: {
-      id: -1,
       title: expect.stringMatching(/Raw data input \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'standard',
       series: [
         {
           color: '#8b5cf6',
           command: '',
-          configId: -1,
           id: 0,
           label: 'Series 1',
         },
@@ -43,32 +41,28 @@ test('transform raw numeric data (multi)', () => {
     [3, 3, 3],
   ]);
 
-  const output = transform(input, -1);
+  const output = transform(input);
 
   expect(output).toEqual({
     config: {
-      id: -1,
       title: expect.stringMatching(/Raw data input \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'standard',
       series: [
         {
           color: '#8b5cf6',
           command: '',
-          configId: -1,
           id: 0,
           label: 'Series 1',
         },
         {
           color: '#ec4899',
           command: '',
-          configId: -1,
           id: 1,
           label: 'Series 2',
         },
         {
           color: '#14b8a6',
           command: '',
-          configId: -1,
           id: 2,
           label: 'Series 3',
         },

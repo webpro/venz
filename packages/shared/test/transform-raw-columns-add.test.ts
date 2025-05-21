@@ -9,7 +9,7 @@ a b c
 1 2 3
 `;
 
-  const { config, data } = transform(input, -1);
+  const { config, data } = transform(input);
 
   const add = `
 a b c
@@ -18,29 +18,25 @@ a b c
 3 4 5
 `;
 
-  const output = transform(add, -1, undefined, config, data);
+  const output = transform(add, { config, data });
 
   expect(output).toEqual({
     config: {
-      id: -1,
       title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'standard',
       series: [
         {
           color: '#8b5cf6',
-          configId: -1,
           id: 0,
           label: 'a',
         },
         {
           color: '#ec4899',
-          configId: -1,
           id: 1,
           label: 'b',
         },
         {
           color: '#14b8a6',
-          configId: -1,
           id: 2,
           label: 'c',
         },

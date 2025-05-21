@@ -7,7 +7,7 @@ test('transform hyperfine json data', async () => {
   const filePath = new URL('./fixtures/hyperfine-results.json', __filename);
   const input = await readFile(filePath, 'utf-8');
 
-  const output = transform(input, -1);
+  const output = transform(input);
 
   expect(output).toEqual({
     config: {
@@ -61,7 +61,7 @@ test('transform hyperfine json (parameterized)', async () => {
   const filePath = new URL('./fixtures/hyperfine-results-parameterized.json', __filename);
   const input = await readFile(filePath, 'utf-8');
 
-  const output = transform(input, -1);
+  const output = transform(input);
 
   expect(output).toEqual({
     config: {

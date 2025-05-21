@@ -8,7 +8,7 @@ test('transform and add labeled data (datetime)', () => {
     ['2025-06', 1],
   ]);
 
-  const { config, data } = transform(input, -1);
+  const { config, data } = transform(input);
 
   const add = JSON.stringify([
     ['2025-04', 4],
@@ -16,30 +16,26 @@ test('transform and add labeled data (datetime)', () => {
     ['2025-06', 3],
   ]);
 
-  const output = transform(add, -1, undefined, config, data);
+  const output = transform(add, { config, data });
 
   expect(output).toEqual({
     config: {
-      id: -1,
       title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'standard',
       sort: 'datetime',
       series: [
         {
           color: '#8b5cf6',
-          configId: -1,
           id: 0,
           label: '2025-04',
         },
         {
           color: '#ec4899',
-          configId: -1,
           id: 1,
           label: '2025-05',
         },
         {
           color: '#14b8a6',
-          configId: -1,
           id: 2,
           label: '2025-06',
         },
@@ -47,13 +43,11 @@ test('transform and add labeled data (datetime)', () => {
       labels: [
         {
           color: '#8b5cf6',
-          configId: -1,
           id: 0,
           label: 'Series 1',
         },
         {
           color: '#ec4899',
-          configId: -1,
           id: 1,
           label: 'Series 2',
         },

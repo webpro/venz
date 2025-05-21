@@ -12,6 +12,14 @@ export const LabeledColumns = () => {
   url.searchParams.append('data', [2, 1.9, 1.8, 2.2].join(','));
   url.searchParams.append('data', [2.5, 2.4, 2.4, 2.6].join(','));
 
+  const literal = new URL('/', origin);
+  literal.searchParams.set('type', 'line');
+  literal.searchParams.set('lp', 'br');
+  literal.searchParams.set(
+    'data',
+    'col-A col-B col-C\n 1.2    2    2.5\n 1.1    1.9  2.4\n1.15    1.8  2.4\n0.98    2.2  2.6',
+  );
+
   return (
     <>
       <div class="flex justify-start gap-8">
@@ -37,6 +45,14 @@ col-A,col-B,col-C
 
       <p>
         <Wink url={url} />
+      </p>
+
+      <p>
+        Instead of separate parameters, the <code>data</code> can be the full text:
+      </p>
+
+      <p>
+        <Wink url={literal} />
       </p>
     </>
   );

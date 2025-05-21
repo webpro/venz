@@ -1,5 +1,6 @@
 import type { Configuration, Statistics, Series, SeriesData, JsonValue, ConfigList, ConfigStandard } from '../types.ts';
 import { getNextAvailableColor } from '../colors.ts';
+import type { InitialConfig, Options } from './index.ts';
 
 export function calculateStats(values: number[]): Statistics {
   const sorted = values.toSorted((a, b) => a - b);
@@ -96,13 +97,9 @@ export function parseLabeledValues(input: string): Array<[string, number[]]> {
     .filter((pair): pair is [string, number[]] => pair !== null);
 }
 
-export function transformData(
-  values: number[][],
-  configId: number,
-  seriesId?: number,
-  existingConfig?: Configuration,
-  existingData?: SeriesData[],
-) {
+export function transformData(values: number[][], options: Options) {
+  const { configId, seriesId, config: existingConfig, data: existingData } = options;
+
   const now = new Date();
   const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
 
@@ -131,20 +128,14 @@ export function transformData(
   return { config, data };
 }
 
-export function transformRawData(
-  input: string,
-  configId: number,
-  seriesId?: number,
-  existingConfig?: Configuration,
-  existingData?: SeriesData[],
-) {
+export function transformRawData(input: string, options: Options) {
   const lines = input.split('\n').filter(line => line.trim());
   const isOneNumberPerLine = lines.every(line => parseRawValues(line).length === 1);
   const values = isOneNumberPerLine
     ? [parseRawValues(input)]
     : lines.map(parseRawValues).filter(values => values.length > 0);
 
-  return transformData(values, configId, seriesId, existingConfig);
+  return transformData(values, options);
 }
 
 export const isLabelValueTuple = (arr: JsonValue) =>
@@ -153,13 +144,9 @@ export const isLabelValueTuple = (arr: JsonValue) =>
   typeof arr[0] === 'string' &&
   (typeof arr[1] === 'number' || (Array.isArray(arr[1]) && arr[1].every(v => typeof v === 'number')));
 
-export function transformLabeledColumnsData(
-  input: [string[], number[][]],
-  configId: number,
-  seriesId?: number,
-  existingConfig?: Configuration,
-  existingData?: SeriesData[],
-) {
+export function transformLabeledColumnsData(input: [string[], number[][]], options: Options) {
+  const { configId, config: existingConfig, data: existingData } = options;
+
   const now = new Date();
   const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
 
@@ -199,13 +186,8 @@ export function transformLabeledColumnsData(
   return { config, data };
 }
 
-export function transformLabeledData(
-  input: Array<[string, number | number[]]>,
-  configId: number,
-  seriesId?: number,
-  existingConfig?: Configuration,
-  existingData?: SeriesData[],
-) {
+export function transformLabeledData(input: Array<[string, number | number[]]>, options: Options) {
+  const { configId, seriesId, config: existingConfig, data: existingData, initialConfig } = options;
   const now = new Date();
   const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
 
@@ -227,7 +209,7 @@ export function transformLabeledData(
         id: nextId + i,
         configId,
         label,
-        color: getNextAvailableColor(series),
+        color: initialConfig?.colors?.[i] ?? getNextAvailableColor(series),
       });
     }
 
@@ -249,8 +231,8 @@ export function transformLabeledData(
     labels.push({
       id: i,
       configId,
-      label: `Series ${i + 1}`,
-      color: getNextAvailableColor(labels),
+      label: initialConfig?.labels?.[i] ?? `Series ${i + 1}`,
+      color: initialConfig?.colors?.[i] ?? getNextAvailableColor(labels),
     });
   }
 
@@ -263,6 +245,8 @@ export function transformLabeledData(
         sort,
         series,
         labels,
+        labelX: initialConfig?.labelX,
+        labelY: initialConfig?.labelY,
       };
 
   return { config, data };

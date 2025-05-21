@@ -20,8 +20,6 @@ type RenderProps = {
   sortMode: Accessor<SortMode>;
   fullRange: Accessor<boolean>;
   theme: () => Theme;
-  labelX?: string;
-  labelY?: string;
 };
 
 export const renderSVG = (props: RenderProps) => {
@@ -69,8 +67,9 @@ export const renderSVG = (props: RenderProps) => {
       .range([0, width]);
   };
 
+  const isLabeled = Boolean(props.data()[0]?.label);
+
   const getLabeledScale = (props: RenderProps) => {
-    const isLabeled = Boolean(props.data()[0]?.label);
     const sort = props.config()?.sort;
     const domain = isLabeled
       ? [...new Set(props.data().map(m => m.label))]
@@ -191,18 +190,24 @@ export const renderSVG = (props: RenderProps) => {
 
   const isAlignEnd = props.chartType() === 'scatter' || props.chartType() === 'line' || props.chartType() === 'pivot';
 
+  const isDenseTicks =
+    (isLabeled && (props.chartType() === 'scatter' || props.chartType() === 'line')
+      ? props.config()?.labels
+      : props.data()
+    ).length > 10;
+
   svg
     .append('g')
     .attr('transform', `translate(0,${height})`)
     .call(axisBottom(x))
     .selectAll('text')
     .style('fill', 'currentColor')
-    .attr('transform', () => (props.data().length > 10 ? 'rotate(-45)' : null))
+    .attr('transform', () => (isDenseTicks ? 'rotate(-45)' : null))
     .attr('text-anchor', (d, i, r) =>
-      isAlignEnd && r.length === i + 1 ? 'end' : props.data().length > 10 ? 'end' : 'middle',
+      isAlignEnd && r.length !== 1 && r.length === i + 1 ? 'end' : isDenseTicks ? 'end' : 'middle',
     )
-    .attr('dy', props.data().length > 10 ? '.1em' : '0.7em')
-    .attr('dx', props.data().length > 10 ? '-.8em' : null)
+    .attr('dy', isDenseTicks ? '.1em' : '0.7em')
+    .attr('dx', isDenseTicks ? '-.8em' : null)
     .text(d =>
       props.chartType() === 'scatter' || props.chartType() === 'line'
         ? Number.isInteger(d)
@@ -218,7 +223,7 @@ export const renderSVG = (props: RenderProps) => {
     .attr('text-anchor', 'middle')
     .style('fill', 'currentColor')
     .style('font-family', 'sans-serif')
-    .text(props.config()?.labelX ?? props.labelX ?? 'Run #');
+    .text(props.config()?.labelX ?? 'Run #');
 
   svg
     .append('text')
@@ -228,7 +233,7 @@ export const renderSVG = (props: RenderProps) => {
     .attr('text-anchor', 'middle')
     .style('fill', 'currentColor')
     .style('font-family', 'sans-serif')
-    .text(props.config()?.labelY ?? props.labelY ?? `median (s)`);
+    .text(props.config()?.labelY ?? `median (s)`);
 
   if (props.legendPosition() !== 'n') {
     const isRight = props.legendPosition().includes('r');
@@ -312,12 +317,14 @@ export const renderSVG = (props: RenderProps) => {
       const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
 
       const xPos = x(selectedId) || x(stats.label);
+      const boxWidth = Math.max(10, 50 - props.data().length);
+      const halfWidth = boxWidth / 2;
 
       svg
         .append('rect')
-        .attr('x', xPos - 20)
+        .attr('x', xPos - halfWidth)
         .attr('y', y(q3))
-        .attr('width', 40)
+        .attr('width', boxWidth)
         .attr('height', y(q1) - y(q3))
         .attr('fill', color)
         .attr('fill-opacity', 0.2)
@@ -325,8 +332,8 @@ export const renderSVG = (props: RenderProps) => {
 
       svg
         .append('line')
-        .attr('x1', xPos - 20)
-        .attr('x2', xPos + 20)
+        .attr('x1', xPos - halfWidth)
+        .attr('x2', xPos + halfWidth)
         .attr('y1', y(stats.median))
         .attr('y2', y(stats.median))
         .attr('stroke', color)

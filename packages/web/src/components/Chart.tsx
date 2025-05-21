@@ -9,7 +9,7 @@ import { ChartSeries } from './ChartSeries';
 import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
-import { renderSVG } from './render';
+import { renderSVG } from './render-svg';
 import { transformFromSearchParams } from '../util/helpers';
 import type { ImgBgPadding, SortMode } from '../types';
 
@@ -107,8 +107,6 @@ export default function Chart() {
       sortMode,
       fullRange,
       theme,
-      labelX: fromUrl.labelX,
-      labelY: fromUrl.labelY,
     });
   });
 

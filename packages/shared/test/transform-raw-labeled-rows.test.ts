@@ -8,30 +8,26 @@ test('transform raw labeled data rows (datetime)', () => {
 2025-06 7 8 9
 `;
 
-  const output = transform(input, -1);
+  const output = transform(input);
 
   expect(output).toEqual({
     config: {
-      id: -1,
       title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'standard',
       sort: 'datetime',
       series: [
         {
           color: '#8b5cf6',
-          configId: -1,
           id: 0,
           label: '2025-04',
         },
         {
           color: '#ec4899',
-          configId: -1,
           id: 1,
           label: '2025-05',
         },
         {
           color: '#14b8a6',
-          configId: -1,
           id: 2,
           label: '2025-06',
         },
@@ -39,19 +35,16 @@ test('transform raw labeled data rows (datetime)', () => {
       labels: [
         {
           color: '#8b5cf6',
-          configId: -1,
           id: 0,
           label: 'Series 1',
         },
         {
           color: '#ec4899',
-          configId: -1,
           id: 1,
           label: 'Series 2',
         },
         {
           color: '#14b8a6',
-          configId: -1,
           id: 2,
           label: 'Series 3',
         },
@@ -102,30 +95,26 @@ test('transform raw labeled data rows (semver)', () => {
 1.0.2 1 1 1
 `;
 
-  const output = transform(input, -1);
+  const output = transform(input);
 
   expect(output).toEqual({
     config: {
-      id: -1,
       title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'standard',
       sort: 'semver',
       series: [
         {
           color: '#8b5cf6',
-          configId: -1,
           id: 0,
           label: '1.0.0',
         },
         {
           color: '#ec4899',
-          configId: -1,
           id: 1,
           label: '1.0.1',
         },
         {
           color: '#14b8a6',
-          configId: -1,
           id: 2,
           label: '1.0.2',
         },
@@ -133,19 +122,16 @@ test('transform raw labeled data rows (semver)', () => {
       labels: [
         {
           color: '#8b5cf6',
-          configId: -1,
           id: 0,
           label: 'Series 1',
         },
         {
           color: '#ec4899',
-          configId: -1,
           id: 1,
           label: 'Series 2',
         },
         {
           color: '#14b8a6',
-          configId: -1,
           id: 2,
           label: 'Series 3',
         },
@@ -196,30 +182,26 @@ B 4 5 6 7
 C 7 8 9 10
 `;
 
-  const output = transform(input, -1);
+  const output = transform(input);
 
   expect(output).toEqual({
     config: {
-      id: -1,
       title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'standard',
       sort: undefined,
       series: [
         {
           color: '#8b5cf6',
-          configId: -1,
           id: 0,
           label: 'A',
         },
         {
           color: '#ec4899',
-          configId: -1,
           id: 1,
           label: 'B',
         },
         {
           color: '#14b8a6',
-          configId: -1,
           id: 2,
           label: 'C',
         },
@@ -227,25 +209,21 @@ C 7 8 9 10
       labels: [
         {
           color: '#8b5cf6',
-          configId: -1,
           id: 0,
           label: 'Series 1',
         },
         {
           color: '#ec4899',
-          configId: -1,
           id: 1,
           label: 'Series 2',
         },
         {
           color: '#14b8a6',
-          configId: -1,
           id: 2,
           label: 'Series 3',
         },
         {
           color: '#f97316',
-          configId: -1,
           id: 3,
           label: 'Series 4',
         },
