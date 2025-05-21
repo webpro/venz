@@ -36,8 +36,8 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   const legendPosition = getLegendPosition(searchParams.lp);
   const fullRange = getFullRange(searchParams.br);
 
-  const series = type === 'pivot' && config?.labels ? config.labels : Array.from(config?.series ?? []);
-  const selectedSeries = (type === 'pivot' && config?.labels ? config.labels : config.series).map(label => label.id);
+  const series = (type === 'pivot' && config?.labels ? config.labels : config?.series) ?? [];
+  const selectedSeries = series.map(label => label.id);
 
   return { type, legendPosition, fullRange, config, data: seriesData, series, selectedSeries };
 }
