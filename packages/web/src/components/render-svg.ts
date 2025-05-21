@@ -413,6 +413,7 @@ export const renderSVG = (props: RenderProps) => {
         .attr('opacity', 0.6);
     } else if (props.chartType() === 'line') {
       if (!stats) continue;
+
       const curve = line()
         .x((d, i) => x(i))
         .y(d => y(d))
@@ -493,6 +494,50 @@ export const renderSVG = (props: RenderProps) => {
         .attr('stroke', color)
         .attr('stroke-width', 2)
         .attr('d', curve);
+
+      svg
+        .selectAll(`circle-${selectedId}`)
+        .data(datum)
+        .enter()
+        .append('g')
+        .attr('transform', d => `translate(${x(d[0])},${y(d[1])})`)
+        .each(function (d, i) {
+          const g = select(this);
+          g.append('circle').attr('r', 12).attr('fill', 'transparent').attr('class', 'hit-area');
+          g.append('circle').attr('r', 3).attr('fill', color).attr('class', 'visible-dot');
+
+          const isFirst = i === 0;
+          const isLast = i === datum.length - 1;
+          const xOffset = isFirst ? 15 : isLast ? -15 : 0;
+
+          const tooltipGroup = g.append('g').attr('class', 'tooltip-group');
+
+          const text = tooltipGroup
+            .append('text')
+            .attr('class', 'tooltip')
+            .attr('y', -10)
+            .attr('x', xOffset)
+            .attr('text-anchor', isFirst ? 'start' : isLast ? 'end' : 'middle')
+            .style('font-size', '12px')
+            .style('fill', 'white')
+            .text(d[1]);
+
+          const textWidth = text.node().getBBox().width;
+          const padding = 8;
+
+          tooltipGroup
+            .append('rect')
+            .attr('class', 'tooltip-bg')
+            .attr('x', xOffset + (isFirst ? -padding : isLast ? -textWidth - padding : -textWidth / 2 - padding))
+            .attr('y', -25)
+            .attr('width', textWidth + padding * 2)
+            .attr('height', 20)
+            .attr('rx', 4)
+            .attr('fill', 'rgba(0, 0, 0, 0.8)')
+            .attr('stroke', 'rgba(255, 255, 255, 0.2)');
+
+          text.raise();
+        });
     } else if (props.chartType() === 'bar') {
       if (!stats) continue;
       const xPos = x(selectedId) || x(stats.label);
