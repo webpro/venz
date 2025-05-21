@@ -11,7 +11,7 @@ type DropdownProps = {
 
 type DropdownOption = {
   value: string;
-  icon?: JSX.Element;
+  icon?: () => JSX.Element;
   label: string;
   onClick?: () => void;
   separator?: boolean;

@@ -40,12 +40,12 @@ export const ChartControls = (props: ChartControlsProps) => {
         label="Chart type"
         value={props.chartType()}
         options={[
-          { value: 'median', icon: <MedianChart />, label: 'median' },
-          { value: 'bar', icon: <Bar />, label: 'bar' },
-          { value: 'line', icon: <Line />, label: 'line' },
-          { value: 'pivot', icon: <Pivot />, label: 'pivot', disabled: !props.hasLabels },
-          { value: 'box', icon: <BoxPlot />, label: 'box plot' },
-          { value: 'scatter', icon: <ScatterPlot />, label: 'scatter' },
+          { value: 'bar', icon: Bar, label: 'bar' },
+          { value: 'median', icon: MedianChart, label: 'median' },
+          { value: 'line', icon: Line, label: 'line' },
+          { value: 'pivot', icon: Pivot, label: 'pivot', disabled: !props.hasLabels },
+          { value: 'box', icon: BoxPlot, label: 'box plot' },
+          { value: 'scatter', icon: ScatterPlot, label: 'scatter' },
         ]}
         onChange={props.setChartType}
       />
@@ -54,9 +54,9 @@ export const ChartControls = (props: ChartControlsProps) => {
         label="Sort mode"
         value={props.sortMode()}
         options={[
-          { value: 'original', icon: <Line />, label: 'original' },
-          { value: 'ascending', icon: <SortAsc />, label: 'ascending' },
-          { value: 'descending', icon: <SortDesc />, label: 'descending' },
+          { value: 'original', icon: Line, label: 'original' },
+          { value: 'ascending', icon: SortAsc, label: 'ascending' },
+          { value: 'descending', icon: SortDesc, label: 'descending' },
         ]}
         onChange={props.setSortMode}
       />
@@ -65,11 +65,11 @@ export const ChartControls = (props: ChartControlsProps) => {
         label="Legend position"
         value={props.legendPosition()}
         options={[
-          { value: 'n', icon: <LegendNone />, label: 'legend' },
-          { value: 'tl', icon: <LegendTopLeft />, label: '' },
-          { value: 'tr', icon: <LegendTopRight />, label: '' },
-          { value: 'bl', icon: <LegendBottomLeft />, label: '' },
-          { value: 'br', icon: <LegendBottomRight />, label: '' },
+          { value: 'n', icon: LegendNone, label: 'legend' },
+          { value: 'tl', icon: LegendTopLeft, label: '' },
+          { value: 'tr', icon: LegendTopRight, label: '' },
+          { value: 'bl', icon: LegendBottomLeft, label: '' },
+          { value: 'br', icon: LegendBottomRight, label: '' },
         ]}
         onChange={props.setLegendPosition}
       />
@@ -82,17 +82,17 @@ export const ChartControls = (props: ChartControlsProps) => {
         label="Download image"
         icon={<Download />}
         options={[
-          { value: 'svg', icon: <Download />, label: 'svg', onClick: () => download(props.svgRef, { format: 'svg' }) },
-          { value: 'png', icon: <Download />, label: 'png', onClick: () => download(props.svgRef, { format: 'png' }) },
+          { value: 'svg', icon: Download, label: 'svg', onClick: () => download(props.svgRef, { format: 'svg' }) },
+          { value: 'png', icon: Download, label: 'png', onClick: () => download(props.svgRef, { format: 'png' }) },
           {
             value: 'webp',
-            icon: <Download />,
+            icon: Download,
             label: 'webP',
             onClick: () => download(props.svgRef, { format: 'webp' }),
           },
           {
             value: 'avif',
-            icon: <Download />,
+            icon: Download,
             label: 'avif',
             onClick: () => download(props.svgRef, { format: 'avif' }),
           },
@@ -100,7 +100,7 @@ export const ChartControls = (props: ChartControlsProps) => {
           {
             value: 'bg-color',
             label: `bg (${props.imgDownloadBgColor()})`,
-            icon: <div class={`w-full h-full`} style={`background-color: ${props.imgDownloadBgColor()}`} />,
+            icon: () => <div class={`w-full h-full`} style={`background-color: ${props.imgDownloadBgColor()}`} />,
             onClick: () => {
               const colors = ['none', '#000', '#fff'];
               const currentIndex = colors.indexOf(props.imgDownloadBgColor());
