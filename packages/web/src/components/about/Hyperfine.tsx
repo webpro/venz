@@ -72,7 +72,7 @@ export const Hyperfine = () => {
 
       <p>Example command:</p>
 
-      <div class="flex justify-start gap-8">
+      <div class="flex flex-wrap justify-start gap-8">
         <pre class="border p-4 bg-neutral-800 light:bg-neutral-100 high-contrast:bg-background">{`
 hyperfine --warmup 3
   'sleep 0.35'
@@ -84,7 +84,7 @@ hyperfine --warmup 3
 
       <p>Example output:</p>
 
-      <div class="flex justify-start gap-8">
+      <div class="flex flex-wrap justify-start gap-8">
         <pre class="border p-4 bg-neutral-800 light:bg-neutral-100 high-contrast:bg-background">{`
 {
   "results": [

@@ -63,7 +63,7 @@ export const ChartSeries = (props: Props) => {
 
   return (
     <form
-      class="flex flex-col border border-foreground rounded-2"
+      class="flex flex-col border border-foreground rounded-2 max-w-full"
       onSubmit={event => {
         event.preventDefault();
         handleSave();
@@ -78,56 +78,58 @@ export const ChartSeries = (props: Props) => {
           return (
             <label
               for={`toggle-visibility-${i()}`}
-              class="flex items-center gap-2 px-4 py-1 cursor-pointer hover:bg-foreground hover:text-background!"
+              class="flex flex-wrap items-center gap-2 px-4 py-1 cursor-pointer hover:bg-foreground hover:text-background!"
               style={`color: ${getSeriesColor(s, theme())()}`}
             >
-              <input
-                type="checkbox"
-                id={`toggle-visibility-${i()}`}
-                aria-label="toggle series visibility"
-                checked={props.selectedSeries().includes(s.id)}
-                onChange={event => {
-                  props.setSelectedSeries(prev =>
-                    (event.currentTarget.checked ? [...prev, s.id] : prev.filter(id => id !== s.id)).sort(),
-                  );
-                }}
-                class="w-4 h-4 rounded-sm"
-              />
-              <div class="relative w-6 scale-50">
+              <div class="flex items-center gap-2 min-w-0">
                 <input
-                  type="color"
-                  aria-label="color"
-                  value={s.color}
+                  type="checkbox"
+                  id={`toggle-visibility-${i()}`}
+                  aria-label="toggle series visibility"
+                  checked={props.selectedSeries().includes(s.id)}
                   onChange={event => {
-                    props.setSeries(series => series.id === s.id, 'color', event.currentTarget.value);
-                    handleSave();
+                    props.setSelectedSeries(prev =>
+                      (event.currentTarget.checked ? [...prev, s.id] : prev.filter(id => id !== s.id)).sort(),
+                    );
                   }}
-                  class="w-full h-3 cursor-pointer appearance-none bg-transparent border-0"
+                  class="w-4 h-4 rounded-sm"
                 />
-                <div
-                  class="pointer-events-none absolute inset-0 rounded-full"
-                  style={{ 'background-color': getSeriesColor(s, theme())() }}
+                <div class="relative w-6 scale-50 flex-shrink-0">
+                  <input
+                    type="color"
+                    aria-label="color"
+                    value={s.color}
+                    onChange={event => {
+                      props.setSeries(series => series.id === s.id, 'color', event.currentTarget.value);
+                      handleSave();
+                    }}
+                    class="w-full h-3 cursor-pointer appearance-none bg-transparent border-0"
+                  />
+                  <div
+                    class="pointer-events-none absolute inset-0 rounded-full"
+                    style={{ 'background-color': getSeriesColor(s, theme())() }}
+                  />
+                </div>
+                <input
+                  type="text"
+                  aria-label="series label"
+                  value={s.label}
+                  onChange={event => {
+                    props.setSeries(series => series.id === s.id, 'label', event.currentTarget.value);
+                  }}
+                  onBlur={handleSave}
+                  class="bg-transparent border-none py-1"
                 />
               </div>
-              <input
-                type="text"
-                aria-label="series label"
-                value={s.label}
-                onChange={event => {
-                  props.setSeries(series => series.id === s.id, 'label', event.currentTarget.value);
-                }}
-                onBlur={handleSave}
-                class="bg-transparent border-none py-1"
-              />
 
               {(props.type === 'hyperfine-default' || props.type === 'hyperfine-json') && (
-                <code class="p-2 text-base text-gray-400 font-mono">{s.command}</code>
+                <code class="py-2 text-base text-gray-400 font-mono">{s.command}</code>
               )}
 
               {props.type !== 'list' &&
                 seriesWithStats().length > 1 &&
                 (!s.ratio || s.ratio === 1 || (
-                  <em class="text-right ml-auto text-gray-400">
+                  <em class="text-gray-400 w-auto ml-auto">
                     <span class="mr-2" style={`color: ${fasterSeries.color}`}>
                       {fasterSeries.label}
                     </span>

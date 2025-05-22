@@ -19,7 +19,7 @@ export const NumbersJSON = () => {
 
   return (
     <>
-      <div class="flex justify-start gap-8">
+      <div class="flex flex-wrap justify-start gap-8">
         <pre class="border p-4 bg-neutral-800 light:bg-neutral-100 high-contrast:bg-background">{`
 [5, 4, 5]
 `}</pre>
@@ -60,7 +60,7 @@ export const LabeledNumbersJSON = () => {
 
   return (
     <>
-      <div class="flex justify-start gap-8">
+      <div class="flex flex-wrap justify-start gap-8">
         <pre class="border p-4 bg-neutral-800 light:bg-neutral-100 high-contrast:bg-background">{`
 [
   ["Bananas", 5],
@@ -93,7 +93,7 @@ export const LabeledNumberSeriesJSON = () => {
 
   return (
     <>
-      <div class="flex justify-start gap-8">
+      <div class="flex flex-wrap justify-start gap-8">
         <pre class="border p-4 bg-neutral-800 light:bg-neutral-100 high-contrast:bg-background">{`
 [
   ["Bananas", [5, 4, 5]],

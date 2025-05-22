@@ -17,7 +17,7 @@ export const Unlabeled = () => {
     <>
       <p>Numbers separated by space, comma, semicolon, or newline:</p>
 
-      <div class="flex justify-start gap-8">
+      <div class="flex flex-wrap justify-start gap-8">
         <pre class="border p-4 bg-neutral-800 light:bg-neutral-100 high-contrast:bg-background">
           {randomNumbers.join(', ')}
         </pre>

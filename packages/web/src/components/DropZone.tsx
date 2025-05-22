@@ -22,7 +22,7 @@ export const DropZone = (props: Props) => {
       onDrop={() => setIsDragging(false)}
     >
       <div class="text-foreground text-lg">
-        <div class="flex flex-col gap-8 items-center">
+        <div class="flex flex-col gap-8 items-center text-center">
           <Switch>
             <Match when={props.config()?.series.length > 0}>
               <p>

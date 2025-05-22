@@ -17,7 +17,7 @@ export const Labeled = () => {
 
   return (
     <>
-      <div class="flex justify-start gap-8">
+      <div class="flex flex-wrap justify-start gap-8">
         <pre class="border p-4 bg-neutral-800 light:bg-neutral-100 high-contrast:bg-background">{`
 2025-01 150
 2025-02 120
