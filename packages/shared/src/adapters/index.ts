@@ -27,16 +27,19 @@ export type Options = {
 };
 
 export function transform(
-  input: string,
-  options: Options = {},
+  input: string | JsonValue,
+  options: Options = {}
 ): { config: undefined | Configuration; data: SeriesData[] } {
   const { configId = -1, seriesId, config } = options;
 
-  if (typeof input !== 'string') throw new Error('Input must be a string');
+  if (typeof input !== 'string' && typeof input !== 'object')
+    throw new Error('Input must be a string or a JSON object');
+
   if (input.length === 0) return { config: undefined, data: [] };
 
   try {
-    const json = JSON.parse(input);
+    const json = typeof input === 'string' ? JSON.parse(input) : input;
+
     if (isHyperfineJSON(json)) {
       return transformHyperfineData(json, configId, seriesId, config);
     }
@@ -59,16 +62,18 @@ export function transform(
       }
     }
   } catch (error) {
-    if (isLabeledRawData(input)) {
-      return transformLabeledData(parseLabeledValues(input), options);
-    }
+    if (typeof input === 'string') {
+      if (isLabeledRawData(input)) {
+        return transformLabeledData(parseLabeledValues(input), options);
+      }
 
-    if (isRawNumericData(input)) {
-      return transformRawData(input, options);
-    }
+      if (isRawNumericData(input)) {
+        return transformRawData(input, options);
+      }
 
-    if (isLabeledColumnsRawData(input)) {
-      return transformLabeledColumnsData(parseLabeledColumnValues(input), options);
+      if (isLabeledColumnsRawData(input)) {
+        return transformLabeledColumnsData(parseLabeledColumnValues(input), options);
+      }
     }
 
     console.error(error);

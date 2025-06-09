@@ -21,7 +21,10 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   const { label, data, labelY: ly, labelX: lx, l, color } = searchParams;
   const labels = typeof label === 'string' ? [label] : Array.isArray(label) ? label : [];
   const values = typeof data === 'string' ? [data] : Array.isArray(data) ? data : [];
-  const input = labels.length === values.length ? labels.map((label, i) => [label, values[i]].join(' ')) : values;
+  const input =
+    labels.length === values.length
+      ? labels.map((label, i) => [label, values[i].split(SEPARATOR).map(Number)])
+      : values;
 
   const initialConfig: InitialConfig = {
     labelX: Array.isArray(lx) ? lx[0] : lx,
@@ -30,7 +33,7 @@ export function transformFromSearchParams(searchParams: SearchParams) {
     colors: typeof color === 'string' ? [color] : Array.isArray(color) ? color : [],
   };
 
-  const { config, data: seriesData } = transform(input.join('\n'), { initialConfig });
+  const { config, data: seriesData } = transform(input, { initialConfig });
 
   const type = getChartType(searchParams.type);
   const legendPosition = getLegendPosition(searchParams.lp);
