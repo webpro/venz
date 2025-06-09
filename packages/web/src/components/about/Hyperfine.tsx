@@ -55,7 +55,7 @@ export const Hyperfine = () => {
           exit_codes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
       ],
-    }),
+    })
   );
 
   return (

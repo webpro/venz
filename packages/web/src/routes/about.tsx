@@ -7,6 +7,7 @@ import { LabeledNumberSeriesJSON, LabeledNumbersJSON, NumbersJSON } from '../com
 import { Hyperfine } from '../components/about/Hyperfine';
 import { Title } from '@solidjs/meta';
 import { CreateURL } from '../components/about/CreateURL';
+import { Mitata } from '../components/about/Mitata';
 
 export default function About() {
   return (
@@ -56,6 +57,9 @@ export default function About() {
             <Link href="#hyperfine">Hyperfine</Link>
           </li>
           <li>
+            <Link href="#mitata">Mitata</Link>
+          </li>
+          <li>
             <Link href="#url">Create URL</Link>
           </li>
         </ul>
@@ -101,6 +105,12 @@ export default function About() {
         </h3>
 
         <Hyperfine />
+
+        <h3 id="mitata" class="text-3xl">
+          <a href="#mitata">Mitata</a>
+        </h3>
+
+        <Mitata />
 
         <h3 id="url" class="text-3xl">
           <a href="#url">Create URL</a>
