@@ -1,0 +1,270 @@
+{
+  "layout": [
+    {
+      "name": null,
+      "types": []
+    }
+  ],
+  "benchmarks": [
+    {
+      "runs": [
+        {
+          "stats": {
+            "kind": "yield",
+            "samples": [0.061, 0.061, 0.061],
+            "min": 0.061,
+            "max": 0.061,
+            "p25": 0.081298828125,
+            "p50": 0.081298828125,
+            "p75": 0.08154296875,
+            "p99": 0.091552734375,
+            "p999": 0.142333984375,
+            "avg": 0.08356547771258424,
+            "ticks": 10,
+            "heap": {
+              "_": 1241100,
+              "total": 121914.90625,
+              "min": 0.087890625,
+              "max": 182.927734375,
+              "avg": 0.09823133208444122
+            }
+          },
+          "args": {
+            "len": 1,
+            "len2": "4"
+          },
+          "name": "look_mom_no_spaghetti"
+        },
+        {
+          "stats": {
+            "kind": "yield",
+            "samples": [0.061, 0.061, 0.061],
+            "min": 0.061,
+            "max": 0.061,
+            "p25": 0.061,
+            "p50": 0.061,
+            "p75": 0.061,
+            "p99": 0.091552734375,
+            "p999": 0.13232421875,
+            "avg": 0.08400052299022823,
+            "ticks": 5048492032,
+            "heap": {
+              "_": 1232533,
+              "total": 131662.404296875,
+              "min": 0.087890625,
+              "max": 169.283203125,
+              "avg": 0.10682262000033671
+            }
+          },
+          "args": {
+            "len": 2,
+            "len2": "4"
+          },
+          "name": "look_mom_no_spaghetti"
+        },
+        {
+          "stats": {
+            "kind": "yield",
+            "samples": [0.061, 0.061, 0.061],
+            "min": 0.061,
+            "max": 0.061,
+            "p25": 0.061,
+            "p50": 0.061,
+            "p75": 0.061,
+            "p99": 0.091552734375,
+            "p999": 0.13232421875,
+            "avg": 0.08355324624924307,
+            "ticks": 5096767488,
+            "heap": {
+              "_": 1244316,
+              "total": 131651.29296875,
+              "min": 0.087890625,
+              "max": 200.158203125,
+              "avg": 0.10580213785625998
+            }
+          },
+          "args": {
+            "len": 3,
+            "len2": "4"
+          },
+          "name": "look_mom_no_spaghetti"
+        },
+        {
+          "stats": {
+            "kind": "yield",
+            "samples": [0.061, 0.061, 0.061],
+            "min": 0.061,
+            "max": 0.061,
+            "p25": 0.061,
+            "p50": 0.061,
+            "p75": 0.061,
+            "p99": 0.061,
+            "p999": 0.061,
+            "avg": 0.08345560884964619,
+            "ticks": 5073817600,
+            "heap": {
+              "_": 1238716,
+              "total": 123538.20703125,
+              "min": 0.087890625,
+              "max": 144.115234375,
+              "avg": 0.09973085600835865
+            }
+          },
+          "args": {
+            "len": 1,
+            "len2": "5"
+          },
+          "name": "look_mom_no_spaghetti"
+        },
+        {
+          "stats": {
+            "kind": "yield",
+            "samples": [0.061, 0.061, 0.061],
+            "min": 0.061,
+            "max": 0.061,
+            "p25": 0.061,
+            "p50": 0.061,
+            "p75": 0.08154296875,
+            "p99": 0.091552734375,
+            "p999": 0.1220703125,
+            "avg": 0.08363146931884813,
+            "ticks": 5069725696,
+            "heap": {
+              "_": 1237722,
+              "total": 129397.32421875,
+              "min": 0.087890625,
+              "max": 222.955078125,
+              "avg": 0.10454473962549748
+            }
+          },
+          "args": {
+            "len": 2,
+            "len2": "5"
+          },
+          "name": "look_mom_no_spaghetti"
+        },
+        {
+          "stats": {
+            "kind": "yield",
+            "debug": "async function anonymous($fn,$gc,$now,$heap,$params,$counters\n) {\n\n    \n    \n\n    let _ = 0; let t = 0;\n    let samples = new Array(2 ** 20);\n    const heap = { _: 0, total: 0, min: Infinity, max: -Infinity };\n    \n\n    \n\n    $gc();\n\n    for (; _ < 1000000000; _++) {\n      if (_ >= 12 && t >= 706200000) break;\n\n      \n\n      \n\n      \n      const h0 = $heap();\n       const t0 = $now();\n\n      \n        for (let o = 0; o < 1024; o++) {\n          \n\n          $fn();\n$fn();\n$fn();\n$fn();\n        }\n      \n\n      const t1 = $now();\n      \n\n      \n        heap: {\n          const t0 = $now();\n          const h1 = ($heap() - h0) / 4096; t += $now() - t0;\n\n          if (0 <= h1) {\n            heap._++;\n            heap.total += h1;\n            heap.min = Math.min(h1, heap.min);\n            heap.max = Math.max(h1, heap.max);\n          }\n        }\n      \n\n      ;\n\n      const diff = t1 - t0;\n      t += t1 - t0;\n      samples[_] = diff / 4096;\n    }\n\n    samples.length = _;\n    samples.sort((a, b) => a - b);\n    if (samples.length > 12) samples = samples.slice(2, -2);\n\n    return {\n      samples,\n      min: samples[0],\n      max: samples[samples.length - 1],\n      p25: samples[(.25 * (samples.length - 1)) | 0],\n      p50: samples[(.50 * (samples.length - 1)) | 0],\n      p75: samples[(.75 * (samples.length - 1)) | 0],\n      p99: samples[(.99 * (samples.length - 1)) | 0],\n      p999: samples[(.999 * (samples.length - 1)) | 0],\n      avg: samples.reduce((a, v) => a + v, 0) / samples.length,\n      ticks: samples.length * 4096,\n      heap: { ...heap, avg: heap.total / heap._ },\n      \n      \n    };\n\n    \n  \n}",
+            "samples": [0.061, 0.061, 0.061],
+            "min": 0.061,
+            "max": 0.061,
+            "p25": 0.061,
+            "p50": 0.061,
+            "p75": 0.08154296875,
+            "p99": 0.11181640625,
+            "p999": 0.142578125,
+            "avg": 0.09125827440026678,
+            "ticks": 4428038144,
+            "heap": {
+              "_": 1081053,
+              "total": 120236.73828125,
+              "min": 0.087890625,
+              "max": 224.138671875,
+              "avg": 0.11122187189827881
+            }
+          },
+          "args": {
+            "len": 3,
+            "len2": "5"
+          },
+          "name": "look_mom_no_spaghetti"
+        },
+        {
+          "stats": {
+            "kind": "yield",
+            "samples": [0.061, 0.061, 0.061],
+            "min": 0.061,
+            "max": 0.061,
+            "p25": 0.061,
+            "p50": 0.061,
+            "p75": 0.08154296875,
+            "p99": 0.101806640625,
+            "p999": 0.142578125,
+            "avg": 0.08566069731674815,
+            "ticks": 4872626176,
+            "heap": {
+              "_": 1189598,
+              "total": 120964.939453125,
+              "min": 0.087890625,
+              "max": 144.115234375,
+              "avg": 0.10168556054492778
+            }
+          },
+          "args": {
+            "len": 1,
+            "len2": "6"
+          },
+          "name": "look_mom_no_spaghetti"
+        },
+        {
+          "stats": {
+            "kind": "yield",
+            "samples": [0.061, 0.061, 0.061],
+            "min": 0.061,
+            "max": 0.061,
+            "p25": 0.061,
+            "p50": 0.061,
+            "p75": 0.08154296875,
+            "p99": 0.091552734375,
+            "p999": 0.13232421875,
+            "avg": 0.08356272192926219,
+            "ticks": 5076860928,
+            "heap": {
+              "_": 1239455,
+              "total": 131507.712890625,
+              "min": 0.087890625,
+              "max": 206.818359375,
+              "avg": 0.10610124037631459
+            }
+          },
+          "args": {
+            "len": 2,
+            "len2": "6"
+          },
+          "name": "look_mom_no_spaghetti"
+        },
+        {
+          "stats": {
+            "kind": "yield",
+            "samples": [0.061, 0.061, 0.061],
+            "min": 0.061,
+            "max": 0.061,
+            "p25": 0.061,
+            "p50": 0.061,
+            "p75": 0.08154296875,
+            "p99": 0.091552734375,
+            "p999": 0.13232421875,
+            "avg": 0.0837485985354702,
+            "ticks": 5078573056,
+            "heap": {
+              "_": 1239872,
+              "total": 137583.16796875,
+              "min": 0.087890625,
+              "max": 256.126953125,
+              "avg": 0.11096562223257724
+            }
+          },
+          "args": {
+            "len": 3,
+            "len2": "6"
+          },
+          "name": "look_mom_no_spaghetti"
+        }
+      ],
+      "kind": "multi-args",
+      "args": {
+        "len": [1, 2, 3],
+        "len2": ["4", "5", "6"]
+      },
+      "alias": "look_mom_no_spaghetti",
+      "group": 0,
+      "baseline": false,
+      "style": {
+        "highlight": false,
+        "compact": false
+      }
+    }
+  ]
+}

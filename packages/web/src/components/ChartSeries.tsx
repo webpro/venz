@@ -122,7 +122,7 @@ export const ChartSeries = (props: Props) => {
                 />
               </div>
 
-              {props.type.startsWith('hyperfine-') && (
+              {(props.type.startsWith('hyperfine-') || props.type.startsWith('mitata-')) && (
                 <code class="py-2 text-base text-gray-400 font-mono">{s.command}</code>
               )}
 
@@ -134,7 +134,7 @@ export const ChartSeries = (props: Props) => {
                       {fasterSeries.label}
                     </span>
                     is {s.ratio.toFixed(2)} ± {s.relativeStddev.toFixed(2)} times{' '}
-                    {props.type.startsWith('hyperfine-') ? 'faster' : 'lower'}
+                    {props.type.startsWith('hyperfine-') || props.type.startsWith('mitata-') ? 'faster' : 'lower'}
                   </em>
                 ))}
             </label>

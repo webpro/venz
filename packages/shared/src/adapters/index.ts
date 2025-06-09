@@ -1,4 +1,5 @@
 import { isHyperfineJSON, transformHyperfineData } from './hyperfine.ts';
+import { isMitataJSON, transformMitataData } from './mitata.ts';
 import {
   isLabeledColumnsRawData,
   isLabeledRawData,
@@ -38,6 +39,10 @@ export function transform(
     const json = JSON.parse(input);
     if (isHyperfineJSON(json)) {
       return transformHyperfineData(json, configId, seriesId, config);
+    }
+
+    if (isMitataJSON(json)) {
+      return transformMitataData(json, configId, seriesId, config);
     }
 
     if (Array.isArray(json)) {

@@ -1,4 +1,11 @@
-export const configTypes = ['standard', 'hyperfine-default', 'hyperfine-parameter', 'list'] as const;
+export const configTypes = [
+  'standard',
+  'hyperfine-default',
+  'hyperfine-parameter',
+  'mitata',
+  'mitata-parameter',
+  'list',
+] as const;
 
 export type ConfigType = (typeof configTypes)[number];
 
@@ -31,6 +38,20 @@ interface HyperfineConfigParameter extends BaseConfig {
   series: Series[];
 }
 
+export interface ConfigMitataDefault extends BaseConfig {
+  id: number;
+  type: 'mitata';
+  series: Series[];
+}
+
+export interface ConfigMitataParameter extends BaseConfig {
+  id: number;
+  type: 'mitata-parameter';
+  parameterNames: string[];
+  command?: string;
+  series: Series[];
+}
+
 export interface ConfigList extends BaseConfig {
   id: number;
   type: 'list';
@@ -41,7 +62,13 @@ export interface ConfigList extends BaseConfig {
   series: Series[];
 }
 
-export type Configuration = HyperfineConfigDefault | HyperfineConfigParameter | ConfigList | ConfigStandard;
+export type Configuration =
+  | HyperfineConfigDefault
+  | HyperfineConfigParameter
+  | ConfigMitataDefault
+  | ConfigMitataParameter
+  | ConfigList
+  | ConfigStandard;
 
 export interface IncomingConfig extends BaseConfig {
   series: IncomingSeries[];
@@ -103,6 +130,33 @@ export interface HyperfineResults extends JsonObject {
 
 export interface HyperfineJSON extends JsonObject {
   results: HyperfineResults[];
+}
+
+interface MitataStats extends JsonObject {
+  samples: number[];
+  min: number;
+  max: number;
+  avg: number;
+  p50: number;
+  ticks: number;
+}
+
+interface MitataRun extends JsonObject {
+  stats: MitataStats;
+  name: string;
+  args: Record<string, string | number>;
+}
+
+interface MitataBenchmark extends JsonObject {
+  alias: string;
+  runs: MitataRun[];
+  args?: {
+    [key: string]: (string | number)[];
+  };
+}
+
+export interface MitataJSON extends JsonObject {
+  benchmarks: MitataBenchmark[];
 }
 
 type JsonPrimitive = string | number | boolean | null;

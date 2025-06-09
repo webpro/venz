@@ -254,7 +254,7 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
                   </div>
                 </Match>
 
-                <Match when={config.type === 'hyperfine-parameter'}>
+                <Match when={config.type === 'hyperfine-parameter' || config.type === 'mitata-parameter'}>
                   <div class="flex flex-col gap-4">
                     <label for="param-command">Command</label>
                     <Input
