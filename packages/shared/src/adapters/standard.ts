@@ -2,6 +2,8 @@ import type { Configuration, Statistics, Series, SeriesData, JsonValue, ConfigLi
 import { getNextAvailableColor } from '../colors.ts';
 import type { Options } from './index.ts';
 
+export const SEPARATOR = /[\s,;*]+/;
+
 export function calculateStats(values: number[]): Statistics {
   const sorted = values.toSorted((a, b) => a - b);
   const sum = values.reduce((a, b) => a + b, 0);
@@ -20,14 +22,14 @@ export function calculateStats(values: number[]): Statistics {
 
 function parseRawValues(input: string): number[] {
   return input
-    .split(/[\s,;]+/)
+    .split(SEPARATOR)
     .map(v => Number.parseFloat(v.trim()))
     .filter(n => !Number.isNaN(n));
 }
 
 export function isRawNumericData(input: string): boolean {
   const trimmed = input.trim();
-  const hasNumbers = /^[\d.\s,;\n]+$/.test(trimmed);
+  const hasNumbers = /^[\d.\s,;\n*]+$/.test(trimmed);
   if (!hasNumbers) return false;
   const lines = trimmed.split('\n').filter(line => line.trim());
   const isOneNumberPerLine = lines.every(line => parseRawValues(line).length === 1);
@@ -48,8 +50,8 @@ export function isLabeledColumnsRawData(input: string): boolean {
       .trim()
       .split('\n')
       .filter(line => line.trim());
-    const labels = lines[0].split(/[\s,;]+/).filter(label => label.trim());
-    const values = lines[2].split(/[\s,;]+/).filter(value => value.trim());
+    const labels = lines[0].split(SEPARATOR).filter(label => label.trim());
+    const values = lines[2].split(SEPARATOR).filter(value => value.trim());
     return labels.every(value => /\w/.test(value)) && values.every(value => /^[\d\.]+$/.test(value));
   } catch {
     return false;
@@ -62,7 +64,7 @@ export function isLabeledRawData(input: string): boolean {
       .trim()
       .split('\n')
       .filter(line => line.trim());
-    const parts = lines[0].split(/[\s,;]+/);
+    const parts = lines[0].split(SEPARATOR);
     return parts.length >= 2 && isNaN(Number(parts[0])) && !isNaN(Number(parts[1]));
   } catch {
     return false;
@@ -71,11 +73,11 @@ export function isLabeledRawData(input: string): boolean {
 
 export function parseLabeledColumnValues(input: string): [string[], number[][]] {
   const lines = input.split('\n').filter(line => line.trim());
-  const labels = lines[0].split(/[\s,;]+/).map(col => col.trim());
+  const labels = lines[0].split(SEPARATOR).map(col => col.trim());
   const values = Array.from({ length: labels.length }, () => [] as number[]);
   for (let i = 1; i < lines.length; i++) {
     const numbers = lines[i]
-      .split(/[\s,;]+/)
+      .split(SEPARATOR)
       .map(v => Number.parseFloat(v))
       .filter(n => !isNaN(n));
     if (numbers.length === labels.length) {
@@ -90,7 +92,7 @@ export function parseLabeledValues(input: string): Array<[string, number[]]> {
     .split('\n')
     .filter(line => line.trim())
     .map(line => {
-      const [label, ...values] = line.split(/[\s,;]+/);
+      const [label, ...values] = line.split(SEPARATOR);
       const numbers = values.map(Number).filter(n => !isNaN(n));
       return numbers.length > 0 ? [label, numbers] : null;
     })

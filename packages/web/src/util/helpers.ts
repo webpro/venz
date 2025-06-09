@@ -1,6 +1,6 @@
 import { transform, type InitialConfig, type SeriesData } from '@venz/shared';
 import type { ChartType, LegendPosition, SearchParams } from '../types';
-import { calculateStats } from '@venz/shared/src/adapters/standard';
+import { calculateStats, SEPARATOR } from '@venz/shared/src/adapters/standard';
 
 export const generateNumbers = () => Array.from({ length: 10 }, () => Math.floor(Math.random() * 100) + 1);
 
