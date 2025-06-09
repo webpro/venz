@@ -71,20 +71,23 @@ export const renderSVG = (props: RenderProps) => {
 
   const isLabeled = Boolean(props.data()[0]?.label);
 
+  const isSelected = (_, index: number) => props.selectedSeries().includes(index);
+
   const getLabeledScale = (props: RenderProps) => {
     const sort = props.config()?.sort;
-    const domain = isLabeled
-      ? [...new Set(props.data().map(m => m.label))]
-      : props.chartType() === 'pivot'
-        ? props.data().map(s => s.seriesId)
-        : props.selectedSeries();
+    const data = props.data();
+    const selected =
+      props.chartType() === 'pivot'
+        ? data.map(m => m.label)
+        : data.filter(isSelected).map(m => (isLabeled ? m.label : m.seriesId));
+    const domain = [...new Set(selected)];
     if (props.sortMode() === 'original') {
       if (sort === 'semver') domain.sort(compare);
       else if (sort === 'datetime') domain.sort((a, b) => new Date(a) - new Date(b));
     } else {
       domain.sort((a, b) => {
-        const aMetric = props.data().find(m => (isLabeled ? m.label : m.seriesId) === a)?.median ?? 0;
-        const bMetric = props.data().find(m => (isLabeled ? m.label : m.seriesId) === b)?.median ?? 0;
+        const aMetric = data.find(m => (isLabeled ? m.label : m.seriesId) === a)?.median ?? 0;
+        const bMetric = data.find(m => (isLabeled ? m.label : m.seriesId) === b)?.median ?? 0;
         return props.sortMode() === 'ascending' ? aMetric - bMetric : bMetric - aMetric;
       });
     }
@@ -99,7 +102,7 @@ export const renderSVG = (props: RenderProps) => {
   const getYScale = () => {
     const values =
       props.chartType() === 'pivot'
-        ? props.data().flatMap(d => d.values.filter((_, index) => props.selectedSeries().includes(index)))
+        ? props.data().flatMap(d => d.values.filter(isSelected))
         : props
             .data()
             .filter(s => props.selectedSeries().includes(s.seriesId))
