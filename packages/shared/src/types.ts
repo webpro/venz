@@ -83,7 +83,7 @@ export interface BaseSeries {
 export interface IncomingSeriesDefault extends BaseSeries {}
 
 export interface IncomingSeries extends BaseSeries {
-  parameters?: Record<string, string>;
+  parameters?: Record<string, string | number>;
   prepare?: SimpleCommand[];
   meta?: { hash?: string };
 }

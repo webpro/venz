@@ -96,7 +96,7 @@ test('transform mitata json (parameterized)', async () => {
           id: 0,
           label: '1 4',
           command: 'look_mom_no_spaghetti 1 4',
-          parameters: { len: '1', len2: '4' },
+          parameters: { len: 1, len2: '4' },
         },
         {
           color: '#ec4899',
@@ -104,7 +104,7 @@ test('transform mitata json (parameterized)', async () => {
           id: 1,
           label: '2 4',
           command: 'look_mom_no_spaghetti 2 4',
-          parameters: { len: '2', len2: '4' },
+          parameters: { len: 2, len2: '4' },
         },
         {
           color: '#14b8a6',
@@ -112,7 +112,7 @@ test('transform mitata json (parameterized)', async () => {
           id: 2,
           label: '3 4',
           command: 'look_mom_no_spaghetti 3 4',
-          parameters: { len: '3', len2: '4' },
+          parameters: { len: 3, len2: '4' },
         },
         {
           color: '#f97316',
@@ -121,7 +121,7 @@ test('transform mitata json (parameterized)', async () => {
           id: 3,
           label: '1 5',
           parameters: {
-            len: '1',
+            len: 1,
             len2: '5',
           },
         },
@@ -132,7 +132,7 @@ test('transform mitata json (parameterized)', async () => {
           id: 4,
           label: '2 5',
           parameters: {
-            len: '2',
+            len: 2,
             len2: '5',
           },
         },
@@ -143,7 +143,7 @@ test('transform mitata json (parameterized)', async () => {
           id: 5,
           label: '3 5',
           parameters: {
-            len: '3',
+            len: 3,
             len2: '5',
           },
         },
@@ -154,7 +154,7 @@ test('transform mitata json (parameterized)', async () => {
           id: 6,
           label: '1 6',
           parameters: {
-            len: '1',
+            len: 1,
             len2: '6',
           },
         },
@@ -165,7 +165,7 @@ test('transform mitata json (parameterized)', async () => {
           id: 7,
           label: '2 6',
           parameters: {
-            len: '2',
+            len: 2,
             len2: '6',
           },
         },
@@ -176,7 +176,7 @@ test('transform mitata json (parameterized)', async () => {
           id: 8,
           label: '3 6',
           parameters: {
-            len: '3',
+            len: 3,
             len2: '6',
           },
         },

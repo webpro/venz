@@ -31,13 +31,11 @@ function transformMitataWorkload(json: MitataJSON): Results[] {
   const isParameterized = json.benchmarks[0].kind === 'multi-args' && json.benchmarks[0].args;
 
   if (isParameterized) {
-    return json.benchmarks[0].runs.map(benchmark => {
-      type P = Record<string, string>;
-      const parameters = Object.entries(benchmark.args).reduce((p: P, [k, v]) => ((p[k] = String(v)), p), {} as P);
-      const samples = truncateSamples(benchmark.stats.samples);
+    return json.benchmarks[0].runs.map(run => {
+      const samples = truncateSamples(run.stats.samples);
       const values = Number.isInteger(samples[0]) ? samples.map(toSeconds) : samples;
       return {
-        series: { label: benchmark.name, parameters },
+        series: { label: run.name, parameters: run.args },
         data: calculateStats(values),
       };
     });
@@ -108,7 +106,7 @@ export function transformMitataData(
       const command =
         hasParameters && result.series.parameters
           ? parameterNames.reduce(
-              (acc, name) => acc.replace(`\{${name}\}`, result.series.parameters[name]),
+              (acc, name) => acc.replace(`\{${name}\}`, result.series.parameters[name].toString()),
               commandTemplate
             )
           : result.series.label;

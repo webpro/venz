@@ -64,9 +64,9 @@ export function transformHyperfineData(
   const parameterName = hasParameters && parameters ? Object.keys(parameters)[0] : null;
   const command =
     parameters &&
-    parameterName &&
+    parameterName in parameters &&
     firstSeries.command &&
-    firstSeries.command.replace(parameters[parameterName], `{${parameterName}}`);
+    firstSeries.command.replace(parameters[parameterName].toString(), `{${parameterName}}`);
 
   if (existingConfig) {
     const data: SeriesData[] = [];
@@ -100,10 +100,10 @@ export function transformHyperfineData(
 
     for (const result of results) {
       const id = seriesId ?? series.length;
-      const label =
-        parameterName && result.series.parameters ? result.series.parameters[parameterName] : `Command ${id + 1}`;
+      const parameters = result.series.parameters;
+      const label = parameterName && parameters ? parameters[parameterName].toString() : `Command ${id + 1}`;
 
-      series.push({ ...result.series, id, configId, label, color: getNextAvailableColor(series) });
+      series.push({ ...result.series, id, configId, label: label, color: getNextAvailableColor(series) });
       data.push({ ...result.data, id, seriesId: id });
     }
 
