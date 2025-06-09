@@ -45,7 +45,7 @@ const examples = [
     {
       title: 'hyperfine example #3',
       type: 'hyperfine-parameter',
-      parameterName: 'compiler',
+      parameterNames: ['compiler'],
       command: '{compiler} -O2 main.cpp',
       series: [
         { label: 'gcc', command: 'gcc -O2 main.cpp', color: COLORS[7], parameters: { compiler: 'gcc' } },

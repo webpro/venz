@@ -272,9 +272,9 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
                     <label for="param-name">Parameter name</label>
                     <Input
                       id="param-name"
-                      value={config.parameterName}
+                      value={config.parameterNames[0] ?? ''}
                       onInput={event => {
-                        setConfig('parameterName', event.currentTarget.value);
+                        setConfig('parameterNames', [event.currentTarget.value]);
                         setIsDirty(true);
                       }}
                       onBlur={handleSave}

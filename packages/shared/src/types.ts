@@ -33,7 +33,7 @@ interface HyperfineConfigDefault extends BaseConfig {
 interface HyperfineConfigParameter extends BaseConfig {
   id: number;
   type: 'hyperfine-parameter';
-  parameterName: string;
+  parameterNames: string[];
   command: string;
   series: Series[];
 }
