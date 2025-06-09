@@ -20,21 +20,21 @@ test('transform mitata json data', async () => {
           command: 'sleep 2.1s',
           configId: -1,
           id: 0,
-          label: 'Command 1',
+          label: 'Series 1',
         },
         {
           color: '#ec4899',
           command: 'sleep 2.2s',
           configId: -1,
           id: 1,
-          label: 'Command 2',
+          label: 'Series 2',
         },
         {
           color: '#14b8a6',
           command: 'sleep 2.3s',
           configId: -1,
           id: 2,
-          label: 'Command 3',
+          label: 'Series 3',
         },
       ],
     },
@@ -73,7 +73,7 @@ test('transform mitata json data', async () => {
   });
 });
 
-test.only('transform mitata json (parameterized)', async () => {
+test('transform mitata json (parameterized)', async () => {
   const __filename = new URL('.', import.meta.url);
   const filePath = new URL('./fixtures/mitata-results-parameterized.json', __filename);
   const input = await readFile(filePath, 'utf-8');

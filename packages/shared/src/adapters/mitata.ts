@@ -2,6 +2,8 @@ import type { Configuration, IncomingSeries, JsonValue, MitataJSON, Series, Seri
 import { getNextAvailableColor } from '../colors';
 import { calculateStats } from './standard';
 
+const MAX_SAMPLES = 100_000;
+
 const toSeconds = (ns: number) => ns / 1_000_000_000;
 
 export function isMitataJSON(data: JsonValue): data is MitataJSON {
@@ -21,33 +23,36 @@ interface Results {
   data: Statistics;
 }
 
+function truncateSamples(samples: number[]): number[] {
+  const truncated = samples.slice(0, MAX_SAMPLES);
+  if (samples.length !== truncated.length) {
+    console.warn(`Data loss: ${(((samples.length - truncated.length) / samples.length) * 100).toFixed(2)}%`);
+  }
+  return truncated;
+}
+
 function transformMitataWorkload(json: MitataJSON): Results[] {
   const isParameterized = json.benchmarks[0].kind === 'multi-args' && json.benchmarks[0].args;
 
   if (isParameterized) {
-    return json.benchmarks[0].runs.map((s, index) => {
-      const parameters = Object.entries(s.args).reduce(
-        (acc, [key, value]) => {
-          acc[key] = String(value);
-          return acc;
-        },
-        {} as Record<string, string>
-      );
-      const samples = Number.isInteger(s.stats.samples[0]) ? s.stats.samples.map(toSeconds) : s.stats.samples;
+    return json.benchmarks[0].runs.map(benchmark => {
+      type P = Record<string, string>;
+      const parameters = Object.entries(benchmark.args).reduce((p: P, [k, v]) => ((p[k] = String(v)), p), {} as P);
+      const samples = truncateSamples(benchmark.stats.samples);
+      const values = Number.isInteger(samples[0]) ? samples.map(toSeconds) : samples;
       return {
-        series: { label: s.name, parameters },
-        data: calculateStats(samples),
+        series: { label: benchmark.name, parameters },
+        data: calculateStats(values),
       };
     });
   }
 
-  return json.benchmarks.map((s, index) => {
-    const samples = Number.isInteger(s.runs[0].stats.samples[0])
-      ? s.runs[0].stats.samples.map(toSeconds)
-      : s.runs[0].stats.samples;
+  return json.benchmarks.map(benchmark => {
+    const samples = truncateSamples(benchmark.runs[0].stats.samples);
+    const values = Number.isInteger(samples[0]) ? samples.map(toSeconds) : samples;
     return {
-      series: { label: s.alias ?? s.runs[0].name },
-      data: calculateStats(samples),
+      series: { label: benchmark.alias ?? benchmark.runs[0].name },
+      data: calculateStats(values),
     };
   });
 }
