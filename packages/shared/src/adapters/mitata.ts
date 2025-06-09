@@ -60,7 +60,9 @@ export function transformMitataData(
   const now = new Date();
   const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
 
-  const size = json.benchmarks[0].runs[0].stats.samples.length;
+  const samples = json.benchmarks[0].runs[0].stats.samples;
+  const size = samples.length;
+  const unit = Number.isInteger(samples[0]) ? 's' : 'ns';
 
   const results = transformMitataWorkload(json);
   const hasParameters = results.every(r => r.series.parameters && Object.keys(r.series.parameters).length > 0);
@@ -90,6 +92,7 @@ export function transformMitataData(
       id: configId,
       series,
       title: `New mitata benchmark (${timestamp})`,
+      labelY: `median (${unit})`,
     };
 
     const config: Configuration =
