@@ -12,11 +12,18 @@ import {
   transformLabeledData,
   transformRawData,
 } from './standard.ts';
-import type { Configuration, SeriesData } from '../types.ts';
+import type { ConfigType, Configuration, JsonValue, SeriesData } from '../types.ts';
 
 export { generateCommand } from './hyperfine.ts';
 
-export type InitialConfig = { labelX?: string; labelY?: string; labels?: string[]; colors?: string[] };
+export type InitialConfig = {
+  type?: ConfigType;
+  labelX?: string;
+  labelY?: string;
+  labels?: string[];
+  colors?: string[];
+  commands?: string[];
+};
 
 export type Options = {
   configId?: number;

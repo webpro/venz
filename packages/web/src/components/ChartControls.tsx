@@ -15,6 +15,7 @@ import { Bar } from './icons/Bar';
 import { download } from '../util/download';
 import type { Accessor, Setter } from 'solid-js';
 import type { ChartType, ImgBgPadding, LegendPosition, SortMode } from '../types';
+import { Share } from './icons/Share';
 
 type ChartControlsProps = {
   svgRef: SVGSVGElement;
@@ -31,6 +32,7 @@ type ChartControlsProps = {
   setImgDownloadBgColor: Setter<string>;
   imgDownloadPadding: Accessor<ImgBgPadding>;
   setImgDownloadPadding: Setter<ImgBgPadding>;
+  onShare: () => void;
 };
 
 export const ChartControls = (props: ChartControlsProps) => {
@@ -115,6 +117,10 @@ export const ChartControls = (props: ChartControlsProps) => {
           },
         ]}
       />
+
+      <IconButton aria-label="Share URL" onClick={props.onShare} title="Copy URL to clipboard">
+        <Share />
+      </IconButton>
     </div>
   );
 };

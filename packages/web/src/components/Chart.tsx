@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, onCleanup, Show } from 'solid-js';
+import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
 import { Button, ButtonLink } from './Button';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { getStorageAdapter } from '../storage';
@@ -10,7 +10,7 @@ import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
 import { renderSVG } from './render-svg';
-import { transformFromSearchParams, transpose } from '../util/helpers';
+import { createShareableUrl, transformFromSearchParams } from '../util/helpers';
 import type { ImgBgPadding, SortMode } from '../types';
 
 export const storage = getStorageAdapter();
@@ -39,6 +39,7 @@ export default function Chart() {
 
   createEffect(() => {
     if (!(!searchParams.type && chartType() === 'median')) setSearchParams({ type: chartType() });
+    if (!(!searchParams.ct && config()?.type === 'standard')) setSearchParams({ ct: config()?.type });
     if (!(!searchParams.lp && legendPosition() === 'tr')) setSearchParams({ lp: legendPosition() });
     if (!(!searchParams.br && fullRange() === true)) setSearchParams({ br: fullRange() ? '0' : '1' });
   });
@@ -112,6 +113,14 @@ export default function Chart() {
     });
   });
 
+  const handleShare = () => {
+    const [loss, url] = createShareableUrl(searchParams, series, data());
+    const relative = loss * 100;
+    const prettyUrl = url.origin + '?' + decodeURIComponent(url.searchParams.toString());
+    navigator.clipboard.writeText(prettyUrl);
+    addToast(`URL copied to clipboard (${relative === 0 ? 'no' : `${relative.toFixed(2)}%`} data loss)`);
+  };
+
   return (
     <div
       class="flex flex-col gap-8 max-w-[960px] m-auto"
@@ -151,6 +160,7 @@ export default function Chart() {
         setImgDownloadBgColor={setImgDownloadBgColor}
         imgDownloadPadding={imgDownloadPadding}
         setImgDownloadPadding={setImgDownloadPadding}
+        onShare={handleShare}
       />
 
       {series.length > 0 && (

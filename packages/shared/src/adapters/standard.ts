@@ -212,6 +212,7 @@ export function transformLabeledData(input: Array<[string, number | number[]]>, 
         configId,
         label,
         color: initialConfig?.colors?.[i] ?? getNextAvailableColor(series),
+        command: initialConfig?.commands?.[i],
       });
     }
 
@@ -243,7 +244,7 @@ export function transformLabeledData(input: Array<[string, number | number[]]>, 
     : {
         id: configId,
         title: `New labeled data series (${timestamp})`,
-        type: 'standard',
+        type: initialConfig?.type ?? 'standard',
         sort,
         series,
         labels,
