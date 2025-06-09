@@ -192,10 +192,7 @@ export const renderSVG = (props: RenderProps) => {
 
   const isAlignEnd = props.chartType() === 'scatter' || props.chartType() === 'line' || props.chartType() === 'pivot';
 
-  const labels =
-    isLabeled && (props.chartType() === 'scatter' || props.chartType() === 'line')
-      ? props.config()?.labels
-      : props.data().map(d => d.label);
+  const labels = x.domain().map(d => String(d));
 
   const isDenseTicks = labels.length > 20 || labels.reduce((acc, l) => acc + l.length, 0) > 100;
 
