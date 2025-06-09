@@ -19,17 +19,17 @@
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.3",
     "@solidjs/start": "^1.1.4",
-    "@tailwindcss/postcss": "^4.1.7",
+    "@tailwindcss/postcss": "^4.1.8",
     "@venz/shared": "workspace:*",
     "d3-array": "^3.2.4",
     "d3-axis": "^3.0.0",
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
     "d3-shape": "^3.2.0",
-    "postcss": "^8.5.3",
+    "postcss": "^8.5.4",
     "semver": "^7.7.2",
-    "solid-js": "^1.9.6",
-    "tailwindcss": "^4.1.7",
+    "solid-js": "^1.9.7",
+    "tailwindcss": "^4.1.8",
     "vinxi": "0.5.6"
   }
 }
