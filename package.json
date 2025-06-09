@@ -12,6 +12,7 @@
     "wrangler": "^4.15.2"
   },
   "scripts": {
+    "dev": "pnpm run -F @venz/web dev",
     "knip": "knip"
   },
   "packageManager": "pnpm@10.11.0"
