@@ -65,7 +65,8 @@ export const renderSVG = (props: RenderProps) => {
     const _max = max(props.data().map(s => s.values.length ?? 0));
     return scaleLinear()
       .domain([0, _max ? _max - 1 : 0])
-      .range([0, width]);
+      .range([0, width])
+      .nice();
   };
 
   const isLabeled = Boolean(props.data()[0]?.label);
@@ -147,13 +148,13 @@ export const renderSVG = (props: RenderProps) => {
           ...props
             .data()
             .filter(s => props.selectedSeries().includes(s.seriesId))
-            .flatMap(m => m.min),
+            .flatMap(m => m.min)
         ),
         Math.max(
           ...props
             .data()
             .filter(s => props.selectedSeries().includes(s.seriesId))
-            .flatMap(m => m.max),
+            .flatMap(m => m.max)
         ) * 1.01,
       ])
       .range([height * 0.9, 0])
@@ -170,7 +171,7 @@ export const renderSVG = (props: RenderProps) => {
     .call(
       axisLeft(y)
         .tickSize(-width)
-        .tickFormat(() => ''),
+        .tickFormat(() => '')
     );
 
   if (props.chartType() !== 'bar') {
@@ -183,7 +184,7 @@ export const renderSVG = (props: RenderProps) => {
       .call(
         axisBottom(x)
           .tickSize(-height)
-          .tickFormat(() => ''),
+          .tickFormat(() => '')
       );
   }
 
@@ -205,7 +206,7 @@ export const renderSVG = (props: RenderProps) => {
     .style('fill', 'currentColor')
     .attr('transform', () => (isDenseTicks ? 'rotate(-45)' : null))
     .attr('text-anchor', (d, i, r) =>
-      isAlignEnd && r.length !== 1 && r.length === i + 1 ? 'end' : isDenseTicks ? 'end' : 'middle',
+      isAlignEnd && r.length !== 1 && r.length === i + 1 ? 'end' : isDenseTicks ? 'end' : 'middle'
     )
     .attr('dy', isDenseTicks ? '.1em' : '0.7em')
     .attr('dx', isDenseTicks ? '-.8em' : null)
@@ -214,7 +215,7 @@ export const renderSVG = (props: RenderProps) => {
         ? Number.isInteger(d)
           ? Number(d) + 1
           : ''
-        : props.series[d]?.label || d,
+        : props.series[d]?.label || d
     );
 
   svg
@@ -255,7 +256,7 @@ export const renderSVG = (props: RenderProps) => {
       .append('g')
       .attr(
         'transform',
-        (_, i) => `translate(0, ${props.legendPosition().includes('t') ? i * 25 : (i + 1 - topTen.length) * 25})`,
+        (_, i) => `translate(0, ${props.legendPosition().includes('t') ? i * 25 : (i + 1 - topTen.length) * 25})`
       )
       .each(function (selectedId) {
         const currentSeries = props.series.find(s => s.id === selectedId);
@@ -275,7 +276,7 @@ export const renderSVG = (props: RenderProps) => {
   for (const selectedId of props.selectedSeries()) {
     const currentSeries = props.series.find(s => s.id === selectedId);
     const stats = (props.chartType() === 'pivot' ? transpose(props.data()) : props.data()).find(
-      d => d.seriesId === selectedId,
+      d => d.seriesId === selectedId
     );
 
     if (!currentSeries || !stats) continue;

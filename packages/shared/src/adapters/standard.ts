@@ -1,6 +1,6 @@
 import type { Configuration, Statistics, Series, SeriesData, JsonValue, ConfigList, ConfigStandard } from '../types.ts';
 import { getNextAvailableColor } from '../colors.ts';
-import type { InitialConfig, Options } from './index.ts';
+import type { Options } from './index.ts';
 
 export function calculateStats(values: number[]): Statistics {
   const sorted = values.toSorted((a, b) => a - b);

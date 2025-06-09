@@ -93,7 +93,7 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
 
   createEffect(() => {
     const nonEmptyPrepare = series.filter(
-      (cmd, index) => index === series.length - 1 || cmd.command?.trim() || cmd.label.trim(),
+      (cmd, index) => index === series.length - 1 || cmd.command?.trim() || cmd.label.trim()
     );
     const lastCommand = nonEmptyPrepare[nonEmptyPrepare.length - 1];
     if (
@@ -296,7 +296,7 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
                               setSeries(
                                 i(),
                                 'command',
-                                config.command.replace(`{${config.name}}`, event.currentTarget.value),
+                                config.command.replace(`{${config.name}}`, event.currentTarget.value)
                               );
                               setConfig('series', series);
                               setIsDirty(true);

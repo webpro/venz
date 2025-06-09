@@ -46,7 +46,7 @@ export const ChartSeries = (props: Props) => {
         const ratio = stats?.median / lowestStats?.median;
         const relativeStddev = !isLowest
           ? Math.sqrt(
-              Math.pow(stats?.stddev / stats?.median, 2) + Math.pow(lowestStats?.stddev / lowestStats?.median, 2),
+              Math.pow(stats?.stddev / stats?.median, 2) + Math.pow(lowestStats?.stddev / lowestStats?.median, 2)
             ) * ratio
           : 0;
 
@@ -89,7 +89,7 @@ export const ChartSeries = (props: Props) => {
                   checked={props.selectedSeries().includes(s.id)}
                   onChange={event => {
                     props.setSelectedSeries(prev =>
-                      (event.currentTarget.checked ? [...prev, s.id] : prev.filter(id => id !== s.id)).sort(),
+                      (event.currentTarget.checked ? [...prev, s.id] : prev.filter(id => id !== s.id)).sort()
                     );
                   }}
                   class="w-4 h-4 rounded-sm"
@@ -122,7 +122,7 @@ export const ChartSeries = (props: Props) => {
                 />
               </div>
 
-              {(props.type === 'hyperfine-default' || props.type === 'hyperfine-json') && (
+              {props.type.startsWith('hyperfine-') && (
                 <code class="py-2 text-base text-gray-400 font-mono">{s.command}</code>
               )}
 
@@ -134,7 +134,7 @@ export const ChartSeries = (props: Props) => {
                       {fasterSeries.label}
                     </span>
                     is {s.ratio.toFixed(2)} ± {s.relativeStddev.toFixed(2)} times{' '}
-                    {props.type === 'hyperfine-default' || props.type === 'hyperfine-parameter' ? 'faster' : 'lower'}
+                    {props.type.startsWith('hyperfine-') ? 'faster' : 'lower'}
                   </em>
                 ))}
             </label>

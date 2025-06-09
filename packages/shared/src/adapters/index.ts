@@ -11,7 +11,7 @@ import {
   transformLabeledData,
   transformRawData,
 } from './standard.ts';
-import type { ConfigStandard, Configuration, SeriesData } from '../types.ts';
+import type { Configuration, SeriesData } from '../types.ts';
 
 export { generateCommand } from './hyperfine.ts';
 

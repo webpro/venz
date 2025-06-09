@@ -1,4 +1,4 @@
-import { transform, type ConfigStandard, type Configuration, type InitialConfig, type SeriesData } from '@venz/shared';
+import { transform, type InitialConfig, type SeriesData } from '@venz/shared';
 import type { ChartType, LegendPosition, SearchParams } from '../types';
 import { calculateStats } from '@venz/shared/src/adapters/standard';
 

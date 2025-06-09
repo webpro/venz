@@ -89,9 +89,10 @@ export function transformHyperfineData(
     };
 
     const config: Configuration =
-      existingConfig ?? hasParameters
+      (existingConfig ?? hasParameters)
         ? { ...baseConfig, type: 'hyperfine-parameter', parameterName: parameterName ?? '', command: command ?? '' }
         : { ...baseConfig, type: 'hyperfine-default' };
+
     for (const result of results) {
       const id = seriesId ?? series.length;
       const label =

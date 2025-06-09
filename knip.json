@@ -4,5 +4,5 @@
       "entry": ["app.config.ts", "src/app.tsx", "src/entry-*.tsx", "src/routes/**/*.{ts,tsx}"]
     }
   },
-  "ignoreDependencies": ["postcss", "@cloudflare/workers-types", "wrangler"]
+  "ignoreDependencies": ["@cloudflare/workers-types", "wrangler"]
 }
