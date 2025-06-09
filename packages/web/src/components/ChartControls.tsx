@@ -12,8 +12,8 @@ import { SortAsc } from './icons/SortAsc';
 import { SortDesc } from './icons/SortDesc';
 import { Dropdown } from './Dropdown';
 import { Bar } from './icons/Bar';
-import { download } from '../util/download';
-import type { Accessor, Setter } from 'solid-js';
+import { download, type ImageFormat } from '../util/download';
+import { createSignal, type Accessor, type Setter } from 'solid-js';
 import type { ChartType, ImgBgPadding, LegendPosition, SortMode } from '../types';
 import { Share } from './icons/Share';
 
@@ -29,14 +29,17 @@ type ChartControlsProps = {
   setLegendPosition: Setter<LegendPosition>;
   fullRange: Accessor<boolean>;
   setFullRange: Setter<boolean>;
-  imgDownloadBgColor: Accessor<string>;
-  setImgDownloadBgColor: Setter<string>;
-  imgDownloadPadding: Accessor<ImgBgPadding>;
-  setImgDownloadPadding: Setter<ImgBgPadding>;
   onShare: () => void;
 };
 
 export const ChartControls = (props: ChartControlsProps) => {
+  const [imgDownloadBgColor, setImgDownloadBgColor] = createSignal('none');
+  const [imgDownloadPadding, setImgDownloadPadding] = createSignal<ImgBgPadding>(0);
+
+  const downloadImg = (format: ImageFormat) => {
+    download(props.svgRef, { format, backgroundColor: imgDownloadBgColor(), padding: imgDownloadPadding() });
+  };
+
   return (
     <div class="flex justify-end gap-4">
       <Dropdown
@@ -85,36 +88,26 @@ export const ChartControls = (props: ChartControlsProps) => {
         label="Download image"
         icon={<Download />}
         options={[
-          { value: 'svg', icon: Download, label: 'svg', onClick: () => download(props.svgRef, { format: 'svg' }) },
-          { value: 'png', icon: Download, label: 'png', onClick: () => download(props.svgRef, { format: 'png' }) },
-          {
-            value: 'webp',
-            icon: Download,
-            label: 'webP',
-            onClick: () => download(props.svgRef, { format: 'webp' }),
-          },
-          {
-            value: 'avif',
-            icon: Download,
-            label: 'avif',
-            onClick: () => download(props.svgRef, { format: 'avif' }),
-          },
+          { value: 'svg', icon: Download, label: 'svg', onClick: () => downloadImg('svg') },
+          { value: 'png', icon: Download, label: 'png', onClick: () => downloadImg('png') },
+          { value: 'webp', icon: Download, label: 'webP', onClick: () => downloadImg('webp') },
+          { value: 'avif', icon: Download, label: 'avif', onClick: () => downloadImg('avif') },
           { separator: true, value: '', label: '' },
           {
             value: 'bg-color',
-            label: `bg (${props.imgDownloadBgColor()})`,
-            icon: () => <div class={`w-full h-full`} style={`background-color: ${props.imgDownloadBgColor()}`} />,
+            label: `bg (${imgDownloadBgColor()})`,
+            icon: () => <div class={`w-full h-full`} style={`background-color: ${imgDownloadBgColor()}`} />,
             onClick: () => {
               const colors = ['none', '#000', '#fff'];
-              const currentIndex = colors.indexOf(props.imgDownloadBgColor());
+              const currentIndex = colors.indexOf(imgDownloadBgColor());
               const nextIndex = (currentIndex + 1) % colors.length;
-              props.setImgDownloadBgColor(colors[nextIndex]);
+              setImgDownloadBgColor(colors[nextIndex]);
             },
           },
           {
             value: 'padding',
-            label: `padding: ${props.imgDownloadPadding()}`,
-            onClick: () => props.setImgDownloadPadding(prev => (prev === 0 ? 12 : prev === 12 ? 24 : 0)),
+            label: `padding: ${imgDownloadPadding()}`,
+            onClick: () => setImgDownloadPadding(prev => (prev === 0 ? 12 : prev === 12 ? 24 : 0)),
           },
         ]}
       />

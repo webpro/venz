@@ -1,5 +1,7 @@
+export type ImageFormat = 'png' | 'svg' | 'webp' | 'avif';
+
 type DownloadChartOptions = {
-  format?: 'png' | 'svg' | 'webp' | 'avif';
+  format?: ImageFormat;
   scale?: number;
   padding?: number;
   backgroundColor?: string;
@@ -13,7 +15,7 @@ export const download = (svgElement: SVGSVGElement, options: DownloadChartOption
     svgClone.setAttribute('class', 'venz-chart');
     svgClone.setAttribute(
       'viewBox',
-      `-${padding} -${padding} ${svgElement.clientWidth + padding * 2} ${svgElement.clientHeight + padding * 2}`,
+      `-${padding} -${padding} ${svgElement.clientWidth + padding * 2} ${svgElement.clientHeight + padding * 2}`
     );
     if (backgroundColor !== 'none') {
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'circle');

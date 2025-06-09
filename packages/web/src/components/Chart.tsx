@@ -34,8 +34,6 @@ export default function Chart() {
   const [fullRange, setFullRange] = createSignal(fromUrl.fullRange);
   const [sortMode, setSortMode] = createSignal<SortMode>('original');
   const [legendPosition, setLegendPosition] = createSignal(fromUrl.legendPosition);
-  const [imgDownloadBgColor, setImgDownloadBgColor] = createSignal('none');
-  const [imgDownloadPadding, setImgDownloadPadding] = createSignal<ImgBgPadding>(0);
 
   createEffect(() => {
     if (!(!searchParams.type && chartType() === 'median')) setSearchParams({ type: chartType() });
@@ -157,10 +155,6 @@ export default function Chart() {
         setLegendPosition={setLegendPosition}
         fullRange={fullRange}
         setFullRange={setFullRange}
-        imgDownloadBgColor={imgDownloadBgColor}
-        setImgDownloadBgColor={setImgDownloadBgColor}
-        imgDownloadPadding={imgDownloadPadding}
-        setImgDownloadPadding={setImgDownloadPadding}
         onShare={handleShare}
       />
 
