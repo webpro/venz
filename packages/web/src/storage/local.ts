@@ -13,7 +13,7 @@ export class LocalStorageAdapter implements StorageAdapter {
 
   private async getDb() {
     return new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, 2);
+      const request = indexedDB.open(this.dbName, 3);
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve(request.result);
       request.onblocked = event => console.log(event);
@@ -27,6 +27,7 @@ export class LocalStorageAdapter implements StorageAdapter {
         }
         const transaction = request.transaction;
         if (event.oldVersion < 2) migrations[1](db, transaction);
+        if (event.oldVersion < 3) migrations[2](db, transaction);
       };
     });
   }

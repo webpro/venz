@@ -65,4 +65,24 @@ export const migrations = {
       };
     };
   },
+  2: (db: IDBDatabase, transaction: IDBTransaction) => {
+    debugger;
+    const configStore = transaction.objectStore('configurations');
+    configStore.openCursor().onsuccess = e => {
+      const cursor = (e.target as IDBRequest).result;
+      if (cursor) {
+        const config = cursor.value;
+        if (config.type === 'hyperfine-default') {
+          config.type = 'hyperfine';
+          cursor.update(config);
+        }
+        if (config.type === 'hyperfine-parameter' && 'parameterName' in config) {
+          config.parameterNames = [config.parameterName];
+          delete config.parameterName;
+          cursor.update(config);
+        }
+        cursor.continue();
+      }
+    };
+  },
 };
