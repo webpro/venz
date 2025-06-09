@@ -148,6 +148,7 @@ export default function Chart() {
       <ChartControls
         svgRef={svgRef}
         hasLabels={data().length === 0 || config()?.labels}
+        isTooManyValues={data()[0]?.values && data()[0].values.length > 500}
         chartType={chartType}
         setChartType={setChartType}
         sortMode={sortMode}

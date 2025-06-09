@@ -20,6 +20,7 @@ import { Share } from './icons/Share';
 type ChartControlsProps = {
   svgRef: SVGSVGElement;
   hasLabels: boolean;
+  isTooManyValues: boolean;
   chartType: Accessor<ChartType>;
   setChartType: Setter<ChartType>;
   sortMode: Accessor<SortMode>;
@@ -44,10 +45,10 @@ export const ChartControls = (props: ChartControlsProps) => {
         options={[
           { value: 'bar', icon: Bar, label: 'bar' },
           { value: 'median', icon: MedianChart, label: 'median' },
-          { value: 'line', icon: Line, label: 'line' },
-          { value: 'pivot', icon: Pivot, label: 'pivot', disabled: !props.hasLabels },
           { value: 'box', icon: BoxPlot, label: 'box plot' },
-          { value: 'scatter', icon: ScatterPlot, label: 'scatter' },
+          { value: 'line', icon: Line, label: 'line', disabled: props.isTooManyValues },
+          { value: 'scatter', icon: ScatterPlot, label: 'scatter', disabled: props.isTooManyValues },
+          { value: 'pivot', icon: Pivot, label: 'pivot', disabled: !props.hasLabels },
         ]}
         onChange={props.setChartType}
       />
