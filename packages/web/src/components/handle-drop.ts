@@ -30,13 +30,10 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
       const input = await file.text();
 
       if (!props.chartId || props.chartId === 'chart') {
-        const { config: incomingConfig, data: incomingData } = transform(
-          input,
-          -1,
-          undefined,
-          props.config(),
-          props.data(),
-        );
+        const { config: incomingConfig, data: incomingData } = transform(input, {
+          config: props.config(),
+          data: props.data(),
+        });
         if (incomingConfig) {
           props.setConfig(incomingConfig);
           props.setSeries(incomingConfig.series);
@@ -49,7 +46,7 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
         if (!match?.groups) {
           props.addToast(
             `Filename must be "venz-drop-${props.chartId}.json" or "venz-drop-${props.chartId}-[seriesId].json"`,
-            'error',
+            'error'
           );
           continue;
         }

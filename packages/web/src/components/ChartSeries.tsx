@@ -122,9 +122,7 @@ export const ChartSeries = (props: Props) => {
                 />
               </div>
 
-              {(props.type.startsWith('hyperfine-') || props.type.startsWith('mitata-')) && (
-                <code class="py-2 text-base text-gray-400 font-mono">{s.command}</code>
-              )}
+              {s.command && <code class="py-2 text-base text-gray-400 font-mono">{s.command}</code>}
 
               {props.type !== 'list' &&
                 seriesWithStats().length > 1 &&

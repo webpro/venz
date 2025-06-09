@@ -91,7 +91,7 @@ export function transformHyperfineData(
     const config: Configuration =
       (existingConfig ?? hasParameters)
         ? { ...baseConfig, type: 'hyperfine-parameter', parameterName: parameterName ?? '', command: command ?? '' }
-        : { ...baseConfig, type: 'hyperfine-default' };
+        : { ...baseConfig, type: 'hyperfine' };
 
     for (const result of results) {
       const id = seriesId ?? series.length;
@@ -114,7 +114,7 @@ export const generateCommand = (config: Configuration) => {
       return `hyperfine --warmup 3 --parameter-list ${config.parameterName} ${commands.map(cmd =>
         cmd.label.split(',')
       )} '${config.command}' --export-json venz-drop-${config.id}.json`;
-    case 'hyperfine-default':
+    case 'hyperfine':
       return [
         'hyperfine --warmup 3',
         ...commands.map(cmd => (cmd.command ? `'${cmd.command.replace(/'/g, "\\'")}'` : '')),

@@ -1,6 +1,6 @@
 export const configTypes = [
   'standard',
-  'hyperfine-default',
+  'hyperfine',
   'hyperfine-parameter',
   'mitata',
   'mitata-parameter',
@@ -26,7 +26,7 @@ export interface ConfigStandard extends BaseConfig {
 
 interface HyperfineConfigDefault extends BaseConfig {
   id: number;
-  type: 'hyperfine-default';
+  type: 'hyperfine';
   series: Series[];
 }
 

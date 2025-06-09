@@ -21,7 +21,7 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
   const [config, setConfig] = createStore<Configuration>({
     id: -1,
     title: '',
-    type: 'hyperfine-default',
+    type: 'hyperfine',
     series: [],
   });
 
@@ -198,7 +198,7 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
               </div>
 
               <Switch>
-                <Match when={config.type === 'hyperfine-default'}>
+                <Match when={config.type === 'hyperfine'}>
                   <h2>Commands</h2>
 
                   <div class="flex flex-col gap-2">
@@ -590,7 +590,7 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
           <Show
             when={
               selectedConfig() &&
-              (config.type === 'hyperfine-default' || config.type === 'hyperfine-parameter') &&
+              (config.type === 'hyperfine' || config.type === 'hyperfine-parameter') &&
               series.length > 0
             }
           >

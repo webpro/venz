@@ -13,7 +13,7 @@ test('transform hyperfine json data', async () => {
     config: {
       id: -1,
       title: expect.stringMatching(/New hyperfine benchmark \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
-      type: 'hyperfine-default',
+      type: 'hyperfine',
       series: [
         {
           color: '#8b5cf6',

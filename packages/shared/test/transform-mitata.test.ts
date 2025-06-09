@@ -85,7 +85,7 @@ test.only('transform mitata json (parameterized)', async () => {
       id: -1,
       title: expect.stringMatching(/New mitata benchmark \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'mitata-parameter',
-      parameterName: 'len',
+      parameterNames: ['len', 'len2'],
       command: 'look_mom_no_spaghetti {len} {len2}',
       series: [
         {

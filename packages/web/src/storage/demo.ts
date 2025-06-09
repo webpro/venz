@@ -21,7 +21,7 @@ const examples = [
   [
     {
       title: 'hyperfine example #1',
-      type: 'hyperfine-default',
+      type: 'hyperfine',
       series: [
         { label: 'Third command', command: 'sleep 0.35', color: COLORS[2] },
         { label: 'Second command', command: 'sleep 0.31', color: COLORS[1] },
@@ -32,7 +32,7 @@ const examples = [
   [
     {
       title: 'hyperfine example #2',
-      type: 'hyperfine-default',
+      type: 'hyperfine',
       series: [
         { label: 'compress', command: 'yes | head -c 10M | compress > /dev/null', color: COLORS[3] },
         { label: 'gzip', command: 'yes | head -c 10M | gzip > /dev/null', color: COLORS[4] },
