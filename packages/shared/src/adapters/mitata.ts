@@ -24,11 +24,7 @@ interface Results {
 }
 
 function truncateSamples(samples: number[]): number[] {
-  const truncated = samples.slice(0, MAX_SAMPLES);
-  if (samples.length !== truncated.length) {
-    console.warn(`Data loss: ${(((samples.length - truncated.length) / samples.length) * 100).toFixed(2)}%`);
-  }
-  return truncated;
+  return samples.slice(0, MAX_SAMPLES);
 }
 
 function transformMitataWorkload(json: MitataJSON): Results[] {
@@ -65,6 +61,8 @@ export function transformMitataData(
 ) {
   const now = new Date();
   const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+  const size = json.benchmarks[0].runs[0].stats.samples.length;
 
   const results = transformMitataWorkload(json);
   const hasParameters = results.every(r => r.series.parameters && Object.keys(r.series.parameters).length > 0);
@@ -121,6 +119,8 @@ export function transformMitataData(
       data.push({ ...result.data, id, seriesId: id });
     }
 
-    return { config, data };
+    const loss = (size - data[0].values.length) / size;
+
+    return { config, data, loss };
   }
 }

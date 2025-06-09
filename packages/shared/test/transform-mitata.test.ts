@@ -10,6 +10,7 @@ test('transform mitata json data', async () => {
   const output = transform(input);
 
   expect(output).toEqual({
+    loss: 0,
     config: {
       id: -1,
       title: expect.stringMatching(/New mitata benchmark \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
@@ -81,6 +82,7 @@ test('transform mitata json (parameterized)', async () => {
   const output = transform(input);
 
   expect(output).toEqual({
+    loss: 0,
     config: {
       id: -1,
       title: expect.stringMatching(/New mitata benchmark \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),

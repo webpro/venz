@@ -36,7 +36,7 @@ export type Options = {
 export function transform(
   input: string | JsonValue,
   options: Options = {}
-): { config: undefined | Configuration; data: SeriesData[] } {
+): { config: undefined | Configuration; data: SeriesData[]; loss?: number } {
   const { configId = -1, seriesId, config } = options;
 
   if (typeof input !== 'string' && typeof input !== 'object')
