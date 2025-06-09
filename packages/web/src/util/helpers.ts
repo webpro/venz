@@ -24,9 +24,11 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   const labels = typeof label === 'string' ? [label] : Array.isArray(label) ? label : [];
   const values = typeof data === 'string' ? [data] : Array.isArray(data) ? data : [];
   const input =
-    labels.length === values.length
-      ? labels.map((label, i) => [label, values[i].split(SEPARATOR).map(Number)])
-      : values;
+    values.length === 1 && (values[0].startsWith('{') || values[0].startsWith('['))
+      ? values[0]
+      : labels.length === values.length
+        ? labels.map((label, i) => [label, values[i].split(SEPARATOR).map(Number)])
+        : values;
 
   const initialConfig: InitialConfig = {
     type: typeof ct === 'string' && configTypes.includes(ct) ? ct : 'standard',
