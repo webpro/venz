@@ -5,15 +5,15 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250607.0",
-    "@types/node": "^22.15.30",
-    "knip": "^5.60.2",
-    "typescript": "^5.8.3",
-    "wrangler": "^4.19.1"
+    "@cloudflare/workers-types": "^4.20250926.0",
+    "@types/node": "^24.5.2",
+    "knip": "^5.64.1",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.40.2"
   },
   "scripts": {
     "dev": "pnpm run -F @venz/web dev",
     "knip": "knip"
   },
-  "packageManager": "pnpm@10.11.1"
+  "packageManager": "pnpm@10.17.1"
 }
