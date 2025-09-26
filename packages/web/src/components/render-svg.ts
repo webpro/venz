@@ -103,10 +103,12 @@ export const renderSVG = (props: RenderProps) => {
     const values =
       props.chartType() === 'pivot'
         ? props.data().flatMap(d => d.values.filter(isSelected))
-        : props
-            .data()
-            .filter(s => props.selectedSeries().includes(s.seriesId))
-            .flatMap(s => s.max);
+        : props.chartType() === 'bar'
+          ? props.data().map(s => s.median)
+          : props
+              .data()
+              .filter(s => props.selectedSeries().includes(s.seriesId))
+              .flatMap(s => s.max);
 
     return scaleLinear()
       .domain([0, Math.max(...values) * 1.05])
@@ -145,22 +147,19 @@ export const renderSVG = (props: RenderProps) => {
       .style('stroke', 'currentColor')
       .style('stroke-width', 1);
 
+    const values =
+      props.chartType() === 'median' || props.chartType() === 'bar'
+        ? props.data().map(s => s.median)
+        : props.chartType() === 'pivot'
+          ? props.data().flatMap(d => d.values.filter(isSelected))
+          : props
+              .data()
+              .filter(s => props.selectedSeries().includes(s.seriesId))
+              .flatMap(s => [s.min, s.max]);
+
     return scaleLinear()
-      .domain([
-        Math.min(
-          ...props
-            .data()
-            .filter(s => props.selectedSeries().includes(s.seriesId))
-            .flatMap(m => m.min)
-        ),
-        Math.max(
-          ...props
-            .data()
-            .filter(s => props.selectedSeries().includes(s.seriesId))
-            .flatMap(m => m.max)
-        ) * 1.01,
-      ])
-      .range([height * 0.9, 0])
+      .domain([Math.min(...values) * 0.9, Math.max(...values) * 1.01])
+      .range([height, 0])
       .nice();
   };
 
@@ -191,7 +190,11 @@ export const renderSVG = (props: RenderProps) => {
       );
   }
 
-  svg.append('g').call(axisLeft(y)).selectAll('text').style('fill', 'currentColor');
+  svg
+    .append('g')
+    .call(axisLeft(y).tickFormat(props.fullRange() ? null : d => (d === y.domain()[0] ? '' : d)))
+    .selectAll('text')
+    .style('fill', 'currentColor');
 
   const isAlignEnd = props.chartType() === 'scatter' || props.chartType() === 'line' || props.chartType() === 'pivot';
 
