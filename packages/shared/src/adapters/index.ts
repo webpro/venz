@@ -67,6 +67,10 @@ export function transform(
       if (json.every(v => Array.isArray(v) && v.every(v => typeof v === 'number'))) {
         return transformData(json, options);
       }
+
+      if (json.every(v => typeof v === 'string')) {
+        return transform(json.join('\n'), options);
+      }
     }
   } catch (error) {
     if (typeof input === 'string') {
