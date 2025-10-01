@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
+import { matchLabeledTitle } from './helpers.ts';
 
 test('transform raw labeled data rows (datetime)', () => {
   const input = `
@@ -12,7 +13,7 @@ test('transform raw labeled data rows (datetime)', () => {
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchLabeledTitle,
       type: 'standard',
       sort: 'datetime',
       series: [
@@ -32,7 +33,7 @@ test('transform raw labeled data rows (datetime)', () => {
           label: '2025-06',
         },
       ],
-      labels: [
+      seriesX: [
         {
           color: '#8b5cf6',
           id: 0,
@@ -99,7 +100,7 @@ test('transform raw labeled data rows (semver)', () => {
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchLabeledTitle,
       type: 'standard',
       sort: 'semver',
       series: [
@@ -119,7 +120,7 @@ test('transform raw labeled data rows (semver)', () => {
           label: '1.0.2',
         },
       ],
-      labels: [
+      seriesX: [
         {
           color: '#8b5cf6',
           id: 0,
@@ -186,7 +187,7 @@ C 7 8 9 10
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchLabeledTitle,
       type: 'standard',
       sort: undefined,
       series: [
@@ -206,7 +207,7 @@ C 7 8 9 10
           label: 'C',
         },
       ],
-      labels: [
+      seriesX: [
         {
           color: '#8b5cf6',
           id: 0,

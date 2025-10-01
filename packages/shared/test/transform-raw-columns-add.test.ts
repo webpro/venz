@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
+import { matchLabeledTitle } from './helpers.ts';
 
 test('transform raw column data', () => {
   const input = `
@@ -22,7 +23,7 @@ a b c
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchLabeledTitle,
       type: 'standard',
       series: [
         {

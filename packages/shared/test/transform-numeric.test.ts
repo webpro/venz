@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
+import { matchRawTitle } from './helpers.ts';
 
 test('transform numeric data (single)', () => {
   const input = JSON.stringify([1, 1, 1]);
@@ -8,7 +9,7 @@ test('transform numeric data (single)', () => {
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/Raw data input \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchRawTitle,
       type: 'standard',
       series: [
         {
@@ -45,7 +46,7 @@ test('transform raw numeric data (multi)', () => {
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/Raw data input \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchRawTitle,
       type: 'standard',
       series: [
         {

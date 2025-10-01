@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
+import { matchLabeledTitle } from './helpers.ts';
 
 test('transform raw labeled data (datetime)', () => {
   const input = `
@@ -12,7 +13,7 @@ test('transform raw labeled data (datetime)', () => {
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchLabeledTitle,
       type: 'standard',
       sort: 'datetime',
       series: [
@@ -32,7 +33,7 @@ test('transform raw labeled data (datetime)', () => {
           label: '2025-06',
         },
       ],
-      labels: [
+      seriesX: [
         {
           color: '#8b5cf6',
           id: 0,
@@ -89,7 +90,7 @@ test('transform raw labeled data (semver)', () => {
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchLabeledTitle,
       type: 'standard',
       sort: 'semver',
       series: [
@@ -109,7 +110,7 @@ test('transform raw labeled data (semver)', () => {
           label: '1.0.2',
         },
       ],
-      labels: [
+      seriesX: [
         {
           color: '#8b5cf6',
           id: 0,

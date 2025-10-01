@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
+import { matchLabeledTitle } from './helpers.ts';
 
 test('transform and add labeled data (datetime)', () => {
   const input = JSON.stringify([
@@ -20,7 +21,7 @@ test('transform and add labeled data (datetime)', () => {
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/New labeled data series \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchLabeledTitle,
       type: 'standard',
       sort: 'datetime',
       series: [
@@ -40,7 +41,7 @@ test('transform and add labeled data (datetime)', () => {
           label: '2025-06',
         },
       ],
-      labels: [
+      seriesX: [
         {
           color: '#8b5cf6',
           id: 0,

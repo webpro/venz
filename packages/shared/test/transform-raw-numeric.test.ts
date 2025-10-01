@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
+import { matchRawTitle } from './helpers.ts';
 
 test('transform raw numeric data (single)', () => {
   const input = `
@@ -12,7 +13,7 @@ test('transform raw numeric data (single)', () => {
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/Raw data input \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchRawTitle,
       type: 'standard',
       series: [
         {
@@ -49,7 +50,7 @@ test('transform raw numeric data (multi)', () => {
 
   expect(output).toEqual({
     config: {
-      title: expect.stringMatching(/Raw data input \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
+      title: matchRawTitle,
       type: 'standard',
       series: [
         {
@@ -102,6 +103,86 @@ test('transform raw numeric data (multi)', () => {
         max: 3,
         id: 2,
         seriesId: 2,
+      },
+    ],
+  });
+});
+
+test('transform raw numeric data (json string)', () => {
+  const input = ['1, 2, 3'];
+  const output = transform(input);
+
+  expect(output).toEqual({
+    config: {
+      title: matchRawTitle,
+      type: 'standard',
+      series: [
+        {
+          color: '#8b5cf6',
+          command: '',
+          id: 0,
+          label: 'Series 1',
+        },
+      ],
+    },
+    data: [
+      {
+        values: [1, 2, 3],
+        mean: 2,
+        median: 2,
+        stddev: Math.sqrt(2 / 3),
+        min: 1,
+        max: 3,
+        id: 0,
+        seriesId: 0,
+      },
+    ],
+  });
+});
+
+test('transform raw numeric data (multi json string)', () => {
+  const input = ['1, 2, 3', '4, 5, 6'];
+  const output = transform(input);
+
+  expect(output).toEqual({
+    config: {
+      title: matchRawTitle,
+      type: 'standard',
+      series: [
+        {
+          color: '#8b5cf6',
+          command: '',
+          id: 0,
+          label: 'Series 1',
+        },
+        {
+          color: '#ec4899',
+          command: '',
+          id: 1,
+          label: 'Series 2',
+        },
+      ],
+    },
+    data: [
+      {
+        values: [1, 2, 3],
+        mean: 2,
+        median: 2,
+        stddev: Math.sqrt(2 / 3),
+        min: 1,
+        max: 3,
+        id: 0,
+        seriesId: 0,
+      },
+      {
+        values: [4, 5, 6],
+        mean: 5,
+        median: 5,
+        stddev: Math.sqrt(2 / 3),
+        min: 4,
+        max: 6,
+        id: 1,
+        seriesId: 1,
       },
     ],
   });
