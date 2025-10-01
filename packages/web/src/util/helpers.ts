@@ -78,6 +78,7 @@ export function createShareableUrl(searchParams: SearchParams, series: Series[],
 
 export const transpose = (data: SeriesData[]) => {
   const result: SeriesData[] = [];
+  if (!data[0]) return result;
   for (let i = 0; i < data[0].values.length; i++) {
     result[i] = { id: i, seriesId: i, ...calculateStats(data.map(d => d.values[i])) };
   }
