@@ -104,7 +104,7 @@ export const renderSVG = (props: RenderProps) => {
   const getYScale = () => {
     const values =
       props.chartType() === 'pivot'
-        ? props.data().flatMap(d => d.values.filter(isSelected))
+        ? transpose(props.data()).flatMap(d => d.values.filter(isSelected))
         : props.chartType() === 'bar'
           ? props.data().map(s => s.median)
           : props
@@ -153,7 +153,7 @@ export const renderSVG = (props: RenderProps) => {
       props.chartType() === 'median' || props.chartType() === 'bar'
         ? props.data().map(s => s.median)
         : props.chartType() === 'pivot'
-          ? props.data().flatMap(d => d.values.filter(isSelected))
+          ? transpose(props.data()).flatMap(d => d.values.filter(isSelected))
           : props
               .data()
               .filter(s => props.selectedSeries().includes(s.seriesId))
