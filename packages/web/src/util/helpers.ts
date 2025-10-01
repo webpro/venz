@@ -45,10 +45,7 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   const legendPosition = getLegendPosition(searchParams.lp);
   const fullRange = getFullRange(searchParams.br);
 
-  const series: Series[] = (type === 'pivot' && config?.labels ? config.labels : config?.series) ?? [];
-  const selectedSeries = series.map(label => label.id);
-
-  return { type, legendPosition, fullRange, config, data: seriesData, series, selectedSeries };
+  return { type, legendPosition, fullRange, config, data: seriesData };
 }
 
 export function createShareableUrl(searchParams: SearchParams, series: Series[], data: SeriesData[]): [number, URL] {

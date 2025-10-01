@@ -15,8 +15,10 @@ type RenderProps = {
   config: Accessor<Configuration | undefined>;
   data: Accessor<SeriesData[]>;
   series: Series[];
-  chartType: Accessor<ChartType>;
   selectedSeries: Accessor<number[]>;
+  seriesX: Series[];
+  selectedSeriesX: Accessor<number[]>;
+  chartType: Accessor<ChartType>;
   legendPosition: Accessor<LegendPosition>;
   sortMode: Accessor<SortMode>;
   fullRange: Accessor<boolean>;
@@ -251,7 +253,7 @@ export const renderSVG = (props: RenderProps) => {
 
     const legend = svg.append('g').attr('class', 'legend').attr('transform', `translate(${legendX}, ${legendY})`);
 
-    const topTen = props.selectedSeries().slice(0, 10);
+    const topTen = (props.chartType() === 'pivot' ? props.selectedSeriesX() : props.selectedSeries()).slice(0, 10);
 
     legend
       .selectAll('g')
@@ -263,7 +265,9 @@ export const renderSVG = (props: RenderProps) => {
         (_, i) => `translate(0, ${props.legendPosition().includes('t') ? i * 25 : (i + 1 - topTen.length) * 25})`
       )
       .each(function (selectedId) {
-        const currentSeries = props.series.find(s => s.id === selectedId);
+        const currentSeries = (props.chartType() === 'pivot' ? props.seriesX : props.series).find(
+          s => s.id === selectedId
+        );
         const elementColor = props.theme() === 'high-contrast' ? 'currentColor' : currentSeries.color;
         const g = select(this);
         g.append('text')
@@ -277,211 +281,15 @@ export const renderSVG = (props: RenderProps) => {
       });
   }
 
-  for (const selectedId of props.selectedSeries()) {
-    const currentSeries = props.series.find(s => s.id === selectedId);
-    const stats = (props.chartType() === 'pivot' ? transpose(props.data()) : props.data()).find(
-      d => d.seriesId === selectedId
-    );
+  if (props.chartType() === 'pivot') {
+    for (const selectedId of props.selectedSeriesX()) {
+      const currentSeries = props.seriesX.find(s => s.id === selectedId);
+      const stats = transpose(props.data()).find(d => d.seriesId === selectedId);
 
-    if (!currentSeries || !stats) continue;
+      if (!currentSeries || !stats) continue;
 
-    const color = props.theme() === 'high-contrast' ? 'currentColor' : currentSeries.color;
+      const color = props.theme() === 'high-contrast' ? 'currentColor' : currentSeries.color;
 
-    if (props.chartType() === 'median') {
-      const radius = Math.abs(y(stats.median) - y(stats.median + stats.stddev));
-      const decimals = Math.min(3, Math.max(...stats.values.map(n => (n.toString().split('.')[1] || '').length)));
-
-      const cx = x(selectedId) || x(stats.label);
-
-      svg
-        .append('circle')
-        .attr('cx', cx)
-        .attr('cy', y(stats.median))
-        .attr('r', radius)
-        .attr('fill', color)
-        .attr('fill-opacity', 0.2);
-
-      svg
-        .append('circle')
-        .attr('cx', cx)
-        .attr('cy', y(stats.median))
-        .attr('r', 4)
-        .attr('fill', color)
-        .attr('stroke', color)
-        .attr('stroke-width', 2);
-
-      svg
-        .append('text')
-        .attr('x', cx + 6)
-        .attr('y', y(stats.median) - 6)
-        .style('fill', color)
-        .style('font-family', 'sans-serif')
-        .style('font-size', '12px')
-        .text(stats.median.toFixed(decimals));
-    } else if (props.chartType() === 'box') {
-      const sortedValues = stats.values.toSorted((a, b) => a - b);
-      const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
-      const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
-
-      const xPos = x(selectedId) || x(stats.label);
-      const boxWidth = Math.max(10, 50 - props.data().length * 1.5);
-      const halfWidth = boxWidth / 2;
-
-      svg
-        .append('rect')
-        .attr('x', xPos - halfWidth)
-        .attr('y', y(q3))
-        .attr('width', boxWidth)
-        .attr('height', y(q1) - y(q3))
-        .attr('fill', color)
-        .attr('fill-opacity', 0.2)
-        .attr('stroke', color);
-
-      svg
-        .append('line')
-        .attr('x1', xPos - halfWidth)
-        .attr('x2', xPos + halfWidth)
-        .attr('y1', y(stats.median))
-        .attr('y2', y(stats.median))
-        .attr('stroke', color)
-        .attr('stroke-width', 2);
-
-      svg
-        .append('line')
-        .attr('x1', xPos)
-        .attr('x2', xPos)
-        .attr('y1', y(stats.min))
-        .attr('y2', y(stats.max))
-        .attr('stroke', color)
-        .attr('stroke-width', 1);
-
-      svg
-        .append('line')
-        .attr('x1', xPos - 10)
-        .attr('x2', xPos + 10)
-        .attr('y1', y(stats.max))
-        .attr('y2', y(stats.max))
-        .attr('stroke', color)
-        .attr('stroke-width', 1);
-
-      svg
-        .append('line')
-        .attr('x1', xPos - 10)
-        .attr('x2', xPos + 10)
-        .attr('y1', y(stats.min))
-        .attr('y2', y(stats.min))
-        .attr('stroke', color)
-        .attr('stroke-width', 1);
-
-      if (stats.values.length <= 10) {
-        svg
-          .append('g')
-          .selectAll(`circle-${selectedId}`)
-          .data(stats.values)
-          .enter()
-          .append('circle')
-          .attr('cx', xPos)
-          .attr('cy', d => y(d))
-          .attr('r', 3)
-          .attr('fill', color)
-          .attr('opacity', 0.6);
-      }
-    } else if (props.chartType() === 'scatter') {
-      const dataLength = stats.values.length;
-
-      svg
-        .append('rect')
-        .attr('x', x(0))
-        .attr('y', y(stats.median + stats.stddev))
-        .attr('width', x(dataLength - 1) - x(0))
-        .attr('height', y(stats.median - stats.stddev) - y(stats.median + stats.stddev))
-        .attr('fill', color)
-        .attr('fill-opacity', 0.2);
-
-      svg
-        .append('line')
-        .attr('x1', x(0))
-        .attr('x2', x(dataLength - 1))
-        .attr('y1', y(stats.median))
-        .attr('y2', y(stats.median))
-        .attr('stroke', color)
-        .attr('stroke-width', 2);
-
-      svg
-        .selectAll(`circle-${selectedId}`)
-        .data(stats.values)
-        .enter()
-        .append('circle')
-        .attr('cx', (d, i) => x(i))
-        .attr('cy', d => y(d))
-        .attr('r', 3)
-        .attr('fill', color)
-        .attr('opacity', 0.6);
-    } else if (props.chartType() === 'line') {
-      const curve = line()
-        .x((d, i) => x(i))
-        .y(d => y(d))
-        .curve(curveMonotoneX);
-
-      const values =
-        props.sortMode() === 'original'
-          ? stats.values
-          : props.sortMode() === 'ascending'
-            ? stats.values.toSorted((a, b) => a - b)
-            : stats.values.toSorted((a, b) => b - a);
-
-      svg
-        .append('path')
-        .datum(values)
-        .attr('fill', 'none')
-        .attr('stroke', color)
-        .attr('stroke-width', 2)
-        .attr('d', curve);
-
-      svg
-        .selectAll(`circle-${selectedId}`)
-        .data(values)
-        .enter()
-        .append('g')
-        .attr('transform', (d, i) => `translate(${x(i)},${y(d)})`)
-        .each(function (d, i) {
-          const g = select(this);
-          g.append('circle').attr('r', 12).attr('fill', 'transparent').attr('class', 'hit-area');
-          g.append('circle').attr('r', 3).attr('fill', color).attr('class', 'visible-dot');
-
-          const isFirst = i === 0;
-          const isLast = i === values.length - 1;
-          const xOffset = isFirst ? 15 : isLast ? -15 : 0;
-
-          const tooltipGroup = g.append('g').attr('class', 'tooltip-group');
-
-          const text = tooltipGroup
-            .append('text')
-            .attr('class', 'tooltip')
-            .attr('y', -10)
-            .attr('x', xOffset)
-            .attr('text-anchor', isFirst ? 'start' : isLast ? 'end' : 'middle')
-            .style('font-size', '12px')
-            .style('fill', 'white')
-            .text(d);
-
-          const textWidth = text.node().getBBox().width;
-          const padding = 8;
-
-          tooltipGroup
-            .append('rect')
-            .attr('class', 'tooltip-bg')
-            .attr('x', xOffset + (isFirst ? -padding : isLast ? -textWidth - padding : -textWidth / 2 - padding))
-            .attr('y', -25)
-            .attr('width', textWidth + padding * 2)
-            .attr('height', 20)
-            .attr('rx', 4)
-            .attr('fill', 'rgba(0, 0, 0, 0.8)')
-            .attr('stroke', 'rgba(255, 255, 255, 0.2)');
-
-          text.raise();
-        });
-    } else if (props.chartType() === 'pivot') {
       const labels = props.data().map(d => d.label ?? d.seriesId);
 
       const curve = line()
@@ -541,29 +349,234 @@ export const renderSVG = (props: RenderProps) => {
 
           text.raise();
         });
-    } else if (props.chartType() === 'bar') {
-      const xPos = x(selectedId) || x(stats.label);
-      const barWidth = Math.max(10, 50 - props.data().length * 1.5);
+    }
+  } else {
+    for (const selectedId of props.selectedSeries()) {
+      const currentSeries = props.series.find(s => s.id === selectedId);
+      const stats = props.data().find(d => d.seriesId === selectedId);
 
-      svg
-        .append('rect')
-        .attr('x', xPos - barWidth / 2)
-        .attr('y', y(stats.median))
-        .attr('width', barWidth)
-        .attr('height', height - y(stats.median))
-        .attr('fill', color);
+      if (!currentSeries || !stats) continue;
 
-      const decimals = Math.min(3, Math.max(...stats.values.map(n => (n.toString().split('.')[1] || '').length)));
+      const color = props.theme() === 'high-contrast' ? 'currentColor' : currentSeries.color;
 
-      svg
-        .append('text')
-        .attr('x', xPos)
-        .attr('y', y(stats.median) - 10)
-        .attr('text-anchor', 'middle')
-        .style('fill', color)
-        .style('font-family', 'sans-serif')
-        .style('font-size', '12px')
-        .text(stats.median.toFixed(decimals));
+      if (props.chartType() === 'median') {
+        const radius = Math.abs(y(stats.median) - y(stats.median + stats.stddev));
+        const decimals = Math.min(3, Math.max(...stats.values.map(n => (n.toString().split('.')[1] || '').length)));
+
+        const cx = x(selectedId) || x(stats.label);
+
+        svg
+          .append('circle')
+          .attr('cx', cx)
+          .attr('cy', y(stats.median))
+          .attr('r', radius)
+          .attr('fill', color)
+          .attr('fill-opacity', 0.2);
+
+        svg
+          .append('circle')
+          .attr('cx', cx)
+          .attr('cy', y(stats.median))
+          .attr('r', 4)
+          .attr('fill', color)
+          .attr('stroke', color)
+          .attr('stroke-width', 2);
+
+        svg
+          .append('text')
+          .attr('x', cx + 6)
+          .attr('y', y(stats.median) - 6)
+          .style('fill', color)
+          .style('font-family', 'sans-serif')
+          .style('font-size', '12px')
+          .text(stats.median.toFixed(decimals));
+      } else if (props.chartType() === 'box') {
+        const sortedValues = stats.values.toSorted((a, b) => a - b);
+        const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
+        const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
+
+        const xPos = x(selectedId) || x(stats.label);
+        const boxWidth = Math.max(10, 50 - props.data().length * 1.5);
+        const halfWidth = boxWidth / 2;
+
+        svg
+          .append('rect')
+          .attr('x', xPos - halfWidth)
+          .attr('y', y(q3))
+          .attr('width', boxWidth)
+          .attr('height', y(q1) - y(q3))
+          .attr('fill', color)
+          .attr('fill-opacity', 0.2)
+          .attr('stroke', color);
+
+        svg
+          .append('line')
+          .attr('x1', xPos - halfWidth)
+          .attr('x2', xPos + halfWidth)
+          .attr('y1', y(stats.median))
+          .attr('y2', y(stats.median))
+          .attr('stroke', color)
+          .attr('stroke-width', 2);
+
+        svg
+          .append('line')
+          .attr('x1', xPos)
+          .attr('x2', xPos)
+          .attr('y1', y(stats.min))
+          .attr('y2', y(stats.max))
+          .attr('stroke', color)
+          .attr('stroke-width', 1);
+
+        svg
+          .append('line')
+          .attr('x1', xPos - 10)
+          .attr('x2', xPos + 10)
+          .attr('y1', y(stats.max))
+          .attr('y2', y(stats.max))
+          .attr('stroke', color)
+          .attr('stroke-width', 1);
+
+        svg
+          .append('line')
+          .attr('x1', xPos - 10)
+          .attr('x2', xPos + 10)
+          .attr('y1', y(stats.min))
+          .attr('y2', y(stats.min))
+          .attr('stroke', color)
+          .attr('stroke-width', 1);
+
+        if (stats.values.length <= 10) {
+          svg
+            .append('g')
+            .selectAll(`circle-${selectedId}`)
+            .data(stats.values)
+            .enter()
+            .append('circle')
+            .attr('cx', xPos)
+            .attr('cy', d => y(d))
+            .attr('r', 3)
+            .attr('fill', color)
+            .attr('opacity', 0.6);
+        }
+      } else if (props.chartType() === 'scatter') {
+        const dataLength = stats.values.length;
+
+        svg
+          .append('rect')
+          .attr('x', x(0))
+          .attr('y', y(stats.median + stats.stddev))
+          .attr('width', x(dataLength - 1) - x(0))
+          .attr('height', y(stats.median - stats.stddev) - y(stats.median + stats.stddev))
+          .attr('fill', color)
+          .attr('fill-opacity', 0.2);
+
+        svg
+          .append('line')
+          .attr('x1', x(0))
+          .attr('x2', x(dataLength - 1))
+          .attr('y1', y(stats.median))
+          .attr('y2', y(stats.median))
+          .attr('stroke', color)
+          .attr('stroke-width', 2);
+
+        svg
+          .selectAll(`circle-${selectedId}`)
+          .data(stats.values)
+          .enter()
+          .append('circle')
+          .attr('cx', (d, i) => x(i))
+          .attr('cy', d => y(d))
+          .attr('r', 3)
+          .attr('fill', color)
+          .attr('opacity', 0.6);
+      } else if (props.chartType() === 'line') {
+        const curve = line()
+          .x((d, i) => x(i))
+          .y(d => y(d))
+          .curve(curveMonotoneX);
+
+        const values =
+          props.sortMode() === 'original'
+            ? stats.values
+            : props.sortMode() === 'ascending'
+              ? stats.values.toSorted((a, b) => a - b)
+              : stats.values.toSorted((a, b) => b - a);
+
+        svg
+          .append('path')
+          .datum(values)
+          .attr('fill', 'none')
+          .attr('stroke', color)
+          .attr('stroke-width', 2)
+          .attr('d', curve);
+
+        svg
+          .selectAll(`circle-${selectedId}`)
+          .data(values)
+          .enter()
+          .append('g')
+          .attr('transform', (d, i) => `translate(${x(i)},${y(d)})`)
+          .each(function (d, i) {
+            const g = select(this);
+            g.append('circle').attr('r', 12).attr('fill', 'transparent').attr('class', 'hit-area');
+            g.append('circle').attr('r', 3).attr('fill', color).attr('class', 'visible-dot');
+
+            const isFirst = i === 0;
+            const isLast = i === values.length - 1;
+            const xOffset = isFirst ? 15 : isLast ? -15 : 0;
+
+            const tooltipGroup = g.append('g').attr('class', 'tooltip-group');
+
+            const text = tooltipGroup
+              .append('text')
+              .attr('class', 'tooltip')
+              .attr('y', -10)
+              .attr('x', xOffset)
+              .attr('text-anchor', isFirst ? 'start' : isLast ? 'end' : 'middle')
+              .style('font-size', '12px')
+              .style('fill', 'white')
+              .text(d);
+
+            const textWidth = text.node().getBBox().width;
+            const padding = 8;
+
+            tooltipGroup
+              .append('rect')
+              .attr('class', 'tooltip-bg')
+              .attr('x', xOffset + (isFirst ? -padding : isLast ? -textWidth - padding : -textWidth / 2 - padding))
+              .attr('y', -25)
+              .attr('width', textWidth + padding * 2)
+              .attr('height', 20)
+              .attr('rx', 4)
+              .attr('fill', 'rgba(0, 0, 0, 0.8)')
+              .attr('stroke', 'rgba(255, 255, 255, 0.2)');
+
+            text.raise();
+          });
+      } else if (props.chartType() === 'bar') {
+        const xPos = x(selectedId) || x(stats.label);
+        const barWidth = Math.max(10, 50 - props.data().length * 1.5);
+
+        svg
+          .append('rect')
+          .attr('x', xPos - barWidth / 2)
+          .attr('y', y(stats.median))
+          .attr('width', barWidth)
+          .attr('height', height - y(stats.median))
+          .attr('fill', color);
+
+        const decimals = Math.min(3, Math.max(...stats.values.map(n => (n.toString().split('.')[1] || '').length)));
+
+        svg
+          .append('text')
+          .attr('x', xPos)
+          .attr('y', y(stats.median) - 10)
+          .attr('text-anchor', 'middle')
+          .style('fill', color)
+          .style('font-family', 'sans-serif')
+          .style('font-size', '12px')
+          .text(stats.median.toFixed(decimals));
+      }
     }
   }
 };

@@ -28,8 +28,10 @@ export default function Chart() {
 
   const [chartType, setChartType] = createSignal(fromUrl.type);
   const [config, setConfig] = createSignal(fromUrl.config);
-  const [series, setSeries] = createStore(fromUrl.series);
-  const [selectedSeries, setSelectedSeries] = createSignal(fromUrl.selectedSeries);
+  const [series, setSeries] = createStore(fromUrl.config?.series ?? []);
+  const [selectedSeries, setSelectedSeries] = createSignal(series.map(series => series.id));
+  const [seriesX, setSeriesX] = createStore(config()?.seriesX ?? []);
+  const [selectedSeriesX, setSelectedSeriesX] = createSignal(seriesX.map(series => series.id));
   const [data, setData] = createSignal(fromUrl.data);
   const [fullRange, setFullRange] = createSignal(fromUrl.fullRange);
   const [sortMode, setSortMode] = createSignal<SortMode>('original');
@@ -40,18 +42,6 @@ export default function Chart() {
     if (!(!searchParams.ct && config()?.type === 'standard')) setSearchParams({ ct: config()?.type });
     if (!(!searchParams.lp && legendPosition() === 'tr')) setSearchParams({ lp: legendPosition() });
     if (!(!searchParams.br && fullRange() === true)) setSearchParams({ br: fullRange() ? '0' : '1' });
-  });
-
-  createEffect(() => {
-    if (config()?.type === 'standard') {
-      if (chartType() === 'pivot') {
-        setSeries(config()?.labels ?? config()?.series);
-        setSelectedSeries((config()?.labels ?? config()?.series).map(series => series.id) ?? []);
-      } else {
-        setSeries(config()?.series ?? []);
-        setSelectedSeries(config()?.series?.map(series => series.id) ?? []);
-      }
-    }
   });
 
   const handleSaveAsNewConfiguration = async () => {
@@ -72,9 +62,12 @@ export default function Chart() {
       const data = await storage.getSeriesData(Number(params.id));
       const config = await storage.getConfig(Number(params.id));
       const series = config?.series ?? [];
+      const seriesX = config?.seriesX ?? [];
       setConfig(config);
       setSeries(series);
-      setSelectedSeries(series.map(w => w.id));
+      setSelectedSeries(series.map(series => series.id));
+      setSeriesX(seriesX);
+      setSelectedSeriesX(seriesX.map(series => series.id));
       setData(data);
     })();
   });
@@ -104,6 +97,8 @@ export default function Chart() {
       series,
       chartType,
       selectedSeries,
+      seriesX,
+      selectedSeriesX,
       legendPosition,
       sortMode,
       fullRange,
@@ -145,7 +140,7 @@ export default function Chart() {
 
       <ChartControls
         svgRef={svgRef}
-        hasLabels={data().length === 0 || config()?.labels}
+        hasSeriesX={data().length === 0 || config()?.seriesX}
         isTooManyValues={data()[0]?.values && data()[0].values.length > 500}
         chartType={chartType}
         setChartType={setChartType}
@@ -165,6 +160,10 @@ export default function Chart() {
           setSeries={setSeries}
           selectedSeries={selectedSeries}
           setSelectedSeries={setSelectedSeries}
+          seriesX={seriesX}
+          setSeriesX={setSeriesX}
+          selectedSeriesX={selectedSeriesX}
+          setSelectedSeriesX={setSelectedSeriesX}
           type={config()?.type}
           chartType={chartType}
         />

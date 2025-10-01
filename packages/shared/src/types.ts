@@ -14,20 +14,19 @@ export interface BaseConfig {
   type: ConfigType;
   labelX?: string;
   labelY?: string;
+  series: Series[];
+  seriesX?: Series[];
 }
 
 export interface ConfigStandard extends BaseConfig {
   id: number;
   type: 'standard';
   sort?: 'default' | 'semver' | 'data' | 'datetime';
-  series: Series[];
-  labels?: Series[];
 }
 
 interface HyperfineConfigDefault extends BaseConfig {
   id: number;
   type: 'hyperfine';
-  series: Series[];
 }
 
 interface HyperfineConfigParameter extends BaseConfig {
@@ -35,13 +34,11 @@ interface HyperfineConfigParameter extends BaseConfig {
   type: 'hyperfine-parameter';
   parameterNames: string[];
   command: string;
-  series: Series[];
 }
 
 export interface ConfigMitataDefault extends BaseConfig {
   id: number;
   type: 'mitata';
-  series: Series[];
 }
 
 export interface ConfigMitataParameter extends BaseConfig {
@@ -49,7 +46,6 @@ export interface ConfigMitataParameter extends BaseConfig {
   type: 'mitata-parameter';
   parameterNames: string[];
   command?: string;
-  series: Series[];
 }
 
 export interface ConfigList extends BaseConfig {
@@ -59,7 +55,6 @@ export interface ConfigList extends BaseConfig {
   command?: string;
   prepare?: SimpleCommand[];
   build?: SimpleCommand[];
-  series: Series[];
 }
 
 export type Configuration =

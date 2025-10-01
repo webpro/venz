@@ -198,7 +198,7 @@ export function transformLabeledData(input: Array<[string, number | number[]]>, 
   const [label, values] = input[0];
   const size = Array.isArray(values) ? values.length : 1;
   const series: Series[] = existingConfig?.series ?? [];
-  const labels: Series[] = existingConfig?.labels ?? [];
+  const seriesX: Series[] = existingConfig?.seriesX ?? [];
   const data: SeriesData[] = existingData ?? [];
   const sort = /\d{2}-\d{2}/.test(label) ? 'datetime' : /\d{1}\.\d{1,}\.\d{1}/.test(label) ? 'semver' : undefined;
 
@@ -229,25 +229,25 @@ export function transformLabeledData(input: Array<[string, number | number[]]>, 
     }
   }
 
-  const l = labels.length;
+  const l = seriesX.length;
   for (let i = l; i < l + size; i++) {
-    labels.push({
+    seriesX.push({
       id: i,
       configId,
       label: initialConfig?.labels?.[i] ?? `Series ${i + 1}`,
-      color: initialConfig?.colors?.[i] ?? getNextAvailableColor(labels),
+      color: initialConfig?.colors?.[i] ?? getNextAvailableColor(seriesX),
     });
   }
 
   const config: ConfigStandard = existingConfig
-    ? { ...existingConfig, series, labels }
+    ? { ...existingConfig, series, seriesX }
     : {
         id: configId,
         title: `New labeled data series (${timestamp})`,
         type: initialConfig?.type ?? 'standard',
         sort,
         series,
-        labels,
+        seriesX,
         labelX: initialConfig?.labelX,
         labelY: initialConfig?.labelY,
       };

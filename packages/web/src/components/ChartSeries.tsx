@@ -14,7 +14,11 @@ type Props = {
   series: Series[];
   setSeries: Setter<Series[]>;
   selectedSeries: Accessor<number[]>;
+  selectedSeriesX: Accessor<number[]>;
+  seriesX: Series[];
+  setSeriesX: Setter<Series[]>;
   setSelectedSeries: Setter<number[]>;
+  setSelectedSeriesX: Setter<number[]>;
   type: ConfigType;
   chartType: Accessor<ChartType>;
 };
@@ -30,18 +34,28 @@ export const ChartSeries = (props: Props) => {
     }
   };
 
-  const seriesWithStats = createMemo(() => {
-    const data = props.chartType() === 'pivot' ? transpose(props.data()) : props.data();
-    const lowestStats = data.reduce((lowest, current) => (current.median < lowest.median ? current : lowest), data[0]);
+  const data = () => (props.chartType() === 'pivot' ? transpose(props.data()) : props.data());
+  const series = () => (props.chartType() === 'pivot' ? props.seriesX : props.series);
+  const selectedSeries = () => (props.chartType() === 'pivot' ? props.selectedSeriesX() : props.selectedSeries());
+  const setSelectedSeries = () => (props.chartType() === 'pivot' ? props.setSelectedSeriesX : props.setSelectedSeries);
+  const setSeries = () => (props.chartType() === 'pivot' ? props.setSeriesX : props.setSeries);
 
-    return props.series
+  const seriesWithStats = createMemo(() => {
+    const _data = data();
+    const _series = series();
+    const lowestStats = _data.reduce(
+      (lowest, current) => (current.median < lowest.median ? current : lowest),
+      _data[0]
+    );
+
+    return _series
       .toSorted((a, b) => {
-        const aStats = data.find(d => d.seriesId === a.id);
-        const bStats = data.find(d => d.seriesId === b.id);
+        const aStats = _data.find(d => d.seriesId === a.id);
+        const bStats = _data.find(d => d.seriesId === b.id);
         return (aStats?.median || 0) - (bStats?.median || 0);
       })
       .map(s => {
-        const stats = data.find(d => d.seriesId === s.id);
+        const stats = _data.find(d => d.seriesId === s.id);
         const isLowest = stats?.median === lowestStats?.median;
         const ratio = stats?.median / lowestStats?.median;
         const relativeStddev = !isLowest
@@ -56,7 +70,7 @@ export const ChartSeries = (props: Props) => {
           isFastest: isLowest,
           ratio,
           relativeStddev,
-          fastestSeries: isLowest ? null : props.series.find(fs => fs.id === lowestStats?.seriesId),
+          fastestSeries: isLowest ? null : _series.find(fs => fs.id === lowestStats?.seriesId),
         };
       });
   });
@@ -86,9 +100,9 @@ export const ChartSeries = (props: Props) => {
                   type="checkbox"
                   id={`toggle-visibility-${i()}`}
                   aria-label="toggle series visibility"
-                  checked={props.selectedSeries().includes(s.id)}
+                  checked={selectedSeries().includes(s.id)}
                   onChange={event => {
-                    props.setSelectedSeries(prev =>
+                    setSelectedSeries()(prev =>
                       (event.currentTarget.checked ? [...prev, s.id] : prev.filter(id => id !== s.id)).sort()
                     );
                   }}
@@ -100,7 +114,7 @@ export const ChartSeries = (props: Props) => {
                     aria-label="color"
                     value={s.color}
                     onChange={event => {
-                      props.setSeries(series => series.id === s.id, 'color', event.currentTarget.value);
+                      setSeries()(series => series.id === s.id, 'color', event.currentTarget.value);
                       handleSave();
                     }}
                     class="w-full h-3 cursor-pointer appearance-none bg-transparent border-0"
@@ -115,7 +129,7 @@ export const ChartSeries = (props: Props) => {
                   aria-label="series label"
                   value={s.label}
                   onChange={event => {
-                    props.setSeries(series => series.id === s.id, 'label', event.currentTarget.value);
+                    setSeries()(series => series.id === s.id, 'label', event.currentTarget.value);
                   }}
                   onBlur={handleSave}
                   class="bg-transparent border-none py-1"

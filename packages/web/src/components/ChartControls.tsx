@@ -19,7 +19,7 @@ import { Share } from './icons/Share';
 
 type ChartControlsProps = {
   svgRef: SVGSVGElement;
-  hasLabels: boolean;
+  hasSeriesX: boolean;
   isTooManyValues: boolean;
   chartType: Accessor<ChartType>;
   setChartType: Setter<ChartType>;
@@ -51,7 +51,7 @@ export const ChartControls = (props: ChartControlsProps) => {
           { value: 'box', icon: BoxPlot, label: 'box plot' },
           { value: 'line', icon: Line, label: 'line', disabled: props.isTooManyValues },
           { value: 'scatter', icon: ScatterPlot, label: 'scatter', disabled: props.isTooManyValues },
-          { value: 'pivot', icon: Pivot, label: 'pivot', disabled: !props.hasLabels },
+          { value: 'pivot', icon: Pivot, label: 'pivot', disabled: !props.hasSeriesX },
         ]}
         onChange={props.setChartType}
       />
