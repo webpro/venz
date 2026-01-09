@@ -57,7 +57,7 @@ export const ChartSeries = (props: Props) => {
       .map(s => {
         const stats = _data.find(d => d.seriesId === s.id);
         const isLowest = stats?.median === lowestStats?.median;
-        const ratio = stats?.median / lowestStats?.median;
+        const ratio = lowestStats?.median === 0 ? 0 : stats?.median / lowestStats?.median;
         const relativeStddev = !isLowest
           ? Math.sqrt(
               Math.pow(stats?.stddev / stats?.median, 2) + Math.pow(lowestStats?.stddev / lowestStats?.median, 2)
