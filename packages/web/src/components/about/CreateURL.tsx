@@ -109,19 +109,19 @@ export const CreateURL = () => {
               values
               <ul class="list-inside list-disc pl-8">
                 <li>
-                  <code>tr</code>
+                  <code>tr</code> (top right)
                 </li>
                 <li>
-                  <code>tl</code>
+                  <code>tl</code> (top left)
                 </li>
                 <li>
-                  <code>br</code>
+                  <code>br</code> (bottom right)
                 </li>
                 <li>
-                  <code>bl</code>
+                  <code>bl</code> (bottom left)
                 </li>
                 <li>
-                  <code>n</code>
+                  <code>n</code> (none)
                 </li>
               </ul>
             </li>
@@ -138,10 +138,10 @@ export const CreateURL = () => {
               values
               <ul class="list-inside list-disc pl-8">
                 <li>
-                  <code>0</code>
+                  <code>0</code> (disabled)
                 </li>
                 <li>
-                  <code>1</code>
+                  <code>1</code> (enabled)
                 </li>
               </ul>
             </li>
