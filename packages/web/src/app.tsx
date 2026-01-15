@@ -6,6 +6,7 @@ import { ToastContext, createToastStore } from './stores/toast';
 import Toast from './components/Toast';
 import { ThemeProvider } from './stores/theme';
 import { MetaProvider, Title } from '@solidjs/meta';
+import { Canonical } from './components/Canonical';
 
 export default function App() {
   const toastStore = createToastStore();
@@ -24,6 +25,7 @@ export default function App() {
                   return <div>{err.message} (check console)</div>;
                 }}
               >
+                <Canonical />
                 <Suspense>{props.children}</Suspense>
               </ErrorBoundary>
             )}
