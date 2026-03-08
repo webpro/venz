@@ -7,7 +7,7 @@ import type { ChartType } from '../types';
 import { transpose } from '../util/helpers';
 
 const getSeriesColor = (s: Series, theme: string) =>
-  createMemo(() => (theme === 'high-contrast' ? 'currentColor' : s.color));
+  theme === 'high-contrast' ? 'currentColor' : s.color;
 
 type Props = {
   data: Accessor<SeriesData[]>;
@@ -93,7 +93,7 @@ export const ChartSeries = (props: Props) => {
             <label
               for={`toggle-visibility-${i()}`}
               class="flex flex-wrap items-center gap-2 px-4 py-1 cursor-pointer hover:bg-foreground hover:text-background!"
-              style={`color: ${getSeriesColor(s, theme())()}`}
+              style={`color: ${getSeriesColor(s, theme())}`}
             >
               <div class="flex items-center gap-2 min-w-0">
                 <input
@@ -121,7 +121,7 @@ export const ChartSeries = (props: Props) => {
                   />
                   <div
                     class="pointer-events-none absolute inset-0 rounded-full"
-                    style={{ 'background-color': getSeriesColor(s, theme())() }}
+                    style={{ 'background-color': getSeriesColor(s, theme()) }}
                   />
                 </div>
                 <input
