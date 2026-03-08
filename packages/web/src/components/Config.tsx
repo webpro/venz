@@ -272,7 +272,7 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
                               setSeries(
                                 i(),
                                 'command',
-                                config.command.replace(`{${config.name}}`, event.currentTarget.value)
+                                config.command.replace(`{${config.parameterNames[0]}}`, event.currentTarget.value)
                               );
                               setConfig('series', series);
                               setIsDirty(true);
