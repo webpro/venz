@@ -4,7 +4,6 @@ import { isGenericChart } from './Chart';
 import { storage } from '../storage';
 import { useParams } from '@solidjs/router';
 import { useTheme } from '../stores/theme';
-import type { ChartType } from '../types';
 import { transpose } from '../util/helpers';
 
 const getSeriesColor = (s: Series, theme: string) =>
@@ -21,7 +20,7 @@ type Props = {
   setSelectedSeries: Setter<number[]>;
   setSelectedSeriesX: Setter<number[]>;
   type: ConfigType;
-  chartType: Accessor<ChartType>;
+  transposed: Accessor<boolean>;
 };
 
 export const ChartSeries = (props: Props) => {
@@ -35,11 +34,11 @@ export const ChartSeries = (props: Props) => {
     }
   };
 
-  const data = () => (props.chartType() === 'pivot' ? transpose(props.data()) : props.data());
-  const series = () => (props.chartType() === 'pivot' ? props.seriesX : props.series);
-  const selectedSeries = () => (props.chartType() === 'pivot' ? props.selectedSeriesX() : props.selectedSeries());
-  const setSelectedSeries = () => (props.chartType() === 'pivot' ? props.setSelectedSeriesX : props.setSelectedSeries);
-  const setSeries = () => (props.chartType() === 'pivot' ? props.setSeriesX : props.setSeries);
+  const data = () => (props.transposed() ? transpose(props.data()) : props.data());
+  const series = () => (props.transposed() ? props.seriesX : props.series);
+  const selectedSeries = () => (props.transposed() ? props.selectedSeriesX() : props.selectedSeries());
+  const setSelectedSeries = () => (props.transposed() ? props.setSelectedSeriesX : props.setSelectedSeries);
+  const setSeries = () => (props.transposed() ? props.setSeriesX : props.setSeries);
 
   const seriesWithStats = createMemo(() => {
     const _data = data();

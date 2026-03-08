@@ -3,7 +3,8 @@ import { Wink } from '../Button';
 
 export const Labeled = () => {
   const url = new URL('/', origin);
-  url.searchParams.set('type', 'pivot');
+  url.searchParams.set('type', 'line');
+  url.searchParams.set('t', '1');
   url.searchParams.set('lp', 'br');
   url.searchParams.set('br', '1');
   url.searchParams.append('label', '2025-01');

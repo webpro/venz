@@ -4,7 +4,7 @@ import { Scatter } from './icons/Scatter';
 import { Download } from './icons/Download';
 import { BoxPlot } from './icons/BoxPlot';
 import { MedianChart } from './icons/Median';
-import { Pivot } from './icons/Pivot';
+import { Transpose } from './icons/Pivot';
 import { ScatterPlot } from './icons/ScatterPlot';
 import { LegendBottomLeft, LegendBottomRight, LegendNone, LegendTopLeft, LegendTopRight } from './icons/Legend';
 import { Line } from './icons/Line';
@@ -23,6 +23,8 @@ type ChartControlsProps = {
   isTooManyValues: boolean;
   chartType: Accessor<ChartType>;
   setChartType: Setter<ChartType>;
+  transposed: Accessor<boolean>;
+  setTransposed: Setter<boolean>;
   sortMode: Accessor<SortMode>;
   setSortMode: Setter<SortMode>;
   legendPosition: Accessor<LegendPosition>;
@@ -51,10 +53,19 @@ export const ChartControls = (props: ChartControlsProps) => {
           { value: 'box', icon: BoxPlot, label: 'box plot' },
           { value: 'line', icon: Line, label: 'line', disabled: props.isTooManyValues },
           { value: 'scatter', icon: ScatterPlot, label: 'scatter', disabled: props.isTooManyValues },
-          { value: 'pivot', icon: Pivot, label: 'pivot', disabled: !props.hasSeriesX },
         ]}
         onChange={props.setChartType}
       />
+
+      {props.hasSeriesX && (
+        <IconButton
+          aria-label="Toggle transpose"
+          onClick={() => props.setTransposed(prev => !prev)}
+          title="Transpose series"
+        >
+          <Transpose />
+        </IconButton>
+      )}
 
       <Dropdown
         label="Sort mode"

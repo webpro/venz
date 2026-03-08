@@ -2,7 +2,7 @@ export type SearchParams = {
   [x: string]: undefined | string | string[];
 };
 
-export type ChartType = 'box' | 'median' | 'scatter' | 'line' | 'pivot' | 'bar';
+export type ChartType = 'box' | 'median' | 'scatter' | 'line' | 'bar';
 
 export type SortMode = 'original' | 'ascending' | 'descending';
 

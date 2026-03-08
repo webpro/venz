@@ -22,9 +22,17 @@ export default function Chart() {
   const { addToast } = useToast();
   const { theme } = useTheme();
 
+  if (searchParams.type === 'pivot') {
+    const url = new URL(window.location.href);
+    url.searchParams.set('type', 'line');
+    url.searchParams.set('t', '1');
+    history.replaceState(null, '', url.pathname + url.search);
+  }
+
   const fromUrl = transformFromSearchParams(searchParams);
 
   const [chartType, setChartType] = createSignal(fromUrl.type);
+  const [transposed, setTransposed] = createSignal(fromUrl.transposed);
   const [config, setConfig] = createSignal(fromUrl.config);
   const [series, setSeries] = createStore(fromUrl.config?.series ?? []);
   const [selectedSeries, setSelectedSeries] = createSignal(series.map(series => series.id));
@@ -40,6 +48,7 @@ export default function Chart() {
     if (!(!searchParams.ct && config()?.type === 'standard')) setSearchParams({ ct: config()?.type });
     if (!(!searchParams.lp && legendPosition() === 'tr')) setSearchParams({ lp: legendPosition() });
     if (!(!searchParams.br && fullRange() === true)) setSearchParams({ br: fullRange() ? '0' : '1' });
+    if (!(!searchParams.t && !transposed())) setSearchParams({ t: transposed() ? '1' : undefined });
   });
 
   const handleSaveAsNewConfiguration = async () => {
@@ -91,6 +100,7 @@ export default function Chart() {
       data,
       series,
       chartType,
+      transposed,
       selectedSeries,
       seriesX,
       selectedSeriesX,
@@ -135,10 +145,12 @@ export default function Chart() {
 
       <ChartControls
         svgRef={svgRef}
-        hasSeriesX={data().length === 0 || config()?.seriesX}
+        hasSeriesX={Boolean(config()?.seriesX?.length)}
         isTooManyValues={data()[0]?.values && data()[0].values.length > 500}
         chartType={chartType}
         setChartType={setChartType}
+        transposed={transposed}
+        setTransposed={setTransposed}
         sortMode={sortMode}
         setSortMode={setSortMode}
         legendPosition={legendPosition}
@@ -160,7 +172,7 @@ export default function Chart() {
           selectedSeriesX={selectedSeriesX}
           setSelectedSeriesX={setSelectedSeriesX}
           type={config()?.type}
-          chartType={chartType}
+          transposed={transposed}
         />
       )}
 

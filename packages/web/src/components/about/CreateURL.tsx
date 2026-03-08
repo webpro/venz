@@ -60,9 +60,6 @@ export const CreateURL = () => {
                   <code>line</code>
                 </li>
                 <li>
-                  <code>pivot</code>
-                </li>
-                <li>
                   <code>bar</code>
                 </li>
               </ul>
@@ -140,6 +137,23 @@ export const CreateURL = () => {
                 <li>
                   <code>0</code> (disabled)
                 </li>
+                <li>
+                  <code>1</code> (enabled)
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>t</code>
+          <ul class="list-inside list-disc pl-8">
+            <li>transpose (swap series and seriesX dimensions)</li>
+            <li>
+              default: <code>0</code>
+            </li>
+            <li>
+              values
+              <ul class="list-inside list-disc pl-8">
                 <li>
                   <code>1</code> (enabled)
                 </li>

@@ -9,9 +9,11 @@ export const generateNumbers = () => Array.from({ length: 10 }, () => Math.floor
 export const origin = import.meta.env.DEV ? 'http://localhost:3000' : 'https://try.venz.dev';
 
 const getChartType = (value?: string | string[]): ChartType =>
-  typeof value === 'string' && ['box', 'median', 'scatter', 'line', 'pivot', 'bar'].includes(value)
+  typeof value === 'string' && ['box', 'median', 'scatter', 'line', 'bar'].includes(value)
     ? (value as ChartType)
-    : 'median';
+    : value === 'pivot'
+      ? 'line'
+      : 'median';
 
 const getLegendPosition = (value?: string | string[]): LegendPosition =>
   typeof value === 'string' && ['tr', 'tl', 'br', 'bl', 'n'].includes(value) ? (value as LegendPosition) : 'tr';
@@ -42,10 +44,11 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   const { config, data: seriesData } = transform(input, { initialConfig });
 
   const type = getChartType(searchParams.type);
+  const transposed = searchParams.type === 'pivot' || searchParams.t === '1';
   const legendPosition = getLegendPosition(searchParams.lp);
   const fullRange = getFullRange(searchParams.br);
 
-  return { type, legendPosition, fullRange, config, data: seriesData };
+  return { type, transposed, legendPosition, fullRange, config, data: seriesData };
 }
 
 export function createShareableUrl(searchParams: SearchParams, series: Series[], data: SeriesData[]): [number, URL] {
@@ -57,6 +60,7 @@ export function createShareableUrl(searchParams: SearchParams, series: Series[],
   if (typeof searchParams.labelX === 'string') url.searchParams.set('labelX', searchParams.labelX);
   if (typeof searchParams.labelY === 'string') url.searchParams.set('labelY', searchParams.labelY);
   if (typeof searchParams.ct === 'string') url.searchParams.set('ct', searchParams.ct);
+  if (searchParams.t === '1') url.searchParams.set('t', '1');
 
   for (const id of series) url.searchParams.append('label', id.label);
   for (const id of series) if (typeof id.command === 'string') url.searchParams.append('command', id.command);
