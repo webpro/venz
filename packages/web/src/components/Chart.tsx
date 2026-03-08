@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
+import { createEffect, createResource, createSignal, onCleanup, Show } from 'solid-js';
 import { Button, ButtonLink } from './Button';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { getStorageAdapter } from '../storage';
@@ -55,21 +55,18 @@ export default function Chart() {
 
   let svgRef!: SVGSVGElement;
 
-  createEffect(() => {
-    if (isGenericChart(params.id)) return;
+  const chartId = () => (isGenericChart(params.id) ? undefined : Number(params.id));
 
-    (async () => {
-      const data = await storage.getSeriesData(Number(params.id));
-      const config = await storage.getConfig(Number(params.id));
-      const series = config?.series ?? [];
-      const seriesX = config?.seriesX ?? [];
-      setConfig(config);
-      setSeries(series);
-      setSelectedSeries(series.map(series => series.id));
-      setSeriesX(seriesX);
-      setSelectedSeriesX(seriesX.map(series => series.id));
-      setData(data);
-    })();
+  createResource(chartId, async id => {
+    const [chartData, chartConfig] = await Promise.all([storage.getSeriesData(id), storage.getConfig(id)]);
+    const configSeries = chartConfig?.series ?? [];
+    const configSeriesX = chartConfig?.seriesX ?? [];
+    setConfig(chartConfig);
+    setSeries(configSeries);
+    setSelectedSeries(configSeries.map(s => s.id));
+    setSeriesX(configSeriesX);
+    setSelectedSeriesX(configSeriesX.map(s => s.id));
+    setData(chartData);
   });
 
   createEffect(() => {
