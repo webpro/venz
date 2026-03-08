@@ -18,8 +18,9 @@ export const download = (svgElement: SVGSVGElement, options: DownloadChartOption
       `-${padding} -${padding} ${svgElement.clientWidth + padding * 2} ${svgElement.clientHeight + padding * 2}`
     );
     if (backgroundColor !== 'none') {
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      rect.setAttribute('r', '1e5');
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('width', '100%');
+      rect.setAttribute('height', '100%');
       rect.setAttribute('fill', backgroundColor);
       svgClone.insertBefore(rect, svgClone.firstChild);
       if (backgroundColor === '#000') svgClone.setAttribute('style', 'color: white');
