@@ -189,8 +189,8 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
                   value={config.type}
                   onChange={event => {
                     setConfig('type', event.currentTarget.value);
-                    handleSave();
                     setIsDirty(true);
+                    handleSave();
                   }}
                 >
                   <For each={configTypes}>{type => <option value={type}>{type}</option>}</For>
@@ -449,8 +449,8 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
                       value={config.sort ?? 'default'}
                       onChange={event => {
                         setConfig('sort', event.currentTarget.value);
-                        handleSave();
                         setIsDirty(true);
+                        handleSave();
                       }}
                     >
                       <For each={['default', 'semver', 'datetime']}>{type => <option value={type}>{type}</option>}</For>
