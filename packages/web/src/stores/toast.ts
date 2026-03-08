@@ -13,9 +13,6 @@ interface ToastStore {
   removeToast: (id: number) => void;
 }
 
-const [store, setStore] = createStore<{ toasts: Toast[] }>({ toasts: [] });
-let toastId = 0;
-
 export const ToastContext = createContext<ToastStore>({
   toasts: [],
   addToast: () => {},
@@ -25,6 +22,9 @@ export const ToastContext = createContext<ToastStore>({
 export type AddToast = (message: string, type?: Toast['type']) => void;
 
 export function createToastStore() {
+  const [store, setStore] = createStore<{ toasts: Toast[] }>({ toasts: [] });
+  let toastId = 0;
+
   const addToast = (message: string, type: Toast['type'] = 'success') => {
     setStore('toasts', toasts => [...toasts, { id: toastId++, message, type }]);
   };
