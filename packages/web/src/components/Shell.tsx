@@ -1,9 +1,10 @@
 import { A, useLocation, useParams } from '@solidjs/router';
+import type { ParentProps } from 'solid-js';
 import ThemeSwitch from './ThemeSwitch';
 import { Logo } from './icons/Logo';
 import { GitHub } from './icons/GitHub';
 
-export default ({ children }) => {
+export default (props: ParentProps) => {
   const { pathname } = useLocation();
   const params = useParams();
   const logoLink =
@@ -27,7 +28,7 @@ export default ({ children }) => {
         </div>
       </header>
 
-      <main role="main">{children}</main>
+      <main role="main">{props.children}</main>
 
       <footer role="contentinfo" class="mt-24 mb-12 mx-auto text-center flex flex-col items-center gap-8">
         <p class="text-xs high-contrast:text-base">No worries, your data won't leave your browser.</p>
