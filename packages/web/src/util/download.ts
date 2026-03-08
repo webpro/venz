@@ -1,4 +1,4 @@
-export type ImageFormat = 'png' | 'svg' | 'webp' | 'avif';
+export type ImageFormat = 'png' | 'svg' | 'webp';
 
 type DownloadChartOptions = {
   format?: ImageFormat;
@@ -33,16 +33,23 @@ export const download = (svgElement: SVGSVGElement, options: DownloadChartOption
     return;
   }
 
-  const originalColor = svgElement.style.color;
-  if (backgroundColor === '#000') svgElement.style.color = 'white';
-  const svgData = new XMLSerializer().serializeToString(svgElement);
-  if (backgroundColor === '#000') svgElement.style.color = originalColor;
+  const w = svgElement.clientWidth;
+  const h = svgElement.clientHeight;
+
+  const svgClone = svgElement.cloneNode(true) as SVGSVGElement;
+  svgClone.setAttribute('width', String(w));
+  svgClone.setAttribute('height', String(h));
+  if (backgroundColor === '#000') svgClone.setAttribute('style', 'color: white');
+  const svgData = new XMLSerializer().serializeToString(svgClone);
+
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   const img = new Image();
 
-  canvas.width = (svgElement.clientWidth + padding * 2) * scale;
-  canvas.height = (svgElement.clientHeight + padding * 2) * scale;
+  canvas.width = (w + padding * 2) * scale;
+  canvas.height = (h + padding * 2) * scale;
+
+  const mime = `image/${format}`;
 
   img.onload = () => {
     if (ctx) {
@@ -51,10 +58,10 @@ export const download = (svgElement: SVGSVGElement, options: DownloadChartOption
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
-      ctx.drawImage(img, padding / scale, padding / scale);
+      ctx.drawImage(img, padding, padding);
       const a = document.createElement('a');
       a.download = `venz-chart.${format}`;
-      a.href = canvas.toDataURL(`image/${format}`);
+      a.href = canvas.toDataURL(mime);
       a.click();
     }
   };

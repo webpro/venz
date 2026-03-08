@@ -1,13 +1,12 @@
-import type { ConfigType, Series, SeriesData } from '@venz/shared';
+import { transpose } from '@venz/shared/transpose';
 import { createMemo, For, type Accessor, type Setter } from 'solid-js';
 import { isGenericChart } from './Chart';
 import { storage } from '../storage';
 import { useParams } from '@solidjs/router';
 import { useTheme } from '../stores/theme';
-import { transpose } from '../util/helpers';
+import type { ConfigType, Series, SeriesData } from '@venz/shared/types';
 
-const getSeriesColor = (s: Series, theme: string) =>
-  theme === 'high-contrast' ? 'currentColor' : s.color;
+const getSeriesColor = (s: Series, theme: string) => (theme === 'high-contrast' ? 'currentColor' : s.color);
 
 type Props = {
   data: Accessor<SeriesData[]>;

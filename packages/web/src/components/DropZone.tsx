@@ -1,6 +1,7 @@
 import { createSignal, Match, Show, Switch, type Accessor } from 'solid-js';
 import { Link } from './Button';
-import { generateCommand, type Configuration } from '@venz/shared';
+import { generateCommand } from '@venz/shared/adapter';
+import type { Configuration } from '@venz/shared/types';
 
 type Props = {
   config: Accessor<Configuration>;

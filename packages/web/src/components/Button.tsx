@@ -61,9 +61,8 @@ export const DangerButton = (props: ParentProps<ButtonProps>) => {
 
 export const IconButton = (props: ParentProps<ButtonProps>) => {
   const [own, rest] = splitProps(props, ['children', 'className']);
-  const classNames = [defaultStyles, buttonColorStyles, own.className ?? ''].join(' ');
   return (
-    <button type="button" class={classNames} {...rest}>
+    <button type="button" class={`${defaultStyles} ${buttonColorStyles} ${own.className ?? ''}`} {...rest}>
       {own.children}
     </button>
   );

@@ -1,4 +1,5 @@
-import { transform, type Configuration, type Series, type SeriesData } from '@venz/shared';
+import { transform } from '@venz/shared/adapter';
+import type { Configuration, Series, SeriesData } from '@venz/shared/types';
 import { type AddToast } from '../stores/toast';
 import { storage } from '../storage';
 import type { Accessor, Setter } from 'solid-js';

@@ -15,7 +15,10 @@ import { Bar } from './icons/Bar';
 import { download, type ImageFormat } from '../util/download';
 import { createSignal, type Accessor, type Setter } from 'solid-js';
 import type { ChartType, ImgBgPadding, LegendPosition, SortMode } from '../types';
-import { Share } from './icons/Share';
+import { Clipboard } from './icons/Clipboard';
+import { Link } from './icons/Link';
+import { cdnOrigin } from '../util/helpers';
+import { useTheme } from '../stores/theme';
 
 type ChartControlsProps = {
   svgRef: SVGSVGElement;
@@ -31,8 +34,11 @@ type ChartControlsProps = {
   setLegendPosition: Setter<LegendPosition>;
   fullRange: Accessor<boolean>;
   setFullRange: Setter<boolean>;
+  getShareableUrl: () => string;
   onShare: () => void;
 };
+
+const BG_COLORS = ['none', '#000', '#fff'];
 
 export const ChartControls = (props: ChartControlsProps) => {
   const [imgDownloadBgColor, setImgDownloadBgColor] = createSignal('none');
@@ -41,6 +47,10 @@ export const ChartControls = (props: ChartControlsProps) => {
   const downloadImg = (format: ImageFormat) => {
     download(props.svgRef, { format, backgroundColor: imgDownloadBgColor(), padding: imgDownloadPadding() });
   };
+
+  const { theme } = useTheme();
+
+  const ogImageUrl = (ext: string) => `${cdnOrigin}/i/chart.${ext}?${props.getShareableUrl()}&theme=${theme()}`;
 
   return (
     <div class="flex justify-end gap-4">
@@ -62,6 +72,7 @@ export const ChartControls = (props: ChartControlsProps) => {
           aria-label="Toggle transpose"
           onClick={() => props.setTransposed(prev => !prev)}
           title="Transpose series"
+          className={props.transposed() ? 'bg-foreground! text-background!' : ''}
         >
           <Transpose />
         </IconButton>
@@ -91,28 +102,36 @@ export const ChartControls = (props: ChartControlsProps) => {
         onChange={props.setLegendPosition}
       />
 
-      <IconButton aria-label="Toggle chart break" onClick={() => props.setFullRange(prev => !prev)}>
+      <IconButton
+        aria-label="Toggle chart break"
+        onClick={() => props.setFullRange(prev => !prev)}
+        className={props.fullRange() ? '' : 'bg-foreground! text-background!'}
+      >
         {props.fullRange() ? <Chart /> : <Scatter />}
       </IconButton>
 
       <Dropdown
-        label="Download image"
+        label="Export & share"
         icon={<Download />}
         options={[
-          { value: 'svg', icon: Download, label: 'svg', onClick: () => downloadImg('svg') },
-          { value: 'png', icon: Download, label: 'png', onClick: () => downloadImg('png') },
-          { value: 'webp', icon: Download, label: 'webP', onClick: () => downloadImg('webp') },
-          { value: 'avif', icon: Download, label: 'avif', onClick: () => downloadImg('avif') },
+          { value: 'copy', label: 'copy chart url', icon: Clipboard, onClick: props.onShare },
+          { separator: true, value: '', label: '' },
+          { value: 'link-svg', label: 'open svg', icon: Link, href: ogImageUrl('svg') },
+          { value: 'link-png', label: 'open png', icon: Link, href: ogImageUrl('png') },
+          { value: 'link-webp', label: 'open webp', icon: Link, href: ogImageUrl('webp') },
+          { value: 'link-avif', label: 'open avif', icon: Link, href: ogImageUrl('avif') },
+          { separator: true, value: '', label: '' },
+          { value: 'svg', icon: Download, label: 'download svg', onClick: () => downloadImg('svg') },
+          { value: 'png', icon: Download, label: 'download png', onClick: () => downloadImg('png') },
+          { value: 'webp', icon: Download, label: 'download webp', onClick: () => downloadImg('webp') },
           { separator: true, value: '', label: '' },
           {
             value: 'bg-color',
             label: `bg (${imgDownloadBgColor()})`,
             icon: () => <div class={`w-full h-full`} style={`background-color: ${imgDownloadBgColor()}`} />,
             onClick: () => {
-              const colors = ['none', '#000', '#fff'];
-              const currentIndex = colors.indexOf(imgDownloadBgColor());
-              const nextIndex = (currentIndex + 1) % colors.length;
-              setImgDownloadBgColor(colors[nextIndex]);
+              const currentIndex = BG_COLORS.indexOf(imgDownloadBgColor());
+              setImgDownloadBgColor(BG_COLORS[(currentIndex + 1) % BG_COLORS.length]);
             },
           },
           {
@@ -122,10 +141,6 @@ export const ChartControls = (props: ChartControlsProps) => {
           },
         ]}
       />
-
-      <IconButton aria-label="Share URL" onClick={props.onShare} title="Copy URL to clipboard">
-        <Share />
-      </IconButton>
     </div>
   );
 };

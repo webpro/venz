@@ -5,17 +5,21 @@ import './app.css';
 import { ToastContext, createToastStore } from './stores/toast';
 import Toast from './components/Toast';
 import { ThemeProvider } from './stores/theme';
-import { MetaProvider, Title } from '@solidjs/meta';
+import { Meta, MetaProvider, Title } from '@solidjs/meta';
 import { Canonical } from './components/Canonical';
+import { OgImageContext, createOgImageStore } from './stores/og-image';
 
 export default function App() {
   const toastStore = createToastStore();
+  const ogImageStore = createOgImageStore();
 
   return (
     <ThemeProvider>
       <MetaProvider>
         <Title>Venz</Title>
+        <Meta property="og:image" content={ogImageStore.ogImage()} />
 
+        <OgImageContext.Provider value={ogImageStore}>
         <ToastContext.Provider value={toastStore}>
           <Router
             root={props => (
@@ -42,6 +46,7 @@ export default function App() {
             </div>
           </Show>
         </ToastContext.Provider>
+        </OgImageContext.Provider>
       </MetaProvider>
     </ThemeProvider>
   );

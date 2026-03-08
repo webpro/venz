@@ -14,6 +14,7 @@ type DropdownOption = {
   icon?: () => JSX.Element;
   label: string;
   onClick?: () => void;
+  href?: string;
   separator?: boolean;
   disabled?: boolean;
 };
@@ -93,6 +94,7 @@ export const Dropdown: ParentComponent<DropdownProps> = props => {
               icon={props.options[0].icon}
               label={props.options[0].label}
               selected={props.options[0].value === props.value}
+              href={props.options[0].href}
               onClick={() => props.onChange?.(props.options[0].value)}
               onKeySelect={closeDropdown => {
                 props.options[0].onClick?.();
@@ -112,6 +114,7 @@ export const Dropdown: ParentComponent<DropdownProps> = props => {
                       icon={option.icon}
                       label={option.label}
                       selected={option.value === props.value}
+                      href={option.href}
                       onClick={() => props.onChange?.(option.value)}
                       onKeySelect={closeDropdown => {
                         option.onClick?.();
@@ -136,6 +139,7 @@ export const Dropdown: ParentComponent<DropdownProps> = props => {
                         icon={option.icon}
                         label={option.label}
                         selected={option.value === props.value}
+                        href={option.href}
                         onClick={() => props.onChange?.(option.value)}
                         onKeySelect={closeDropdown => {
                           option.onClick?.();
@@ -163,18 +167,40 @@ type DropdownItemProps = {
   selected?: boolean;
   onClick: () => void;
   onKeySelect: (closeDropdown: boolean) => void;
+  href?: string;
   disabled?: boolean;
 };
 
 const DropdownItem: ParentComponent<DropdownItemProps> = props => {
+  const className = () =>
+    `flex items-center gap-3 w-full px-4 py-2 cursor-pointer text-left bg-background ${
+      props.disabled
+        ? 'text-foreground/50 cursor-not-allowed'
+        : 'text-foreground hover:text-background hover:bg-foreground focus:bg-foreground focus:text-background focus:outline-hidden'
+    }`;
+
+  if (props.href) {
+    return (
+      <a
+        href={props.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        class={className()}
+        role="option"
+        aria-selected={props.selected}
+      >
+        <Show when={props.icon}>
+          <div class="w-4.5 h-4.5 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">{props.icon}</div>
+        </Show>
+        {props.label}
+      </a>
+    );
+  }
+
   return (
     <button
       type="button"
-      class={`flex items-center gap-3 w-full px-4 py-2 cursor-pointer text-left bg-background ${
-        props.disabled
-          ? 'text-foreground/50 cursor-not-allowed'
-          : 'text-foreground hover:text-background hover:bg-foreground focus:bg-foreground focus:text-background focus:outline-hidden'
-      }`}
+      class={className()}
       role="option"
       aria-selected={props.selected}
       disabled={props.disabled}
@@ -191,7 +217,7 @@ const DropdownItem: ParentComponent<DropdownItemProps> = props => {
       }}
     >
       <Show when={props.icon}>
-        <div class="w-6 h-6 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">{props.icon}</div>
+        <div class="w-4.5 h-4.5 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">{props.icon}</div>
       </Show>
       {props.label}
     </button>

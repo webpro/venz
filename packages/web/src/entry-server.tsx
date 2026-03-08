@@ -17,7 +17,6 @@ export default createHandler(() => (
           <meta property="og:url" content="https://try.venz.dev" />
           <meta property="og:title" content="Venz" />
           <meta property="og:description" content="Easy and accessible dataviz" />
-          <meta property="og:image" content="https://try.venz.dev/logo-w.webp" />
 
           <script innerHTML={`document.documentElement.className = localStorage.getItem('theme') || 'dark';`} />
           {assets}

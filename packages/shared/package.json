@@ -1,12 +1,32 @@
 {
   "name": "@venz/shared",
-  "module": "src/index.ts",
-  "types": "src/index.ts",
+  "exports": {
+    "./render": "./src/render/index.ts",
+    "./adapter": "./src/adapters/index.ts",
+    "./types": "./src/types.ts",
+    "./chart": "./src/chart.ts",
+    "./colors": "./src/colors.ts",
+    "./transpose": "./src/transpose.ts"
+  },
   "type": "module",
   "scripts": {
     "test": "vitest"
   },
   "devDependencies": {
+    "@types/d3-array": "^3.2.2",
+    "@types/d3-axis": "^3.0.6",
+    "@types/d3-scale": "^4.0.9",
+    "@types/d3-selection": "^3.0.11",
+    "@types/d3-shape": "^3.1.8",
+    "@types/semver": "^7.7.1",
     "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "d3-array": "^3.2.4",
+    "d3-axis": "^3.0.0",
+    "d3-scale": "^4.0.2",
+    "d3-selection": "^3.0.0",
+    "d3-shape": "^3.2.0",
+    "semver": "^7.7.4"
   }
 }

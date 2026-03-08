@@ -1,6 +1,7 @@
 import { createSignal, createContext, useContext, type ParentProps } from 'solid-js';
 
-export type Theme = 'light' | 'dark' | 'high-contrast';
+export type { Theme } from '@venz/shared/chart';
+import type { Theme } from '@venz/shared/chart';
 type ThemeContextType = { theme: () => Theme; setTheme: (t: Theme) => void };
 
 const ThemeContext = createContext<ThemeContextType>();

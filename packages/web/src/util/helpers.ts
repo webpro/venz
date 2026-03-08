@@ -1,12 +1,13 @@
-import { configTypes, transform, type InitialConfig, type Series, type SeriesData } from '@venz/shared';
+import { transform, SEPARATOR, type InitialConfig } from '@venz/shared/adapter';
+import { configTypes, type Series, type SeriesData } from '@venz/shared/types';
 import type { ChartType, LegendPosition, SearchParams } from '../types';
-import { calculateStats, SEPARATOR } from '@venz/shared/src/adapters/standard';
 
 const MAX_URL_LENGTH = 15_000;
 
 export const generateNumbers = () => Array.from({ length: 10 }, () => Math.floor(Math.random() * 100) + 1);
 
 export const origin = import.meta.env.DEV ? 'http://localhost:3000' : 'https://try.venz.dev';
+export const cdnOrigin = import.meta.env.VITE_CDN_ORIGIN ?? (import.meta.env.DEV ? 'http://localhost:3001' : 'https://cdn.venz.dev');
 
 const getChartType = (value?: string | string[]): ChartType =>
   typeof value === 'string' && ['box', 'median', 'scatter', 'line', 'bar'].includes(value)
@@ -79,12 +80,3 @@ export function createShareableUrl(searchParams: SearchParams, series: Series[],
 
   return [loss / (loss + remainingLength), url];
 }
-
-export const transpose = (data: SeriesData[]) => {
-  const result: SeriesData[] = [];
-  if (!data[0]) return result;
-  for (let i = 0; i < data[0].values.length; i++) {
-    result[i] = { id: i, seriesId: i, ...calculateStats(data.map(d => d.values[i])) };
-  }
-  return result;
-};

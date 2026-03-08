@@ -1,6 +1,6 @@
-import type { Configuration, IncomingSeries, JsonValue, MitataJSON, Series, SeriesData, Statistics } from '../types';
-import { getNextAvailableColor } from '../colors';
-import { calculateStats } from './standard';
+import type { Configuration, IncomingSeries, JsonValue, MitataJSON, Series, SeriesData, Statistics } from '../types.ts';
+import { getNextAvailableColor } from '../colors.ts';
+import { calculateStats } from './standard.ts';
 
 const MAX_SAMPLES = 100_000;
 

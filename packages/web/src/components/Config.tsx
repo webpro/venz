@@ -2,8 +2,9 @@ import { createEffect, createResource, createSignal, For, Match, Switch, Show } 
 import type { Component } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { useNavigate, useParams } from '@solidjs/router';
-import { type Configuration, type Series, type SimpleCommand, generateCommand, configTypes } from '@venz/shared';
-import { getNextAvailableColor } from '@venz/shared';
+import { configTypes, type Configuration, type Series, type SimpleCommand } from '@venz/shared/types';
+import { generateCommand } from '@venz/shared/adapter';
+import { getNextAvailableColor } from '@venz/shared/colors';
 import { storage } from '../storage';
 import { useToast } from '../stores/toast';
 import { Button, ButtonLink, ButtonLinkInverted, DangerButton } from './Button';

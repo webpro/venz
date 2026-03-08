@@ -4,26 +4,25 @@ import { max } from 'd3-array';
 import { axisLeft, axisBottom } from 'd3-axis';
 import { curveMonotoneX, line } from 'd3-shape';
 import { compare, valid } from 'semver';
-import type { Accessor } from 'solid-js';
-import type { Configuration, Series, SeriesData } from '@venz/shared';
-import type { Theme } from '../stores/theme';
-import type { ChartType, LegendPosition, SortMode } from '../types';
-import { transpose } from '../util/helpers';
+import type { Configuration, Series, SeriesData } from '../types.ts';
+import type { Theme, ChartType, LegendPosition, SortMode } from '../chart.ts';
+import { transpose } from '../transpose.ts';
 
-type RenderProps = {
+export type RenderProps = {
   svgRef: SVGSVGElement;
-  config: Accessor<Configuration | undefined>;
-  data: Accessor<SeriesData[]>;
+  config: () => Configuration | undefined;
+  data: () => SeriesData[];
   series: Series[];
-  selectedSeries: Accessor<number[]>;
+  selectedSeries: () => number[];
   seriesX: Series[];
-  selectedSeriesX: Accessor<number[]>;
-  chartType: Accessor<ChartType>;
-  transposed: Accessor<boolean>;
-  legendPosition: Accessor<LegendPosition>;
-  sortMode: Accessor<SortMode>;
-  fullRange: Accessor<boolean>;
+  selectedSeriesX: () => number[];
+  chartType: () => ChartType;
+  transposed: () => boolean;
+  legendPosition: () => LegendPosition;
+  sortMode: () => SortMode;
+  fullRange: () => boolean;
   theme: () => Theme;
+  interactive?: boolean;
 };
 
 type ChartContext = {
@@ -47,7 +46,8 @@ function renderTooltipDot(
   y: ChartContext['y'],
   color: string,
   selectedId: number | string,
-  getX: (d: number, i: number) => number
+  getX: (d: number, i: number) => number,
+  interactive: boolean
 ) {
   svg
     .selectAll(`circle-${selectedId}`)
@@ -57,8 +57,14 @@ function renderTooltipDot(
     .attr('transform', (d, i) => `translate(${getX(d, i)},${y(d)})`)
     .each(function (d, i) {
       const g = select(this);
-      g.append('circle').attr('r', 12).attr('fill', 'transparent').attr('class', 'hit-area');
+
+      if (interactive) {
+        g.append('circle').attr('r', 12).attr('fill', 'transparent').attr('class', 'hit-area');
+      }
+
       g.append('circle').attr('r', 3).attr('fill', color).attr('class', 'visible-dot');
+
+      if (!interactive) return;
 
       const isFirst = i === 0;
       const isLast = i === values.length - 1;
@@ -76,7 +82,7 @@ function renderTooltipDot(
         .style('fill', 'white')
         .text(d);
 
-      const textWidth = text.node().getBBox().width;
+      const textWidth = text.node()!.getBBox().width;
       const padding = 8;
 
       tooltipGroup
@@ -136,6 +142,7 @@ function renderScatter(ctx: ChartContext, stats: SeriesData, color: string, sele
 
 function renderLine(ctx: ChartContext, stats: SeriesData, color: string, selectedId: number) {
   const { svg, x, y, props } = ctx;
+  const interactive = props.interactive !== false;
   const curve = line().x((d, i) => x(i)).y(d => y(d)).curve(curveMonotoneX);
 
   const values =
@@ -146,7 +153,7 @@ function renderLine(ctx: ChartContext, stats: SeriesData, color: string, selecte
         : stats.values.toSorted((a, b) => b - a);
 
   svg.append('path').datum(values).attr('fill', 'none').attr('stroke', color).attr('stroke-width', 2).attr('d', curve);
-  renderTooltipDot(svg, values, x, y, color, selectedId, (_d, i) => x(i));
+  renderTooltipDot(svg, values, x, y, color, selectedId, (_d, i) => x(i), interactive);
 }
 
 function renderBar(ctx: ChartContext, stats: SeriesData, color: string, selectedId: number) {
@@ -162,12 +169,12 @@ function renderBar(ctx: ChartContext, stats: SeriesData, color: string, selected
 
 function renderTransposed(ctx: ChartContext) {
   const { svg, x, y, props } = ctx;
+  const interactive = props.interactive !== false;
   const theme = props.theme();
   const chartType = props.chartType();
   const transposedData = transpose(props.data());
   const labels = props.data().map(d => d.label ?? d.seriesId);
 
-  // Precompute text y-positions for median: push labels apart only when they'd overlap
   const medianTextY = new Map<string, number>();
   if (chartType === 'median') {
     const minGap = 14;
@@ -198,7 +205,7 @@ function renderTransposed(ctx: ChartContext) {
     if (chartType === 'line') {
       const curve = line().x((d, i) => x(labels[i])).y(d => y(d)).curve(curveMonotoneX);
       svg.append('path').datum(stats.values).attr('fill', 'none').attr('stroke', color).attr('stroke-width', 2).attr('d', curve);
-      renderTooltipDot(svg, stats.values, x, y, color, selectedId, (_d, i) => x(labels[i]));
+      renderTooltipDot(svg, stats.values, x, y, color, selectedId, (_d, i) => x(labels[i]), interactive);
     } else if (chartType === 'bar') {
       const groupCount = props.selectedSeriesX().length;
       const groupIndex = props.selectedSeriesX().indexOf(selectedId);
@@ -274,10 +281,11 @@ function renderLegend(ctx: ChartContext, width: number) {
 }
 
 export const renderSVG = (props: RenderProps) => {
-  const margin = { top: 30, right: 0, bottom: 90, left: 60 };
+  const interactive = props.interactive !== false;
+  const margin = { top: 30, right: 4, bottom: 90, left: 60 };
   const svgWidth = props.svgRef.clientWidth;
   const svgHeight = props.svgRef.clientHeight;
-  const width = svgWidth - margin.left;
+  const width = svgWidth - margin.left - margin.right;
   const height = svgHeight - margin.bottom;
 
   select(props.svgRef).selectAll('*').remove();
@@ -293,7 +301,8 @@ export const renderSVG = (props: RenderProps) => {
 
   const pad = 1;
 
-  svg.append('style').text(`
+  if (interactive) {
+    svg.append('style').text(`
       .tooltip {
         opacity: 0;
         pointer-events: none;
@@ -309,6 +318,7 @@ export const renderSVG = (props: RenderProps) => {
         opacity: 1;
       }
     `);
+  }
 
   const getLinearScale = () => {
     const _max = max(props.data().map(s => s.values.length ?? 0));
@@ -380,24 +390,23 @@ export const renderSVG = (props: RenderProps) => {
 
   const y = props.fullRange() ? getYScale() : getYScaleWithBreak();
 
-  // Grid lines
   svg.append('g').attr('class', 'grid').style('stroke', 'currentColor').style('opacity', 0.2).call(axisLeft(y).tickSize(-width).tickFormat(() => ''));
 
   if (props.chartType() !== 'bar') {
     svg.append('g').attr('class', 'grid').attr('transform', `translate(0, ${height})`).style('stroke', 'currentColor').style('opacity', 0.2).call(axisBottom(x).tickSize(-height).tickFormat(() => ''));
   }
 
-  // Y axis
   svg.append('g').call(axisLeft(y).tickFormat(props.fullRange() ? null : d => (d === y.domain()[0] ? '' : d))).selectAll('text').style('fill', 'currentColor');
 
-  // X axis
   const labels = x.domain().map(d => String(d));
   const isDenseTicks = labels.length > 20 || labels.reduce((acc, l) => acc + l.length, 0) > 100;
 
-  svg
+  const xAxisG = svg
     .append('g')
     .attr('transform', `translate(0,${height})`)
-    .call(axisBottom(x))
+    .call(axisBottom(x));
+
+  xAxisG
     .selectAll('text')
     .style('fill', 'currentColor')
     .attr('transform', () => (isDenseTicks ? 'rotate(-45)' : null))
@@ -410,16 +419,17 @@ export const renderSVG = (props: RenderProps) => {
         : props.series[d]?.label || d
     );
 
-  // Axis labels
+  if (!isDenseTicks && !props.transposed()) {
+    xAxisG.select('.tick:last-of-type text').attr('text-anchor', 'end');
+  }
+
   svg.append('text').attr('x', width / 2).attr('y', height + 10 + margin.bottom / 2).attr('text-anchor', 'middle').style('fill', 'currentColor').style('font-family', 'sans-serif').text(props.config()?.labelX ?? 'Run #');
   svg.append('text').attr('x', -height / 2).attr('y', -45).attr('transform', 'rotate(-90)').attr('text-anchor', 'middle').style('fill', 'currentColor').style('font-family', 'sans-serif').text(props.config()?.labelY ?? `median (s)`);
 
   const ctx: ChartContext = { svg, x, y, height, props };
 
-  // Legend
   renderLegend(ctx, width);
 
-  // Chart data
   if (props.transposed()) {
     renderTransposed(ctx);
   } else {

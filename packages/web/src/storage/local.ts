@@ -1,4 +1,4 @@
-import type { Configuration, SeriesData, Series } from '@venz/shared';
+import type { Configuration, SeriesData, Series } from '@venz/shared/types';
 import type { StorageAdapter } from './index.js';
 import { migrations } from './migrations.js';
 import { demoConfigurations } from './demo.js';

@@ -1,4 +1,4 @@
-import type { Configuration, SeriesData } from '@venz/shared';
+import type { Configuration, SeriesData } from '@venz/shared/types';
 import { LocalStorageAdapter } from './local';
 
 export interface StorageAdapter {
@@ -11,7 +11,7 @@ export interface StorageAdapter {
   getSeriesData(id: number): Promise<SeriesData[]>;
 }
 
-export const getStorageAdapter = () => {
+const getStorageAdapter = () => {
   return new LocalStorageAdapter();
 };
 

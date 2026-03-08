@@ -14,6 +14,8 @@ import {
 } from './standard.ts';
 import type { ConfigType, Configuration, JsonValue, SeriesData } from '../types.ts';
 
+export { SEPARATOR, calculateStats } from './standard.ts';
+
 export { generateCommand } from './hyperfine.ts';
 
 export type InitialConfig = {

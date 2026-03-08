@@ -1,0 +1,7 @@
+node_modules
+.git
+packages/web
+packages/og
+.agents
+TODO.md
+CLAUDE.md

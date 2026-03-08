@@ -1,5 +1,6 @@
-import { COLORS, type Configuration, type IncomingConfig, type SeriesData } from '@venz/shared';
-import { calculateStats } from '@venz/shared/src/adapters/standard';
+import { COLORS } from '@venz/shared/colors';
+import { calculateStats } from '@venz/shared/adapter';
+import type { Configuration, IncomingConfig, SeriesData } from '@venz/shared/types';
 
 const examples = [
   [

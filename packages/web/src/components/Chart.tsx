@@ -1,6 +1,7 @@
 import { createEffect, createResource, createSignal, onCleanup, Show } from 'solid-js';
-import { Button, ButtonLink } from './Button';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
+import { renderSVG } from '@venz/shared/render';
+import { Button, ButtonLink } from './Button';
 import { storage } from '../storage';
 import { useToast } from '../stores/toast';
 import { createStore } from 'solid-js/store';
@@ -9,9 +10,8 @@ import { ChartSeries } from './ChartSeries';
 import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
-import { renderSVG } from './render-svg';
 import { createShareableUrl, transformFromSearchParams } from '../util/helpers';
-import type { ImgBgPadding, SortMode } from '../types';
+import type { SortMode } from '../types';
 
 export const isGenericChart = (id: string | undefined) => !id || id === 'chart';
 
@@ -20,13 +20,25 @@ export default function Chart() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   if (searchParams.type === 'pivot') {
     const url = new URL(window.location.href);
     url.searchParams.set('type', 'line');
     url.searchParams.set('t', '1');
     history.replaceState(null, '', url.pathname + url.search);
+  }
+
+  const chromeless = searchParams.chrome === '0';
+
+  if (chromeless) {
+    document.body.style.transition = 'none';
+    document.documentElement.style.transition = 'none';
+    if (searchParams.theme) {
+      const t = searchParams.theme as 'dark' | 'light' | 'high-contrast';
+      setTheme(t);
+      document.documentElement.className = t;
+    }
   }
 
   const fromUrl = transformFromSearchParams(searchParams);
@@ -111,6 +123,11 @@ export default function Chart() {
     });
   });
 
+  const getShareableUrl = () => {
+    const [, url] = createShareableUrl(searchParams, series, data());
+    return decodeURIComponent(url.searchParams.toString());
+  };
+
   const handleShare = () => {
     const [loss, url] = createShareableUrl(searchParams, series, data());
     const relative = loss * 100;
@@ -118,6 +135,10 @@ export default function Chart() {
     navigator.clipboard.writeText(prettyUrl);
     addToast(`URL copied to clipboard (${relative === 0 ? 'no' : `${relative.toFixed(2)}%`} data loss)`);
   };
+
+  if (chromeless) {
+    return <svg ref={svgRef} class="h-96 w-full" id="chart" />;
+  }
 
   return (
     <div
@@ -157,6 +178,7 @@ export default function Chart() {
         setLegendPosition={setLegendPosition}
         fullRange={fullRange}
         setFullRange={setFullRange}
+        getShareableUrl={getShareableUrl}
         onShare={handleShare}
       />
 

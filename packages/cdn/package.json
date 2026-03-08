@@ -1,0 +1,19 @@
+{
+  "name": "@venz/cdn",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.ts",
+    "dev": "node --watch src/server.ts",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.0.30",
+    "@hono/node-server": "^1.14.3",
+    "@resvg/resvg-js": "^2.6.2",
+    "@venz/shared": "workspace:*",
+    "hono": "^4.7.13",
+    "linkedom": "^0.18.12",
+    "sharp": "^0.34.5"
+  }
+}

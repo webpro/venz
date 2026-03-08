@@ -12,7 +12,7 @@
     "wrangler": "^4.71.0"
   },
   "scripts": {
-    "dev": "pnpm run -F @venz/web dev",
+    "dev": "pnpm run -F @venz/web -F @venz/cdn dev",
     "knip": "knip"
   },
   "packageManager": "pnpm@10.17.1"
