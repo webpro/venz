@@ -1,25 +1,21 @@
-import { Container, getContainer } from '@cloudflare/containers';
+import { Container, getRandom } from '@cloudflare/containers';
+import type { DurableObjectNamespace } from '@cloudflare/workers-types';
 
-interface Env {
-  CDN_CONTAINER: DurableObjectNamespace<CdnContainer>;
+const INSTANCE_COUNT = 1;
+
+export class CdnContainer extends Container {
+  defaultPort = 8080;
+  maxInstances = INSTANCE_COUNT;
+  sleepAfter = '10m';
 }
 
-export class CdnContainer extends Container<Env> {
-  defaultPort = 8080;
-  sleepAfter = '10m';
-
-  override onStart() {
-    console.log('CDN container started');
-  }
-
-  override onError(error: unknown) {
-    console.error('CDN container error:', error);
-  }
+interface Env {
+  CDN_CONTAINER: DurableObjectNamespace;
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const container = getContainer(env.CDN_CONTAINER);
-    return container.fetch(request);
+    const container = await getRandom(env.CDN_CONTAINER, INSTANCE_COUNT);
+    return await container.fetch(request);
   },
 };

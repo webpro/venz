@@ -48,6 +48,10 @@ class LRUCache {
     }
   }
 
+  clear() {
+    this.#map.clear();
+  }
+
   get size() {
     return this.#map.size;
   }
@@ -57,7 +61,10 @@ const cache = new LRUCache(CACHE_SIZE);
 
 const app = new Hono();
 
-app.get('/', c => c.redirect('https://try.venz.dev', 301));
+app.get('/', c => {
+  if (c.req.header('host') === 'ping') return c.text('ok');
+  return c.redirect('https://try.venz.dev', 301);
+});
 
 app.get('/favicon.svg', c => {
   return new Response(favicon, {
@@ -115,7 +122,11 @@ app.get('/i/:file', async c => {
       image = svg;
     } else {
       const bg = THEME_BG[theme];
-      const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: width }, background: bg });
+      const resvg = new Resvg(svg, {
+        fitTo: { mode: 'width', value: width },
+        background: bg,
+        font: { fontDirs: ['/usr/share/fonts'] },
+      });
       const rendered = resvg.render();
       const raw = sharp(rendered.pixels, { raw: { width: rendered.width, height: rendered.height, channels: 4 } });
       if (ext === 'png') {
@@ -139,6 +150,11 @@ app.get('/i/:file', async c => {
 });
 
 app.get('/health', c => c.text('ok'));
+
+app.get('/cache/clear', c => {
+  cache.clear();
+  return c.text('ok');
+});
 
 app.get('/stats', c => {
   return c.json({ cache: cache.size });

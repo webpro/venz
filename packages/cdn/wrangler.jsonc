@@ -1,9 +1,7 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "venz-cdn",
 	"main": "src/worker.ts",
-	"compatibility_date": "2025-10-08",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_date": "2025-07-12",
 	"routes": [
 		{
 			"pattern": "cdn.venz.dev",
@@ -14,7 +12,7 @@
 		{
 			"class_name": "CdnContainer",
 			"image": "../../Containerfile",
-			"max_instances": 3
+			"max_instances": 1
 		}
 	],
 	"durable_objects": {
@@ -30,5 +28,11 @@
 			"new_sqlite_classes": ["CdnContainer"],
 			"tag": "v1"
 		}
-	]
+	],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+	}
 }
