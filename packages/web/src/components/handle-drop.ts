@@ -81,7 +81,7 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
       }
     } catch (error: unknown) {
       if (error instanceof Error) props.addToast(`Unable to load ${file.name} (${error.message})`, 'error');
-      props.addToast(`Unable to load ${file.name}`, 'error');
+      else props.addToast(`Unable to load ${file.name}`, 'error');
       console.error(error);
     }
   }
