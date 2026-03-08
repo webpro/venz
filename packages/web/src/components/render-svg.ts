@@ -3,7 +3,7 @@ import { scaleLinear, scalePoint } from 'd3-scale';
 import { max } from 'd3-array';
 import { axisLeft, axisBottom } from 'd3-axis';
 import { curveMonotoneX, line } from 'd3-shape';
-import { compare } from 'semver';
+import { compare, valid } from 'semver';
 import type { Accessor } from 'solid-js';
 import type { Configuration, Series, SeriesData } from '@venz/shared';
 import type { Theme } from '../stores/theme';
@@ -84,7 +84,7 @@ export const renderSVG = (props: RenderProps) => {
         : data.filter(isSelected).map(m => (isLabeled ? m.label : m.seriesId));
     const domain = [...new Set(selected)];
     if (props.sortMode() === 'original') {
-      if (sort === 'semver') domain.sort(compare);
+      if (sort === 'semver') domain.sort((a, b) => valid(a) ? (valid(b) ? compare(a, b) : -1) : valid(b) ? 1 : 0);
       else if (sort === 'datetime') domain.sort((a, b) => new Date(a) - new Date(b));
     } else {
       domain.sort((a, b) => {
