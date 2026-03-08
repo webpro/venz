@@ -1,16 +1,15 @@
-import type { ParentProps } from 'solid-js';
+import { splitProps, type ParentProps } from 'solid-js';
 
 type InputProps = {
   className?: string;
 };
 
 export const Input = (props: ParentProps<InputProps & { value?: string }>) => {
-  const { className = '', value, ...rest } = props;
+  const [own, rest] = splitProps(props, ['className']);
   return (
     <input
       type="text"
-      value={props.value}
-      class={`flex-1 p-2 border-none bg-gray-50 text-gray-700 high-contrast:text-gray-900 ${className}`}
+      class={`flex-1 p-2 border-none bg-gray-50 text-gray-700 high-contrast:text-gray-900 ${own.className ?? ''}`}
       {...rest}
     />
   );
