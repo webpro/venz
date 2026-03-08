@@ -89,53 +89,31 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
     }
   };
 
-  createEffect(() => {
-    const nonEmptyPrepare = series.filter(
-      (cmd, index) => index === series.length - 1 || cmd.command?.trim() || cmd.label.trim()
-    );
-    const lastCommand = nonEmptyPrepare[nonEmptyPrepare.length - 1];
-    if (
-      series[series.length - 1]?.label === '' &&
-      series[series.length - 1]?.command === '' &&
-      series[series.length - 2]?.label === '' &&
-      series[series.length - 2]?.command === ''
-    ) {
-      setSeries(series.toSpliced(-1));
-    } else if (!lastCommand || lastCommand.command || lastCommand.label) {
-      setSeries(series.concat({ label: '', command: '', color: getNextAvailableColor(series) }));
+  const autoGrowCommands = <T extends { command?: string }>(
+    items: T[],
+    setItems: (items: T[]) => void,
+    isEmpty: (item: T) => boolean,
+    emptyItem: () => T
+  ) => {
+    const last = items[items.length - 1];
+    const secondLast = items[items.length - 2];
+    if (last && secondLast && isEmpty(last) && isEmpty(secondLast)) {
+      setItems(items.toSpliced(-1));
+    } else if (!last || !isEmpty(last)) {
+      setItems(items.concat(emptyItem()));
     }
-  });
+  };
 
-  createEffect(() => {
-    const nonEmptyPrepare = prepare.filter((cmd, index) => index === prepare.length - 1 || cmd.command.trim());
-    const lastCommand = nonEmptyPrepare[nonEmptyPrepare.length - 1];
-    if (prepare[prepare.length - 1]?.command === '' && prepare[prepare.length - 2]?.command === '') {
-      setPrepare(prepare.toSpliced(-1));
-    } else if (!lastCommand || lastCommand.command) {
-      setPrepare(prepare.concat({ command: '' }));
-    }
-  });
+  const isEmptyCommand = (cmd: { command?: string }) => !cmd.command?.trim();
+  const isEmptySeries = (cmd: { command?: string; label?: string }) => !cmd.command?.trim() && !cmd.label?.trim();
 
-  createEffect(() => {
-    const nonEmptyBuild = build.filter((cmd, index) => index === build.length - 1 || cmd.command.trim());
-    const lastCommand = nonEmptyBuild[nonEmptyBuild.length - 1];
-    if (build[build.length - 1]?.command === '' && build[build.length - 2]?.command === '') {
-      setBuild(build.toSpliced(-1));
-    } else if (!lastCommand || lastCommand.command) {
-      setBuild(build.concat({ command: '' }));
-    }
-  });
-
+  createEffect(() => autoGrowCommands(series, s => setSeries(s), isEmptySeries, () => ({ label: '', command: '', color: getNextAvailableColor(series) })));
+  createEffect(() => autoGrowCommands(prepare, p => setPrepare(p), isEmptyCommand, () => ({ command: '' })));
+  createEffect(() => autoGrowCommands(build, b => setBuild(b), isEmptyCommand, () => ({ command: '' })));
   createEffect(() => {
     series.forEach((cmd, cmdIndex) => {
-      const prepare = cmd.prepare || [];
-      const nonEmptyPrepare = prepare.filter((cmd, index) => index === prepare.length - 1 || cmd.command.trim());
-      const lastCommand = nonEmptyPrepare[nonEmptyPrepare.length - 1];
-      if (prepare[prepare.length - 1]?.command === '' && prepare[prepare.length - 2]?.command === '') {
-        setSeries(cmdIndex, 'prepare', prepare.toSpliced(-1));
-      } else if (!lastCommand || lastCommand.command) {
-        setSeries(cmdIndex, 'prepare', prepare.concat({ command: '' }));
-      }
+      const prep = cmd.prepare || [];
+      autoGrowCommands(prep, p => setSeries(cmdIndex, 'prepare', p), isEmptyCommand, () => ({ command: '' }));
     });
   });
 
