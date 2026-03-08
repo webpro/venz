@@ -1,6 +1,7 @@
 import type { ConfigType, Series, SeriesData } from '@venz/shared';
 import { createMemo, For, type Accessor, type Setter } from 'solid-js';
-import { isGenericChart, storage } from './Chart';
+import { isGenericChart } from './Chart';
+import { storage } from '../storage';
 import { useParams } from '@solidjs/router';
 import { useTheme } from '../stores/theme';
 import type { ChartType } from '../types';

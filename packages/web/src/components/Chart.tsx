@@ -1,7 +1,7 @@
 import { createEffect, createResource, createSignal, onCleanup, Show } from 'solid-js';
 import { Button, ButtonLink } from './Button';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
-import { getStorageAdapter } from '../storage';
+import { storage } from '../storage';
 import { useToast } from '../stores/toast';
 import { createStore } from 'solid-js/store';
 import { useTheme } from '../stores/theme';
@@ -12,8 +12,6 @@ import { handleDrop, handleGlobalPaste } from './handle-drop';
 import { renderSVG } from './render-svg';
 import { createShareableUrl, transformFromSearchParams } from '../util/helpers';
 import type { ImgBgPadding, SortMode } from '../types';
-
-export const storage = getStorageAdapter();
 
 export const isGenericChart = (id: string | undefined) => !id || id === 'chart';
 

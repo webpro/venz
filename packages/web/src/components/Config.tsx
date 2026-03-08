@@ -4,12 +4,10 @@ import { createStore } from 'solid-js/store';
 import { useNavigate, useParams } from '@solidjs/router';
 import { type Configuration, type Series, type SimpleCommand, generateCommand, configTypes } from '@venz/shared';
 import { getNextAvailableColor } from '@venz/shared';
-import { getStorageAdapter } from '../storage';
+import { storage } from '../storage';
 import { useToast } from '../stores/toast';
 import { Button, ButtonLink, ButtonLinkInverted, DangerButton } from './Button';
 import { ColorInput, CommandInput, Input, Select } from './Form';
-
-const storage = getStorageAdapter();
 
 const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
   const navigate = useNavigate();

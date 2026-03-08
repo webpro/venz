@@ -14,3 +14,5 @@ export interface StorageAdapter {
 export const getStorageAdapter = () => {
   return new LocalStorageAdapter();
 };
+
+export const storage = getStorageAdapter();

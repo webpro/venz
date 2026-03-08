@@ -1,6 +1,6 @@
 import { transform, type Configuration, type Series, type SeriesData } from '@venz/shared';
 import { type AddToast } from '../stores/toast';
-import { storage } from './Chart';
+import { storage } from '../storage';
 import type { Accessor, Setter } from 'solid-js';
 
 type HandleDropProps = {
