@@ -132,9 +132,9 @@ app.get('/i/:file', async c => {
       if (ext === 'png') {
         image = await raw.png().toBuffer();
       } else if (ext === 'webp') {
-        image = await raw.webp({ quality }).toBuffer();
+        image = await raw.webp({ lossless: true }).toBuffer();
       } else {
-        image = await raw.avif({ quality }).toBuffer();
+        image = await raw.avif({ lossless: true }).toBuffer();
       }
     }
 
