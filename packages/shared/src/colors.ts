@@ -1,18 +1,16 @@
-import type { IncomingSeries } from './types.ts';
+import type { IncomingSeries } from "./types.ts";
 
 export const COLORS = [
-  '#8b5cf6',
-  '#ec4899',
-  '#14b8a6',
-  '#f97316',
-  '#06b6d4',
-  '#84cc16',
-  '#6366f1',
-  '#f43f5e',
-  '#10b981',
-  '#3b82f6',
-  '#a855f7',
-  '#eab308',
+  "#4e79a7",
+  "#f28e2c",
+  "#e15759",
+  "#76b7b2",
+  "#59a14f",
+  "#edc949",
+  "#af7aa1",
+  "#ff9da7",
+  "#9c755f",
+  "#bab0ab",
 ];
 
 export const getNextAvailableColor = (existingSeries: IncomingSeries[] = []) => {
