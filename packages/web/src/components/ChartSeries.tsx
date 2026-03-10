@@ -5,6 +5,7 @@ import { storage } from '../storage';
 import { useParams } from '@solidjs/router';
 import { useTheme } from '../stores/theme';
 import type { ConfigType, Series, SeriesData } from '@venz/shared/types';
+import type { PivotMode } from '../types';
 
 const getSeriesColor = (s: Series, theme: string) => (theme === 'high-contrast' ? 'currentColor' : s.color);
 
@@ -19,7 +20,7 @@ type Props = {
   setSelectedSeries: Setter<number[]>;
   setSelectedSeriesX: Setter<number[]>;
   type: ConfigType;
-  transposed: Accessor<boolean>;
+  pivotMode: Accessor<PivotMode>;
 };
 
 export const ChartSeries = (props: Props) => {
@@ -33,11 +34,12 @@ export const ChartSeries = (props: Props) => {
     }
   };
 
-  const data = () => (props.transposed() ? transpose(props.data()) : props.data());
-  const series = () => (props.transposed() ? props.seriesX : props.series);
-  const selectedSeries = () => (props.transposed() ? props.selectedSeriesX() : props.selectedSeries());
-  const setSelectedSeries = () => (props.transposed() ? props.setSelectedSeriesX : props.setSelectedSeries);
-  const setSeries = () => (props.transposed() ? props.setSeriesX : props.setSeries);
+  const useSeriesX = () => props.pivotMode() === 'pivoted' || props.pivotMode() === 'transposed-pivoted';
+  const data = () => (useSeriesX() ? transpose(props.data()) : props.data());
+  const series = () => (useSeriesX() ? props.seriesX : props.series);
+  const selectedSeries = () => (useSeriesX() ? props.selectedSeriesX() : props.selectedSeries());
+  const setSelectedSeries = () => (useSeriesX() ? props.setSelectedSeriesX : props.setSelectedSeries);
+  const setSeries = () => (useSeriesX() ? props.setSeriesX : props.setSeries);
 
   const seriesWithStats = createMemo(() => {
     const _data = data();

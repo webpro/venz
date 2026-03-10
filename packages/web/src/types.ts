@@ -1,4 +1,4 @@
-export type { ChartType, SortMode, LegendPosition } from '@venz/shared/chart';
+export type { ChartType, SortMode, LegendPosition, PivotMode } from '@venz/shared/chart';
 
 export type SearchParams = {
   [x: string]: undefined | string | string[];

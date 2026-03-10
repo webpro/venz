@@ -2,6 +2,7 @@ import { parseHTML } from 'linkedom';
 import { renderSVG, type RenderProps } from '@venz/shared/render';
 import { transform, SEPARATOR } from '@venz/shared/adapter';
 import { configTypes, type SeriesData } from '@venz/shared/types';
+import { getPivotMode } from '@venz/shared/chart';
 import type { Theme, ChartType, LegendPosition } from '@venz/shared/chart';
 
 const THEME_FG: Record<Theme, string> = { dark: '#fff', light: '#000', 'high-contrast': '#ff0' };
@@ -41,18 +42,18 @@ function parseParams(params: URLSearchParams) {
     : typeParam === 'pivot'
       ? 'line'
       : 'median';
-  const transposed = typeParam === 'pivot' || get('t') === '1';
+  const pivotMode = getPivotMode(typeParam, get('p'), get('t'));
   const lpParam = get('lp');
   const legendPosition: LegendPosition = LEGEND_POSITIONS.includes(lpParam as LegendPosition)
     ? (lpParam as LegendPosition)
     : 'tr';
   const fullRange = get('br') !== '1';
 
-  return { chartType, transposed, legendPosition, fullRange, config, data };
+  return { chartType, pivotMode, legendPosition, fullRange, config, data };
 }
 
 export function renderChart(params: URLSearchParams, width: number, height: number, theme: Theme): string {
-  const { chartType, transposed, legendPosition, fullRange, config, data } = parseParams(params);
+  const { chartType, pivotMode, legendPosition, fullRange, config, data } = parseParams(params);
 
   const { document } = parseHTML('<!DOCTYPE html><html><body></body></html>');
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -75,7 +76,7 @@ export function renderChart(params: URLSearchParams, width: number, height: numb
     seriesX,
     selectedSeriesX: () => selectedSeriesX,
     chartType: () => chartType,
-    transposed: () => transposed,
+    pivotMode: () => pivotMode,
     legendPosition: () => legendPosition,
     sortMode: () => 'original',
     fullRange: () => fullRange,

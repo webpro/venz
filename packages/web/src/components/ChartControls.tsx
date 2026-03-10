@@ -5,6 +5,7 @@ import { Download } from './icons/Download';
 import { BoxPlot } from './icons/BoxPlot';
 import { MedianChart } from './icons/Median';
 import { Transpose } from './icons/Pivot';
+import { SwapAxis } from './icons/SwapAxis';
 import { ScatterPlot } from './icons/ScatterPlot';
 import { LegendBottomLeft, LegendBottomRight, LegendNone, LegendTopLeft, LegendTopRight } from './icons/Legend';
 import { Line } from './icons/Line';
@@ -14,7 +15,7 @@ import { Dropdown } from './Dropdown';
 import { Bar } from './icons/Bar';
 import { download, type ImageFormat } from '../util/download';
 import { createSignal, type Accessor, type Setter } from 'solid-js';
-import type { ChartType, ImgBgPadding, LegendPosition, SortMode } from '../types';
+import type { ChartType, ImgBgPadding, LegendPosition, PivotMode, SortMode } from '../types';
 import { Clipboard } from './icons/Clipboard';
 import { Link } from './icons/Link';
 import { cdnOrigin } from '../util/helpers';
@@ -26,8 +27,8 @@ type ChartControlsProps = {
   isTooManyValues: boolean;
   chartType: Accessor<ChartType>;
   setChartType: Setter<ChartType>;
-  transposed: Accessor<boolean>;
-  setTransposed: Setter<boolean>;
+  pivotMode: Accessor<PivotMode>;
+  setPivotMode: Setter<PivotMode>;
   sortMode: Accessor<SortMode>;
   setSortMode: Setter<SortMode>;
   legendPosition: Accessor<LegendPosition>;
@@ -67,16 +68,35 @@ export const ChartControls = (props: ChartControlsProps) => {
         onChange={props.setChartType}
       />
 
-      {props.hasSeriesX && (
-        <IconButton
-          aria-label="Toggle transpose"
-          onClick={() => props.setTransposed(prev => !prev)}
-          title="Transpose series"
-          className={props.transposed() ? 'bg-foreground! text-background!' : ''}
-        >
-          <Transpose />
-        </IconButton>
-      )}
+      {props.hasSeriesX && (() => {
+        const m = () => props.pivotMode();
+        const isPivoted = () => m() === 'pivoted' || m() === 'transposed-pivoted';
+        const isTransposed = () => m() === 'transposed' || m() === 'transposed-pivoted';
+        const togglePivot = () =>
+          props.setPivotMode(m => m === 'none' ? 'pivoted' : m === 'pivoted' ? 'none' : m === 'transposed' ? 'transposed-pivoted' : 'transposed');
+        const toggleTranspose = () =>
+          props.setPivotMode(m => m === 'none' ? 'transposed' : m === 'transposed' ? 'none' : m === 'pivoted' ? 'transposed-pivoted' : 'pivoted');
+        return (
+          <>
+            <IconButton
+              aria-label="Transpose"
+              onClick={toggleTranspose}
+              title="Transpose"
+              className={isTransposed() ? 'bg-foreground! text-background!' : ''}
+            >
+              <SwapAxis />
+            </IconButton>
+            <IconButton
+              aria-label="Pivot"
+              onClick={togglePivot}
+              title="Pivot"
+              className={isPivoted() ? 'bg-foreground! text-background!' : ''}
+            >
+              <Transpose />
+            </IconButton>
+          </>
+        );
+      })()}
 
       <Dropdown
         label="Sort mode"

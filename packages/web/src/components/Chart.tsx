@@ -11,7 +11,7 @@ import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
 import { createShareableUrl, transformFromSearchParams } from '../util/helpers';
-import type { SortMode } from '../types';
+import type { PivotMode, SortMode } from '../types';
 
 export const isGenericChart = (id: string | undefined) => !id || id === 'chart';
 
@@ -25,7 +25,7 @@ export default function Chart() {
   if (searchParams.type === 'pivot') {
     const url = new URL(window.location.href);
     url.searchParams.set('type', 'line');
-    url.searchParams.set('t', '1');
+    url.searchParams.set('p', '1');
     history.replaceState(null, '', url.pathname + url.search);
   }
 
@@ -44,7 +44,7 @@ export default function Chart() {
   const fromUrl = transformFromSearchParams(searchParams);
 
   const [chartType, setChartType] = createSignal(fromUrl.type);
-  const [transposed, setTransposed] = createSignal(fromUrl.transposed);
+  const [pivotMode, setPivotMode] = createSignal<PivotMode>(fromUrl.pivotMode);
   const [config, setConfig] = createSignal(fromUrl.config);
   const [series, setSeries] = createStore(fromUrl.config?.series ?? []);
   const [selectedSeries, setSelectedSeries] = createSignal(series.map(series => series.id));
@@ -60,7 +60,10 @@ export default function Chart() {
     if (!(!searchParams.ct && config()?.type === 'standard')) setSearchParams({ ct: config()?.type });
     if (!(!searchParams.lp && legendPosition() === 'tr')) setSearchParams({ lp: legendPosition() });
     if (!(!searchParams.br && fullRange() === true)) setSearchParams({ br: fullRange() ? '0' : '1' });
-    if (!(!searchParams.t && !transposed())) setSearchParams({ t: transposed() ? '1' : undefined });
+    const p = pivotMode() === 'pivoted' || pivotMode() === 'transposed-pivoted' ? '1' : undefined;
+    const t = pivotMode() === 'transposed' || pivotMode() === 'transposed-pivoted' ? '1' : undefined;
+    if (!(!searchParams.p && !p)) setSearchParams({ p });
+    if (!(!searchParams.t && !t)) setSearchParams({ t });
   });
 
   const handleSaveAsNewConfiguration = async () => {
@@ -114,7 +117,7 @@ export default function Chart() {
       data,
       series,
       chartType,
-      transposed,
+      pivotMode,
       selectedSeries,
       seriesX,
       selectedSeriesX,
@@ -174,8 +177,8 @@ export default function Chart() {
         isTooManyValues={data()[0]?.values && data()[0].values.length > 500}
         chartType={chartType}
         setChartType={setChartType}
-        transposed={transposed}
-        setTransposed={setTransposed}
+        pivotMode={pivotMode}
+        setPivotMode={setPivotMode}
         sortMode={sortMode}
         setSortMode={setSortMode}
         legendPosition={legendPosition}
@@ -198,7 +201,7 @@ export default function Chart() {
           selectedSeriesX={selectedSeriesX}
           setSelectedSeriesX={setSelectedSeriesX}
           type={config()?.type}
-          transposed={transposed}
+          pivotMode={pivotMode}
         />
       )}
 

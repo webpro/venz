@@ -5,7 +5,7 @@ import { axisLeft, axisBottom } from 'd3-axis';
 import { curveMonotoneX, line } from 'd3-shape';
 import { compare, valid } from 'semver';
 import type { Configuration, RawUnit, Series, SeriesData } from '../types.ts';
-import type { Theme, ChartType, LegendPosition, SortMode } from '../chart.ts';
+import type { Theme, ChartType, LegendPosition, PivotMode, SortMode } from '../chart.ts';
 import { transpose } from '../transpose.ts';
 
 type DisplayUnit = { label: string; convert: (raw: number) => number };
@@ -33,7 +33,7 @@ export type RenderProps = {
   seriesX: Series[];
   selectedSeriesX: () => number[];
   chartType: () => ChartType;
-  transposed: () => boolean;
+  pivotMode: () => PivotMode;
   legendPosition: () => LegendPosition;
   sortMode: () => SortMode;
   fullRange: () => boolean;
@@ -188,20 +188,23 @@ function renderBar(ctx: ChartContext, stats: SeriesData, color: string, selected
   svg.append('text').attr('x', xPos).attr('y', y(stats.median) - 10).attr('text-anchor', 'middle').style('fill', color).style('font-family', 'sans-serif').style('font-size', '12px').text(fmt(stats.median));
 }
 
-function renderTransposed(ctx: ChartContext) {
+function renderPivoted(ctx: ChartContext, opts: {
+  selectedIds: number[];
+  seriesLookup: Series[];
+  data: SeriesData[];
+  labels: (string | number)[];
+}) {
   const { svg, x, y, props } = ctx;
   const interactive = props.interactive !== false;
   const theme = props.theme();
   const chartType = props.chartType();
-  const transposedData = transpose(props.data());
-  const labels = props.data().map(d => d.label ?? d.seriesId);
 
   const medianTextY = new Map<string, number>();
   if (chartType === 'median') {
     const minGap = 14;
-    for (let i = 0; i < labels.length; i++) {
-      const entries = props.selectedSeriesX()
-        .map(sid => ({ sid, value: transposedData.find(d => d.seriesId === sid)?.values[i] }))
+    for (let i = 0; i < opts.labels.length; i++) {
+      const entries = opts.selectedIds
+        .map(sid => ({ sid, value: opts.data.find(d => d.seriesId === sid)?.values[i] }))
         .filter(e => e.value !== undefined)
         .sort((a, b) => b.value - a.value);
 
@@ -215,27 +218,27 @@ function renderTransposed(ctx: ChartContext) {
     }
   }
 
-  for (const selectedId of props.selectedSeriesX()) {
-    const currentSeries = props.seriesX.find(s => s.id === selectedId);
-    const stats = transposedData.find(d => d.seriesId === selectedId);
+  for (const selectedId of opts.selectedIds) {
+    const currentSeries = opts.seriesLookup.find(s => s.id === selectedId);
+    const stats = opts.data.find(d => d.seriesId === selectedId);
 
     if (!currentSeries || !stats) continue;
 
     const color = getColor(theme, currentSeries);
 
     if (chartType === 'line') {
-      const curve = line().x((d, i) => x(labels[i])).y(d => y(d)).curve(curveMonotoneX);
+      const curve = line().x((d, i) => x(opts.labels[i])).y(d => y(d)).curve(curveMonotoneX);
       svg.append('path').datum(stats.values).attr('fill', 'none').attr('stroke', color).attr('stroke-width', 2).attr('d', curve);
-      renderTooltipDot(svg, stats.values, x, y, color, selectedId, (_d, i) => x(labels[i]), interactive);
+      renderTooltipDot(svg, stats.values, x, y, color, selectedId, (_d, i) => x(opts.labels[i]), interactive);
     } else if (chartType === 'bar') {
-      const groupCount = props.selectedSeriesX().length;
-      const groupIndex = props.selectedSeriesX().indexOf(selectedId);
+      const groupCount = opts.selectedIds.length;
+      const groupIndex = opts.selectedIds.indexOf(selectedId);
       const step = (x as ReturnType<typeof scalePoint>).step();
       const totalBarWidth = Math.min(step * 0.8, 80);
       const barWidth = totalBarWidth / groupCount;
 
       stats.values.forEach((value, i) => {
-        const xPos = x(labels[i]);
+        const xPos = x(opts.labels[i]);
         const offset = (groupIndex - (groupCount - 1) / 2) * barWidth;
         svg.append('rect').attr('x', xPos + offset - barWidth / 2).attr('y', y(value)).attr('width', barWidth).attr('height', ctx.height - y(value)).attr('fill', color);
         if (groupCount <= 4) {
@@ -244,16 +247,16 @@ function renderTransposed(ctx: ChartContext) {
       });
     } else if (chartType === 'median') {
       stats.values.forEach((value, i) => {
-        const cx = x(labels[i]);
+        const cx = x(opts.labels[i]);
         const textY = medianTextY.get(`${selectedId}-${i}`) ?? y(value) - 6;
         svg.append('circle').attr('cx', cx).attr('cy', y(value)).attr('r', 4).attr('fill', color).attr('stroke', color).attr('stroke-width', 2);
         svg.append('text').attr('x', cx + 6).attr('y', textY).style('fill', color).style('font-family', 'sans-serif').style('font-size', '12px').text(ctx.fmt(value));
       });
     } else if (chartType === 'scatter') {
-      svg.selectAll(`circle-t-${selectedId}`).data(stats.values).enter().append('circle').attr('cx', (d, i) => x(labels[i])).attr('cy', d => y(d)).attr('r', 3).attr('fill', color).attr('opacity', 0.6);
+      svg.selectAll(`circle-t-${selectedId}`).data(stats.values).enter().append('circle').attr('cx', (d, i) => x(opts.labels[i])).attr('cy', d => y(d)).attr('r', 3).attr('fill', color).attr('opacity', 0.6);
     } else if (chartType === 'box') {
       stats.values.forEach((value, i) => {
-        const xPos = x(labels[i]);
+        const xPos = x(opts.labels[i]);
         svg.append('circle').attr('cx', xPos).attr('cy', y(value)).attr('r', 4).attr('fill', color).attr('stroke', color).attr('stroke-width', 1);
       });
     }
@@ -282,7 +285,8 @@ function renderLegend(ctx: ChartContext, width: number) {
   const theme = props.theme();
 
   const legend = svg.append('g').attr('class', 'legend').attr('transform', `translate(${legendX}, ${legendY})`);
-  const topTen = (props.transposed() ? props.selectedSeriesX() : props.selectedSeries()).slice(0, 10);
+  const useSeriesX = props.pivotMode() === 'pivoted' || props.pivotMode() === 'transposed-pivoted';
+  const topTen = (useSeriesX ? props.selectedSeriesX() : props.selectedSeries()).slice(0, 10);
 
   legend
     .selectAll('g')
@@ -291,7 +295,7 @@ function renderLegend(ctx: ChartContext, width: number) {
     .append('g')
     .attr('transform', (_, i) => `translate(0, ${isTop ? i * 25 : (i + 1 - topTen.length) * 25})`)
     .each(function (selectedId) {
-      const currentSeries = (props.transposed() ? props.seriesX : props.series).find(s => s.id === selectedId);
+      const currentSeries = (useSeriesX ? props.seriesX : props.series).find(s => s.id === selectedId);
       const elementColor = getColor(theme, currentSeries);
       const g = select(this);
       g.append('text').attr('x', 0).attr('y', 10).style('fill', elementColor).style('font-family', 'sans-serif').attr('text-anchor', textAnchor).text(currentSeries.label);
@@ -340,7 +344,8 @@ export const renderSVG = (props: RenderProps) => {
   }
 
   const getLinearScale = () => {
-    const _max = max(props.data().map(s => s.values.length ?? 0));
+    const d = props.pivotMode() === 'transposed-pivoted' ? transpose(props.data()) : props.data();
+    const _max = max(d.map(s => s.values.length ?? 0));
     return scaleLinear()
       .domain([0, _max ? _max - 1 : 0])
       .range([0, width])
@@ -353,10 +358,13 @@ export const renderSVG = (props: RenderProps) => {
   const getLabeledScale = () => {
     const sort = props.config()?.sort;
     const data = props.data();
+    const pivotMode = props.pivotMode();
     const selected =
-      props.transposed()
+      pivotMode === 'pivoted'
         ? data.map(m => m.label)
-        : data.filter(isSelected).map(m => (isLabeled ? m.label : m.seriesId));
+        : pivotMode === 'transposed' || pivotMode === 'transposed-pivoted'
+          ? props.seriesX.map(s => s.label)
+          : data.filter(isSelected).map(m => (isLabeled ? m.label : m.seriesId));
     const domain = [...new Set(selected)];
     if (props.sortMode() === 'original') {
       if (sort === 'semver') domain.sort((a, b) => valid(a) ? (valid(b) ? compare(a, b) : -1) : valid(b) ? 1 : 0);
@@ -372,14 +380,19 @@ export const renderSVG = (props: RenderProps) => {
   };
 
   const x =
-    !props.transposed() && (props.chartType() === 'scatter' || props.chartType() === 'line')
+    (props.pivotMode() === 'none' || props.pivotMode() === 'transposed-pivoted') && (props.chartType() === 'scatter' || props.chartType() === 'line')
       ? getLinearScale()
       : getLabeledScale();
 
+  const pivotedData = () => {
+    const m = props.pivotMode();
+    return m === 'pivoted' || m === 'transposed-pivoted' ? transpose(props.data()) : props.data();
+  };
+
   const getYScale = () => {
     const values =
-      props.transposed()
-        ? transpose(props.data()).flatMap(d => d.values)
+      props.pivotMode() !== 'none'
+        ? pivotedData().flatMap(d => d.values)
         : props.chartType() === 'bar'
           ? props.data().map(s => s.median)
           : props.data().filter(s => props.selectedSeries().includes(s.seriesId)).flatMap(s => s.max);
@@ -398,8 +411,8 @@ export const renderSVG = (props: RenderProps) => {
     svg.append('path').attr('d', `M 0,${start + unit * 3} v ${unit * 2},0`).style('stroke', 'currentColor').style('stroke-width', 1);
 
     const values =
-      props.transposed()
-        ? transpose(props.data()).flatMap(d => d.values)
+      props.pivotMode() !== 'none'
+        ? pivotedData().flatMap(d => d.values)
         : props.chartType() === 'median' || props.chartType() === 'bar'
           ? props.data().map(s => s.median)
           : props.data().filter(s => props.selectedSeries().includes(s.seriesId)).flatMap(s => [s.min, s.max]);
@@ -449,12 +462,12 @@ export const renderSVG = (props: RenderProps) => {
     .attr('dy', isDenseTicks ? '.1em' : '0.7em')
     .attr('dx', isDenseTicks ? '-.8em' : null)
     .text(d =>
-      !props.transposed() && (props.chartType() === 'scatter' || props.chartType() === 'line')
+      (props.pivotMode() === 'none' || props.pivotMode() === 'transposed-pivoted') && (props.chartType() === 'scatter' || props.chartType() === 'line')
         ? Number.isInteger(d) ? Number(d) + 1 : ''
-        : props.series[d]?.label || d
+        : props.pivotMode() === 'transposed' || props.pivotMode() === 'transposed-pivoted' ? d : (props.series[d]?.label || d)
     );
 
-  if (!isDenseTicks && !props.transposed()) {
+  if (!isDenseTicks && (props.pivotMode() === 'none' || props.pivotMode() === 'transposed-pivoted')) {
     xAxisG.select('.tick:last-of-type text').attr('text-anchor', 'end');
   }
 
@@ -467,8 +480,31 @@ export const renderSVG = (props: RenderProps) => {
 
   renderLegend(ctx, width);
 
-  if (props.transposed()) {
-    renderTransposed(ctx);
+  const pivotMode = props.pivotMode();
+  if (pivotMode === 'pivoted') {
+    renderPivoted(ctx, {
+      selectedIds: props.selectedSeriesX(),
+      seriesLookup: props.seriesX,
+      data: transpose(props.data()),
+      labels: props.data().map(d => d.label ?? d.seriesId),
+    });
+  } else if (pivotMode === 'transposed') {
+    renderPivoted(ctx, {
+      selectedIds: props.selectedSeries(),
+      seriesLookup: props.series,
+      data: props.data(),
+      labels: props.seriesX.map(s => s.label),
+    });
+  } else if (pivotMode === 'transposed-pivoted') {
+    const renderer = chartRenderers[props.chartType()];
+    const theme = props.theme();
+    const tData = transpose(props.data());
+    for (const selectedId of props.selectedSeriesX()) {
+      const currentSeries = props.seriesX.find(s => s.id === selectedId);
+      const stats = tData.find(d => d.seriesId === selectedId);
+      if (!currentSeries || !stats) continue;
+      renderer(ctx, { ...stats, label: currentSeries.label }, getColor(theme, currentSeries), selectedId);
+    }
   } else {
     const renderer = chartRenderers[props.chartType()];
     const theme = props.theme();

@@ -1,5 +1,6 @@
 import { transform, SEPARATOR, type InitialConfig } from '@venz/shared/adapter';
 import { configTypes, type Series, type SeriesData } from '@venz/shared/types';
+import { getPivotMode } from '@venz/shared/chart';
 import type { ChartType, LegendPosition, SearchParams } from '../types';
 
 const MAX_URL_LENGTH = 15_000;
@@ -45,11 +46,11 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   const { config, data: seriesData } = transform(input, { initialConfig });
 
   const type = getChartType(searchParams.type);
-  const transposed = searchParams.type === 'pivot' || searchParams.t === '1';
+  const pivotMode = getPivotMode(searchParams.type, searchParams.p, searchParams.t);
   const legendPosition = getLegendPosition(searchParams.lp);
   const fullRange = getFullRange(searchParams.br);
 
-  return { type, transposed, legendPosition, fullRange, config, data: seriesData };
+  return { type, pivotMode, legendPosition, fullRange, config, data: seriesData };
 }
 
 export function createShareableUrl(searchParams: SearchParams, series: Series[], data: SeriesData[]): [number, URL] {
@@ -61,6 +62,7 @@ export function createShareableUrl(searchParams: SearchParams, series: Series[],
   if (typeof searchParams.labelX === 'string') url.searchParams.set('labelX', searchParams.labelX);
   if (typeof searchParams.labelY === 'string') url.searchParams.set('labelY', searchParams.labelY);
   if (typeof searchParams.ct === 'string') url.searchParams.set('ct', searchParams.ct);
+  if (searchParams.p === '1') url.searchParams.set('p', '1');
   if (searchParams.t === '1') url.searchParams.set('t', '1');
 
   for (const id of series) url.searchParams.append('label', id.label);
