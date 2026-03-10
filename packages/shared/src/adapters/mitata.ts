@@ -1,10 +1,9 @@
-import type { Configuration, IncomingSeries, JsonValue, MitataJSON, Series, SeriesData, Statistics } from '../types.ts';
+import type { Configuration, IncomingSeries, JsonValue, MitataJSON, RawUnit, Series, SeriesData, Statistics } from '../types.ts';
 import { getNextAvailableColor } from '../colors.ts';
-import { calculateStats } from './standard.ts';
+import { calculateStats, transformLabeledData } from './standard.ts';
+import type { Options } from './index.ts';
 
 const MAX_SAMPLES = 100_000;
-
-const toSeconds = (ns: number) => ns / 1_000_000_000;
 
 export function isMitataJSON(data: JsonValue): data is MitataJSON {
   return Boolean(
@@ -33,20 +32,18 @@ function transformMitataWorkload(json: MitataJSON): Results[] {
   if (isParameterized) {
     return json.benchmarks[0].runs.map(run => {
       const samples = truncateSamples(run.stats.samples);
-      const values = Number.isInteger(samples[0]) ? samples.map(toSeconds) : samples;
       return {
         series: { label: run.name, parameters: run.args },
-        data: calculateStats(values),
+        data: calculateStats(samples),
       };
     });
   }
 
   return json.benchmarks.map(benchmark => {
     const samples = truncateSamples(benchmark.runs[0].stats.samples);
-    const values = Number.isInteger(samples[0]) ? samples.map(toSeconds) : samples;
     return {
       series: { label: benchmark.alias ?? benchmark.runs[0].name },
-      data: calculateStats(values),
+      data: calculateStats(samples),
     };
   });
 }
@@ -62,7 +59,7 @@ export function transformMitataData(
 
   const samples = json.benchmarks[0].runs[0].stats.samples;
   const size = samples.length;
-  const unit = Number.isInteger(samples[0]) ? 's' : 'ns';
+  const rawUnit: RawUnit = Number.isInteger(samples[0]) ? 'ns' : 's';
 
   const results = transformMitataWorkload(json);
   const hasParameters = results.every(r => r.series.parameters && Object.keys(r.series.parameters).length > 0);
@@ -92,7 +89,7 @@ export function transformMitataData(
       id: configId,
       series,
       title: `New mitata benchmark (${timestamp})`,
-      labelY: `median (${unit})`,
+      rawUnit,
     };
 
     const config: Configuration =
@@ -124,4 +121,35 @@ export function transformMitataData(
 
     return { config, data, loss };
   }
+}
+
+export function transformLabeledMitataData(
+  runs: Array<{ label: string; json: MitataJSON }>,
+  options: Options = {},
+) {
+  const first = runs[0].json;
+  const aliases = first.benchmarks.map(b => b.alias ?? b.runs[0].name);
+
+  const samples = first.benchmarks[0].runs[0].stats.samples;
+  const rawUnit: RawUnit = Number.isInteger(samples[0]) ? 'ns' : 's';
+
+  const labeledData: Array<[string, number[]]> = runs.map(({ label, json }) => {
+    const values = aliases.map(name => {
+      const benchmark = json.benchmarks.find(b => (b.alias ?? b.runs[0].name) === name);
+      if (!benchmark) return 0;
+      const s = benchmark.runs[0].stats.samples;
+      const sorted = s.toSorted((a, b) => a - b);
+      return sorted[Math.floor(sorted.length / 2)];
+    });
+    return [label, values];
+  });
+
+  return transformLabeledData(labeledData, {
+    ...options,
+    initialConfig: {
+      ...options.initialConfig,
+      rawUnit,
+      labels: aliases,
+    },
+  });
 }

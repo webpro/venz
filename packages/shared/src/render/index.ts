@@ -4,9 +4,25 @@ import { max } from 'd3-array';
 import { axisLeft, axisBottom } from 'd3-axis';
 import { curveMonotoneX, line } from 'd3-shape';
 import { compare, valid } from 'semver';
-import type { Configuration, Series, SeriesData } from '../types.ts';
+import type { Configuration, RawUnit, Series, SeriesData } from '../types.ts';
 import type { Theme, ChartType, LegendPosition, SortMode } from '../chart.ts';
 import { transpose } from '../transpose.ts';
+
+type DisplayUnit = { label: string; convert: (raw: number) => number };
+
+function bestDisplayUnit(rawUnit: RawUnit, representative: number): DisplayUnit {
+  if (rawUnit === 'ns') {
+    if (representative >= 1e9) return { label: 's', convert: n => n / 1e9 };
+    if (representative >= 1e6) return { label: 'ms', convert: n => n / 1e6 };
+    if (representative >= 1e3) return { label: 'µs', convert: n => n / 1e3 };
+    return { label: 'ns', convert: n => n };
+  }
+  // seconds
+  if (representative >= 1) return { label: 's', convert: s => s };
+  if (representative >= 0.001) return { label: 'ms', convert: s => s * 1e3 };
+  if (representative >= 1e-6) return { label: 'µs', convert: s => s * 1e6 };
+  return { label: 'ns', convert: s => s * 1e9 };
+}
 
 export type RenderProps = {
   svgRef: SVGSVGElement;
@@ -31,13 +47,20 @@ type ChartContext = {
   y: ReturnType<typeof scaleLinear>;
   height: number;
   props: RenderProps;
+  fmt: (raw: number) => string;
 };
 
 const getColor = (theme: Theme, series: Series) =>
   theme === 'high-contrast' ? 'currentColor' : series.color;
 
-const getDecimals = (values: number[]) =>
-  Math.min(3, Math.max(...values.map(n => (n.toString().split('.')[1] || '').length)));
+const getDecimals = (values: number[]) => {
+  const maxFrac = Math.max(...values.map(n => (n.toString().split('.')[1] || '').length));
+  if (maxFrac === 0) return 0;
+  const magnitude = Math.max(...values.map(Math.abs));
+  if (magnitude >= 100) return Math.min(1, maxFrac);
+  if (magnitude >= 10) return Math.min(2, maxFrac);
+  return Math.min(3, maxFrac);
+};
 
 function renderTooltipDot(
   svg: ChartContext['svg'],
@@ -101,14 +124,13 @@ function renderTooltipDot(
 }
 
 function renderMedian(ctx: ChartContext, stats: SeriesData, color: string, selectedId: number) {
-  const { svg, x, y } = ctx;
+  const { svg, x, y, fmt } = ctx;
   const radius = Math.abs(y(stats.median) - y(stats.median + stats.stddev));
-  const decimals = getDecimals(stats.values);
   const cx = x(selectedId) || x(stats.label);
 
   svg.append('circle').attr('cx', cx).attr('cy', y(stats.median)).attr('r', radius).attr('fill', color).attr('fill-opacity', 0.2);
   svg.append('circle').attr('cx', cx).attr('cy', y(stats.median)).attr('r', 4).attr('fill', color).attr('stroke', color).attr('stroke-width', 2);
-  svg.append('text').attr('x', cx + 6).attr('y', y(stats.median) - 6).style('fill', color).style('font-family', 'sans-serif').style('font-size', '12px').text(stats.median.toFixed(decimals));
+  svg.append('text').attr('x', cx + 6).attr('y', y(stats.median) - 6).style('fill', color).style('font-family', 'sans-serif').style('font-size', '12px').text(fmt(stats.median));
 }
 
 function renderBox(ctx: ChartContext, stats: SeriesData, color: string, selectedId: number) {
@@ -157,14 +179,13 @@ function renderLine(ctx: ChartContext, stats: SeriesData, color: string, selecte
 }
 
 function renderBar(ctx: ChartContext, stats: SeriesData, color: string, selectedId: number) {
-  const { svg, x, y, height, props } = ctx;
+  const { svg, x, y, height, fmt } = ctx;
   const xPos = x(selectedId) || x(stats.label);
   const step = (x as ReturnType<typeof scalePoint>).step();
   const barWidth = Math.min(step * 0.8, 80);
-  const decimals = getDecimals(stats.values);
 
   svg.append('rect').attr('x', xPos - barWidth / 2).attr('y', y(stats.median)).attr('width', barWidth).attr('height', height - y(stats.median)).attr('fill', color);
-  svg.append('text').attr('x', xPos).attr('y', y(stats.median) - 10).attr('text-anchor', 'middle').style('fill', color).style('font-family', 'sans-serif').style('font-size', '12px').text(stats.median.toFixed(decimals));
+  svg.append('text').attr('x', xPos).attr('y', y(stats.median) - 10).attr('text-anchor', 'middle').style('fill', color).style('font-family', 'sans-serif').style('font-size', '12px').text(fmt(stats.median));
 }
 
 function renderTransposed(ctx: ChartContext) {
@@ -212,23 +233,21 @@ function renderTransposed(ctx: ChartContext) {
       const step = (x as ReturnType<typeof scalePoint>).step();
       const totalBarWidth = Math.min(step * 0.8, 80);
       const barWidth = totalBarWidth / groupCount;
-      const decimals = getDecimals(stats.values);
 
       stats.values.forEach((value, i) => {
         const xPos = x(labels[i]);
         const offset = (groupIndex - (groupCount - 1) / 2) * barWidth;
         svg.append('rect').attr('x', xPos + offset - barWidth / 2).attr('y', y(value)).attr('width', barWidth).attr('height', ctx.height - y(value)).attr('fill', color);
         if (groupCount <= 4) {
-          svg.append('text').attr('x', xPos + offset).attr('y', y(value) - 4).attr('text-anchor', 'middle').style('fill', color).style('font-family', 'sans-serif').style('font-size', '10px').text(value.toFixed(decimals));
+          svg.append('text').attr('x', xPos + offset).attr('y', y(value) - 4).attr('text-anchor', 'middle').style('fill', color).style('font-family', 'sans-serif').style('font-size', '10px').text(ctx.fmt(value));
         }
       });
     } else if (chartType === 'median') {
-      const decimals = getDecimals(stats.values);
       stats.values.forEach((value, i) => {
         const cx = x(labels[i]);
         const textY = medianTextY.get(`${selectedId}-${i}`) ?? y(value) - 6;
         svg.append('circle').attr('cx', cx).attr('cy', y(value)).attr('r', 4).attr('fill', color).attr('stroke', color).attr('stroke-width', 2);
-        svg.append('text').attr('x', cx + 6).attr('y', textY).style('fill', color).style('font-family', 'sans-serif').style('font-size', '12px').text(value.toFixed(decimals));
+        svg.append('text').attr('x', cx + 6).attr('y', textY).style('fill', color).style('font-family', 'sans-serif').style('font-size', '12px').text(ctx.fmt(value));
       });
     } else if (chartType === 'scatter') {
       svg.selectAll(`circle-t-${selectedId}`).data(stats.values).enter().append('circle').attr('cx', (d, i) => x(labels[i])).attr('cy', d => y(d)).attr('r', 3).attr('fill', color).attr('opacity', 0.6);
@@ -396,7 +415,23 @@ export const renderSVG = (props: RenderProps) => {
     svg.append('g').attr('class', 'grid').attr('transform', `translate(0, ${height})`).style('stroke', 'currentColor').style('opacity', 0.2).call(axisBottom(x).tickSize(-height).tickFormat(() => ''));
   }
 
-  svg.append('g').call(axisLeft(y).tickFormat(props.fullRange() ? null : d => (d === y.domain()[0] ? '' : d))).selectAll('text').style('fill', 'currentColor');
+  const rawUnit = props.config()?.rawUnit;
+  const allValues = props.data().flatMap(d => d.values);
+  const representative = allValues.length > 0 ? allValues.reduce((a, b) => a + b, 0) / allValues.length : 0;
+  const displayUnit = rawUnit ? bestDisplayUnit(rawUnit, Math.abs(representative)) : undefined;
+  const convert = displayUnit?.convert ?? (n => n);
+
+  const formatConverted = (n: number) => {
+    const v = convert(n);
+    const decimals = getDecimals([v]);
+    return v.toFixed(decimals);
+  };
+
+  const tickFormat = rawUnit
+    ? (d: number) => (d === 0 && !props.fullRange() ? '' : formatConverted(d))
+    : props.fullRange() ? null : (d: number) => (d === y.domain()[0] ? '' : d);
+
+  svg.append('g').call(axisLeft(y).tickFormat(tickFormat)).selectAll('text').style('fill', 'currentColor');
 
   const labels = x.domain().map(d => String(d));
   const isDenseTicks = labels.length > 20 || labels.reduce((acc, l) => acc + l.length, 0) > 100;
@@ -423,10 +458,12 @@ export const renderSVG = (props: RenderProps) => {
     xAxisG.select('.tick:last-of-type text').attr('text-anchor', 'end');
   }
 
-  svg.append('text').attr('x', width / 2).attr('y', height + 10 + margin.bottom / 2).attr('text-anchor', 'middle').style('fill', 'currentColor').style('font-family', 'sans-serif').text(props.config()?.labelX ?? 'Run #');
-  svg.append('text').attr('x', -height / 2).attr('y', -45).attr('transform', 'rotate(-90)').attr('text-anchor', 'middle').style('fill', 'currentColor').style('font-family', 'sans-serif').text(props.config()?.labelY ?? `median (s)`);
+  const labelY = displayUnit ? `median (${displayUnit.label})` : (props.config()?.labelY ?? `median (s)`);
 
-  const ctx: ChartContext = { svg, x, y, height, props };
+  svg.append('text').attr('x', width / 2).attr('y', height + 10 + margin.bottom / 2).attr('text-anchor', 'middle').style('fill', 'currentColor').style('font-family', 'sans-serif').text(props.config()?.labelX ?? 'Run #');
+  svg.append('text').attr('x', -height / 2).attr('y', -45).attr('transform', 'rotate(-90)').attr('text-anchor', 'middle').style('fill', 'currentColor').style('font-family', 'sans-serif').text(labelY);
+
+  const ctx: ChartContext = { svg, x, y, height, props, fmt: formatConverted };
 
   renderLegend(ctx, width);
 

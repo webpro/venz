@@ -250,6 +250,7 @@ export function transformLabeledData(input: Array<[string, number | number[]]>, 
         seriesX,
         labelX: initialConfig?.labelX,
         labelY: initialConfig?.labelY,
+        rawUnit: initialConfig?.rawUnit,
       };
 
   return { config, data };

@@ -14,6 +14,7 @@ test('transform hyperfine json data', async () => {
       id: -1,
       title: expect.stringMatching(/New hyperfine benchmark \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'hyperfine',
+      rawUnit: 's',
       series: [
         {
           color: '#8b5cf6',
@@ -68,6 +69,7 @@ test('transform hyperfine json (parameterized)', async () => {
       id: -1,
       title: expect.stringMatching(/New hyperfine benchmark \(\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}\)/),
       type: 'hyperfine-parameter',
+      rawUnit: 's',
       parameterNames: ['value'],
       command: 'echo {value}',
       series: [

@@ -1,5 +1,5 @@
 import { isHyperfineJSON, transformHyperfineData } from './hyperfine.ts';
-import { isMitataJSON, transformMitataData } from './mitata.ts';
+import { isMitataJSON, transformLabeledMitataData, transformMitataData } from './mitata.ts';
 import {
   isLabeledColumnsRawData,
   isLabeledRawData,
@@ -12,16 +12,19 @@ import {
   transformLabeledData,
   transformRawData,
 } from './standard.ts';
-import type { ConfigType, Configuration, JsonValue, SeriesData } from '../types.ts';
+import type { ConfigType, Configuration, JsonValue, RawUnit, SeriesData } from '../types.ts';
 
 export { SEPARATOR, calculateStats } from './standard.ts';
 
 export { generateCommand } from './hyperfine.ts';
 
+export { isMitataJSON, transformLabeledMitataData } from './mitata.ts';
+
 export type InitialConfig = {
   type?: ConfigType;
   labelX?: string;
   labelY?: string;
+  rawUnit?: RawUnit;
   labels?: string[];
   colors?: string[];
   commands?: string[];

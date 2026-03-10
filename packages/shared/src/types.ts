@@ -9,11 +9,14 @@ export const configTypes = [
 
 export type ConfigType = (typeof configTypes)[number];
 
+export type RawUnit = 'ns' | 's';
+
 export interface BaseConfig {
   title: string;
   type: ConfigType;
   labelX?: string;
   labelY?: string;
+  rawUnit?: RawUnit;
   series: Series[];
   seriesX?: Series[];
 }

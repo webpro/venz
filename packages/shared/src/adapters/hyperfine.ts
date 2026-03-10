@@ -86,6 +86,7 @@ export function transformHyperfineData(
       id: configId,
       series,
       title: `New hyperfine benchmark (${timestamp})`,
+      rawUnit: 's' as const,
     };
 
     const config: Configuration =
