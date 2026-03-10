@@ -52,15 +52,18 @@ function parseParams(params: URLSearchParams) {
   return { chartType, pivotMode, legendPosition, fullRange, config, data };
 }
 
-export function renderChart(params: URLSearchParams, width: number, height: number, theme: Theme): string {
+export function renderChart(params: URLSearchParams, width: number, height: number, padding: number, theme: Theme): string {
   const { chartType, pivotMode, legendPosition, fullRange, config, data } = parseParams(params);
+
+  const innerWidth = width - 2 * padding;
+  const innerHeight = height - 2 * padding;
 
   const { document } = parseHTML('<!DOCTYPE html><html><body></body></html>');
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   document.body.appendChild(svg);
 
-  Object.defineProperty(svg, 'clientWidth', { value: width, configurable: true });
-  Object.defineProperty(svg, 'clientHeight', { value: height, configurable: true });
+  Object.defineProperty(svg, 'clientWidth', { value: innerWidth, configurable: true });
+  Object.defineProperty(svg, 'clientHeight', { value: innerHeight, configurable: true });
 
   const series = config?.series ?? [];
   const seriesX = config?.seriesX ?? [];
@@ -88,7 +91,7 @@ export function renderChart(params: URLSearchParams, width: number, height: numb
 
   const fg = THEME_FG[theme];
   svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('viewBox', `${-padding} ${-padding} ${width} ${height}`);
 
   return svg.toString().replaceAll('currentColor', fg);
 }

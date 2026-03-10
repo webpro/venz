@@ -74,9 +74,11 @@ app.get('/favicon.svg', c => {
 
 app.get('/favicon.ico', c => c.redirect('/favicon.svg', 301));
 
-function cacheKey(file: string, params: URLSearchParams, width: number, height: number, quality: number) {
+const PADDINGS = [0, 12, 24];
+
+function cacheKey(file: string, params: URLSearchParams, width: number, height: number, padding: number, quality: number) {
   const sorted = [...params].sort((a, b) => a[0].localeCompare(b[0]));
-  return `${file}:${width}x${height}:q${quality}:${new URLSearchParams(sorted)}`;
+  return `${file}:${width}x${height}:p${padding}:q${quality}:${new URLSearchParams(sorted)}`;
 }
 
 function etag(key: string) {
@@ -93,13 +95,15 @@ app.get('/i/:file', async c => {
   const width = Math.min(Number(params.get('w')) || VIEWPORT.width, 3840);
   const height = Math.min(Number(params.get('h')) || VIEWPORT.height, 2160);
   const quality = Math.min(Math.max(Number(params.get('q')) || 90, 1), 100);
+  const padParam = Number(params.get('pad')) || 0;
+  const padding = PADDINGS.includes(padParam) ? padParam : 0;
   const themeParam = params.get('theme');
   const theme = THEMES.includes(themeParam as any) ? (themeParam as typeof THEMES[number]) : 'dark';
 
-  for (const key of ['w', 'h', 'q', 'chrome']) params.delete(key);
+  for (const key of ['w', 'h', 'q', 'pad', 'chrome']) params.delete(key);
   if (!params.has('theme')) params.set('theme', theme);
 
-  const key = cacheKey(ext, params, width, height, quality);
+  const key = cacheKey(ext, params, width, height, padding, quality);
   const tag = etag(key);
   const cacheControl = isDev ? 'no-store' : `public, max-age=${CACHE_MAX_AGE}, immutable`;
 
@@ -115,7 +119,7 @@ app.get('/i/:file', async c => {
   }
 
   try {
-    const svg = renderChart(params, width, height, theme);
+    const svg = renderChart(params, width, height, padding, theme);
 
     let image: string | Buffer;
     if (ext === 'svg') {
