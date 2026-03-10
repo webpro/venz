@@ -182,7 +182,7 @@ function renderBar(ctx: ChartContext, stats: SeriesData, color: string, selected
   const { svg, x, y, height, fmt } = ctx;
   const xPos = x(selectedId) || x(stats.label);
   const step = (x as ReturnType<typeof scalePoint>).step();
-  const barWidth = Math.min(step * 0.8, 80);
+  const barWidth = Math.min(step * 0.8, 160);
 
   svg.append('rect').attr('x', xPos - barWidth / 2).attr('y', y(stats.median)).attr('width', barWidth).attr('height', height - y(stats.median)).attr('fill', color);
   svg.append('text').attr('x', xPos).attr('y', y(stats.median) - 10).attr('text-anchor', 'middle').style('fill', color).style('font-family', 'sans-serif').style('font-size', '12px').text(fmt(stats.median));
@@ -234,7 +234,7 @@ function renderPivoted(ctx: ChartContext, opts: {
       const groupCount = opts.selectedIds.length;
       const groupIndex = opts.selectedIds.indexOf(selectedId);
       const step = (x as ReturnType<typeof scalePoint>).step();
-      const totalBarWidth = Math.min(step * 0.8, 80);
+      const totalBarWidth = Math.min(step * 0.8, 160);
       const barWidth = totalBarWidth / groupCount;
 
       stats.values.forEach((value, i) => {
@@ -242,7 +242,9 @@ function renderPivoted(ctx: ChartContext, opts: {
         const offset = (groupIndex - (groupCount - 1) / 2) * barWidth;
         svg.append('rect').attr('x', xPos + offset - barWidth / 2).attr('y', y(value)).attr('width', barWidth).attr('height', ctx.height - y(value)).attr('fill', color);
         if (groupCount <= 4) {
-          svg.append('text').attr('x', xPos + offset).attr('y', y(value) - 4).attr('text-anchor', 'middle').style('fill', color).style('font-family', 'sans-serif').style('font-size', '10px').text(ctx.fmt(value));
+          const totalBars = opts.labels.length * groupCount;
+          const label = groupCount > 1 && totalBars > 20 ? Math.round(Number(ctx.fmt(value))) : ctx.fmt(value);
+          svg.append('text').attr('x', xPos + offset).attr('y', y(value) - 4).attr('text-anchor', 'middle').style('fill', color).style('font-family', 'sans-serif').style('font-size', '10px').text(label);
         }
       });
     } else if (chartType === 'median') {
