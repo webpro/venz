@@ -17,7 +17,7 @@ export default function ChartPage() {
   params.delete('chrome');
   const hasData = params.has('data');
   if (hasData) {
-    setOgImage(`${cdnOrigin}/i/chart.webp?${params}`);
+    setOgImage(`${cdnOrigin}/i/chart.webp?pad=24&${params}`);
   }
 
   if (chromeless) {
