@@ -53,7 +53,7 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   return { type, pivotMode, legendPosition, fullRange, config, data: seriesData };
 }
 
-export function createShareableUrl(searchParams: SearchParams, series: Series[], data: SeriesData[]): [number, URL] {
+export function createShareableUrl(searchParams: SearchParams, series: Series[], seriesX: Series[], data: SeriesData[]): [number, URL] {
   const url = new URL('/', origin);
 
   if (typeof searchParams.type === 'string') url.searchParams.set('type', searchParams.type);
@@ -66,6 +66,7 @@ export function createShareableUrl(searchParams: SearchParams, series: Series[],
   if (searchParams.t === '1') url.searchParams.set('t', '1');
 
   for (const id of series) url.searchParams.append('label', id.label);
+  for (const s of seriesX) url.searchParams.append('l', s.label);
   for (const id of series) if (typeof id.command === 'string') url.searchParams.append('command', id.command);
 
   const remainingLength = MAX_URL_LENGTH - url.toString().length;

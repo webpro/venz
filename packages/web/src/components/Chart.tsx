@@ -129,12 +129,12 @@ export default function Chart() {
   });
 
   const getShareableUrl = () => {
-    const [, url] = createShareableUrl(searchParams, series, data());
+    const [, url] = createShareableUrl(searchParams, series, seriesX, data());
     return decodeURIComponent(url.searchParams.toString());
   };
 
   const handleShare = () => {
-    const [loss, url] = createShareableUrl(searchParams, series, data());
+    const [loss, url] = createShareableUrl(searchParams, series, seriesX, data());
     const relative = loss * 100;
     const prettyUrl = url.origin + '?' + decodeURIComponent(url.searchParams.toString());
     navigator.clipboard.writeText(prettyUrl);
