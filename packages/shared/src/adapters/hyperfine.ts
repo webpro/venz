@@ -1,4 +1,5 @@
 import { getNextAvailableColor } from '../colors.ts';
+import { formatTimestamp } from './standard.ts';
 import type {
   HyperfineResults,
   HyperfineJSON,
@@ -50,11 +51,7 @@ export function transformHyperfineData(
   seriesId?: number,
   existingConfig?: Configuration
 ) {
-  const now = new Date();
-  const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')}`;
+  const timestamp = formatTimestamp();
 
   const results = json.results.map(transformHyperfineWorkload);
 

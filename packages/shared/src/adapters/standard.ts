@@ -4,6 +4,9 @@ import type { Options } from './index.ts';
 
 export const SEPARATOR = /[\s,;*]+/;
 
+export const formatTimestamp = (now = new Date()) =>
+  `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+
 export function calculateStats(values: number[]): Statistics {
   const sorted = values.toSorted((a, b) => a - b);
   const sum = values.reduce((a, b) => a + b, 0);
@@ -102,8 +105,7 @@ export function parseLabeledValues(input: string): Array<[string, number[]]> {
 export function transformData(values: number[][], options: Options) {
   const { configId, seriesId, config: existingConfig, data: existingData } = options;
 
-  const now = new Date();
-  const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+  const timestamp = formatTimestamp();
 
   const series: Series[] = [...(existingConfig?.series ?? [])];
   const startId = existingConfig ? (existingConfig.series.length > 0 ? Math.max(...existingConfig.series.map(s => s.id)) + 1 : 0) : (seriesId ?? 0);
@@ -149,8 +151,7 @@ export const isLabelValueTuple = (arr: JsonValue) =>
 export function transformLabeledColumnsData(input: [string[], number[][]], options: Options) {
   const { configId, config: existingConfig, data: existingData } = options;
 
-  const now = new Date();
-  const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+  const timestamp = formatTimestamp();
 
   const series: Series[] = [...(existingConfig?.series ?? [])];
   const data: SeriesData[] = [...(existingData ?? [])];
@@ -190,8 +191,7 @@ export function transformLabeledColumnsData(input: [string[], number[][]], optio
 
 export function transformLabeledData(input: Array<[string, number | number[]]>, options: Options) {
   const { configId, seriesId, config: existingConfig, data: existingData, initialConfig } = options;
-  const now = new Date();
-  const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+  const timestamp = formatTimestamp();
 
   const nextId = existingConfig ? (existingConfig.series.length > 0 ? Math.max(...existingConfig.series.map(s => s.id)) + 1 : 0) : (seriesId ?? 0);
 

@@ -134,10 +134,12 @@ function renderTooltipDot(
     });
 }
 
+const getXPos = (x: ChartContext['x'], id: number, label: string) => x(id) || x(label);
+
 function renderMedian(ctx: ChartContext, stats: SeriesData, color: string, selectedId: number) {
   const { svg, x, y, fmt } = ctx;
   const radius = Math.min(Math.abs(y(stats.median) - y(stats.median + stats.stddev)), ctx.height / 2);
-  const cx = x(selectedId) || x(stats.label);
+  const cx = getXPos(x, selectedId, stats.label);
 
   svg.append('circle').attr('cx', cx).attr('cy', y(stats.median)).attr('r', radius).attr('fill', color).attr('fill-opacity', 0.2);
   svg.append('circle').attr('cx', cx).attr('cy', y(stats.median)).attr('r', 4).attr('fill', color).attr('stroke', color).attr('stroke-width', 2);
@@ -149,7 +151,7 @@ function renderBox(ctx: ChartContext, stats: SeriesData, color: string, selected
   const sortedValues = stats.values.toSorted((a, b) => a - b);
   const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
   const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
-  const xPos = x(selectedId) || x(stats.label);
+  const xPos = getXPos(x, selectedId, stats.label);
   const boxWidth = Math.max(10, 50 - props.data().length * 1.5);
   const halfWidth = boxWidth / 2;
 
@@ -192,7 +194,7 @@ function renderLine(ctx: ChartContext, stats: SeriesData, color: string, selecte
 function renderBar(ctx: ChartContext, stats: SeriesData, color: string, selectedId: number) {
   const { svg, x, y, height, fmt } = ctx;
   if (!isPointScale(x)) return;
-  const xPos = x(selectedId) || x(stats.label);
+  const xPos = getXPos(x, selectedId, stats.label);
   const step = x.step();
   const barWidth = Math.min(step * 0.8, 160);
 
@@ -324,6 +326,8 @@ export const renderSVG = (props: RenderProps) => {
     if (hasSeriesX) return m;
     return m === 'pivoted' ? 'none' : m === 'transposed' ? 'transposed-pivoted' : m;
   })();
+  const chartType = props.chartType();
+  const isIndexBased = (pivotMode === 'none' || pivotMode === 'transposed-pivoted') && (chartType === 'scatter' || chartType === 'line');
   const interactive = props.interactive !== false;
   const margin = { top: 30, right: 4, bottom: 90, left: 60 };
   const svgWidth = props.svgRef.clientWidth;
@@ -398,10 +402,7 @@ export const renderSVG = (props: RenderProps) => {
     return scalePoint().domain(domain).range([0, width]).padding(pad);
   };
 
-  const x =
-    (pivotMode === 'none' || pivotMode === 'transposed-pivoted') && (props.chartType() === 'scatter' || props.chartType() === 'line')
-      ? getLinearScale()
-      : getLabeledScale();
+  const x = isIndexBased ? getLinearScale() : getLabeledScale();
 
   const pivotedData = () => {
     const m = pivotMode;
@@ -412,7 +413,7 @@ export const renderSVG = (props: RenderProps) => {
     const values =
       pivotMode !== 'none'
         ? pivotedData().flatMap(d => d.values)
-        : props.chartType() === 'bar'
+        : chartType === 'bar'
           ? props.data().map(s => s.median)
           : props.data().filter(s => props.selectedSeries().includes(s.seriesId)).flatMap(s => s.max);
 
@@ -433,9 +434,9 @@ export const renderSVG = (props: RenderProps) => {
     const values =
       pivotMode !== 'none'
         ? pivotedData().flatMap(d => d.values)
-        : props.chartType() === 'median'
+        : chartType === 'median'
           ? selected.flatMap(s => [s.median - s.stddev, s.median + s.stddev])
-          : props.chartType() === 'bar'
+          : chartType === 'bar'
             ? props.data().map(s => s.median)
             : selected.flatMap(s => [s.min, s.max]);
 
@@ -446,7 +447,7 @@ export const renderSVG = (props: RenderProps) => {
 
   svg.append('g').attr('class', 'grid').style('stroke', 'currentColor').style('opacity', 0.2).call(axisLeft(y).tickSize(-width).tickFormat(() => ''));
 
-  if (props.chartType() !== 'bar') {
+  if (chartType !== 'bar') {
     svg.append('g').attr('class', 'grid').attr('transform', `translate(0, ${height})`).style('stroke', 'currentColor').style('opacity', 0.2).call(axisBottom(x).tickSize(-height).tickFormat(() => ''));
   }
 
@@ -483,12 +484,12 @@ export const renderSVG = (props: RenderProps) => {
     .attr('dy', isDenseTicks ? '.1em' : '0.7em')
     .attr('dx', isDenseTicks ? '-.8em' : null)
     .text(d =>
-      (pivotMode === 'none' || pivotMode === 'transposed-pivoted') && (props.chartType() === 'scatter' || props.chartType() === 'line')
+      isIndexBased
         ? Number.isInteger(d) ? Number(d) + 1 : ''
         : pivotMode === 'transposed' || pivotMode === 'transposed-pivoted' ? d : (props.series[d]?.label || d)
     );
 
-  if (!isDenseTicks && (pivotMode === 'none' || pivotMode === 'transposed-pivoted') && (props.chartType() === 'scatter' || props.chartType() === 'line')) {
+  if (!isDenseTicks && isIndexBased) {
     xAxisG.select('.tick:last-of-type text').attr('text-anchor', 'end');
   }
 
@@ -516,7 +517,7 @@ export const renderSVG = (props: RenderProps) => {
       labels: props.seriesX.map(s => s.label),
     });
   } else if (pivotMode === 'transposed-pivoted') {
-    const renderer = chartRenderers[props.chartType()];
+    const renderer = chartRenderers[chartType];
     const theme = props.theme();
     const tData = transpose(props.data());
     for (const selectedId of props.selectedSeriesX()) {
@@ -526,7 +527,7 @@ export const renderSVG = (props: RenderProps) => {
       renderer(ctx, { ...stats, label: currentSeries.label }, getColor(theme, currentSeries), selectedId);
     }
   } else {
-    const renderer = chartRenderers[props.chartType()];
+    const renderer = chartRenderers[chartType];
     const theme = props.theme();
     for (const selectedId of props.selectedSeries()) {
       const currentSeries = props.series.find(s => s.id === selectedId);

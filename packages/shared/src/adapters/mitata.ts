@@ -1,6 +1,6 @@
 import type { Configuration, IncomingSeries, JsonValue, MitataJSON, RawUnit, Series, SeriesData, Statistics } from '../types.ts';
 import { getNextAvailableColor } from '../colors.ts';
-import { calculateStats, transformLabeledData } from './standard.ts';
+import { calculateStats, formatTimestamp, transformLabeledData } from './standard.ts';
 import type { Options } from './index.ts';
 
 const MAX_SAMPLES = 100_000;
@@ -61,8 +61,7 @@ export function transformMitataData(
   seriesId?: number,
   existingConfig?: Configuration
 ) {
-  const now = new Date();
-  const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+  const timestamp = formatTimestamp();
 
   const firstStats = json.benchmarks[0].runs[0].stats;
   const size = firstStats.samples.length;
