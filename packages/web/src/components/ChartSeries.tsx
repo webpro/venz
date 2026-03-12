@@ -34,7 +34,8 @@ export const ChartSeries = (props: Props) => {
     }
   };
 
-  const useSeriesX = () => props.pivotMode() === 'pivoted' || props.pivotMode() === 'transposed-pivoted';
+  const hasSeriesX = () => props.seriesX.length > 0;
+  const useSeriesX = () => hasSeriesX() && (props.pivotMode() === 'pivoted' || props.pivotMode() === 'transposed-pivoted');
   const data = () => (useSeriesX() ? transpose(props.data()) : props.data());
   const series = () => (useSeriesX() ? props.seriesX : props.series);
   const selectedSeries = () => (useSeriesX() ? props.selectedSeriesX() : props.selectedSeries());
