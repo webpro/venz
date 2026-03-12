@@ -1,5 +1,5 @@
 import { isHyperfineJSON, transformHyperfineData } from './hyperfine.ts';
-import { isMitataJSON, transformLabeledMitataData, transformMitataData } from './mitata.ts';
+import { isMitataJSON, transformMitataData } from './mitata.ts';
 import {
   isLabeledColumnsRawData,
   isLabeledRawData,
@@ -18,7 +18,6 @@ export { SEPARATOR, calculateStats } from './standard.ts';
 
 export { generateCommand } from './hyperfine.ts';
 
-export { isMitataJSON, transformLabeledMitataData } from './mitata.ts';
 
 export type InitialConfig = {
   type?: ConfigType;
@@ -109,4 +108,31 @@ export function transform(
   console.log(`transform ${result.config?.type ?? 'unknown'} series=${result.config?.series?.length ?? 0} data=${result.data?.length ?? 0} unit=${result.config?.rawUnit ?? 'none'}\n${result.data?.map(d => `  [${d.seriesId}] median=${d.median} min=${d.min} max=${d.max} values=${d.values.slice(0, 5).join(',')}${d.values.length > 5 ? '...' : ''}`).join('\n')}`);
 
   return result;
+}
+
+export function transformLabeled(
+  runs: Array<{ label: string; text: string }>,
+  options: Options = {}
+): { config: undefined | Configuration; data: SeriesData[] } | null {
+  if (runs.length === 0) return null;
+
+  const first = transform(runs[0].text, options);
+  if (!first.config || first.data.length === 0) return null;
+
+  const seriesLabels = first.config.series.map(s => s.label);
+  const rawUnit = first.config.rawUnit;
+
+  const labeledData: Array<[string, number[]]> = runs.map(({ label, text }) => {
+    const { data } = transform(text, options);
+    return [label, data.map(d => d.median)];
+  });
+
+  return transformLabeledData(labeledData, {
+    ...options,
+    initialConfig: {
+      ...options.initialConfig,
+      rawUnit,
+      labels: seriesLabels,
+    },
+  });
 }
