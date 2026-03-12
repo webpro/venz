@@ -4,8 +4,8 @@ import { Scatter } from './icons/Scatter';
 import { Download } from './icons/Download';
 import { BoxPlot } from './icons/BoxPlot';
 import { MedianChart } from './icons/Median';
-import { Transpose } from './icons/Pivot';
-import { SwapAxis } from './icons/SwapAxis';
+import { Transpose } from './icons/Transpose';
+import { Pivot } from './icons/Pivot';
 import { ScatterPlot } from './icons/ScatterPlot';
 import { LegendBottomLeft, LegendBottomRight, LegendNone, LegendTopLeft, LegendTopRight } from './icons/Legend';
 import { Line } from './icons/Line';
@@ -70,12 +70,12 @@ export const ChartControls = (props: ChartControlsProps) => {
 
       {props.hasSeriesX && (() => {
         const m = () => props.pivotMode();
-        const isPivoted = () => m() === 'pivoted' || m() === 'transposed-pivoted';
-        const isTransposed = () => m() === 'transposed' || m() === 'transposed-pivoted';
-        const togglePivot = () =>
-          props.setPivotMode(m => m === 'none' ? 'pivoted' : m === 'pivoted' ? 'none' : m === 'transposed' ? 'transposed-pivoted' : 'transposed');
+        const isTransposed = () => m() === 'transposed-pivoted' || m() === 'transposed';
+        const isPivoted = () => m() === 'pivoted' || m() === 'transposed';
         const toggleTranspose = () =>
-          props.setPivotMode(m => m === 'none' ? 'transposed' : m === 'transposed' ? 'none' : m === 'pivoted' ? 'transposed-pivoted' : 'pivoted');
+          props.setPivotMode(m => m === 'none' ? 'transposed-pivoted' : m === 'transposed-pivoted' ? 'none' : m === 'pivoted' ? 'transposed' : 'pivoted');
+        const togglePivot = () =>
+          props.setPivotMode(m => m === 'none' ? 'pivoted' : m === 'pivoted' ? 'none' : m === 'transposed-pivoted' ? 'transposed' : 'transposed-pivoted');
         return (
           <>
             <IconButton
@@ -84,15 +84,15 @@ export const ChartControls = (props: ChartControlsProps) => {
               title="Transpose"
               className={isTransposed() ? 'bg-foreground! text-background!' : ''}
             >
-              <SwapAxis />
+              <Transpose />
             </IconButton>
             <IconButton
               aria-label="Pivot"
               onClick={togglePivot}
               title="Pivot"
-              className={isPivoted() ? 'bg-foreground! text-background!' : ''}
+              className={isPivoted() ? '' : 'bg-foreground! text-background!'}
             >
-              <Transpose />
+              <Pivot split={isPivoted()} />
             </IconButton>
           </>
         );

@@ -25,7 +25,6 @@ export default function Chart() {
   if (searchParams.type === 'pivot') {
     const url = new URL(window.location.href);
     url.searchParams.set('type', 'line');
-    url.searchParams.set('p', '1');
     history.replaceState(null, '', url.pathname + url.search);
   }
 
@@ -60,8 +59,8 @@ export default function Chart() {
     if (!(!searchParams.ct && config()?.type === 'standard')) setSearchParams({ ct: config()?.type });
     if (!(!searchParams.lp && legendPosition() === 'tr')) setSearchParams({ lp: legendPosition() });
     if (!(!searchParams.br && fullRange() === true)) setSearchParams({ br: fullRange() ? '0' : '1' });
-    const p = pivotMode() === 'pivoted' || pivotMode() === 'transposed-pivoted' ? '1' : undefined;
-    const t = pivotMode() === 'transposed' || pivotMode() === 'transposed-pivoted' ? '1' : undefined;
+    const t = pivotMode() === 'transposed-pivoted' || pivotMode() === 'transposed' ? '1' : undefined;
+    const p = pivotMode() === 'none' || pivotMode() === 'transposed-pivoted' ? '1' : undefined;
     if (!(!searchParams.p && !p)) setSearchParams({ p });
     if (!(!searchParams.t && !t)) setSearchParams({ t });
   });
