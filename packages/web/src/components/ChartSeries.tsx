@@ -77,6 +77,8 @@ export const ChartSeries = (props: Props) => {
       });
   });
 
+  const fasterSeries = () => seriesWithStats()[0];
+
   return (
     <form
       class="flex flex-col border border-foreground rounded-2 max-w-full"
@@ -89,7 +91,6 @@ export const ChartSeries = (props: Props) => {
 
       <For each={seriesWithStats()}>
         {(s, i) => {
-          const fasterSeries = seriesWithStats()[0];
 
           return (
             <label
@@ -144,8 +145,8 @@ export const ChartSeries = (props: Props) => {
                 seriesWithStats().length > 1 &&
                 (!s.ratio || s.ratio === 1 || (
                   <em class="text-gray-400 w-auto ml-auto">
-                    <span class="mr-2" style={`color: ${fasterSeries.color}`}>
-                      {fasterSeries.label}
+                    <span class="mr-2" style={`color: ${fasterSeries().color}`}>
+                      {fasterSeries().label}
                     </span>
                     is {s.ratio.toFixed(2)} ± {s.relativeStddev.toFixed(2)} times{' '}
                     {props.type.startsWith('hyperfine-') || props.type.startsWith('mitata-') ? 'faster' : 'lower'}

@@ -213,12 +213,15 @@ function renderPivoted(ctx: ChartContext, opts: {
   const theme = props.theme();
   const chartType = props.chartType();
 
+  const dataBySeriesId = new Map<number, SeriesData>();
+  for (const d of opts.data) dataBySeriesId.set(d.seriesId, d);
+
   const medianTextY = new Map<string, number>();
   if (chartType === 'median') {
     const minGap = 14;
     for (let i = 0; i < opts.labels.length; i++) {
       const entries = opts.selectedIds
-        .map(sid => ({ sid, value: opts.data.find(d => d.seriesId === sid)?.values[i] }))
+        .map(sid => ({ sid, value: dataBySeriesId.get(sid)?.values[i] }))
         .filter(e => e.value !== undefined)
         .sort((a, b) => b.value - a.value);
 
@@ -234,7 +237,7 @@ function renderPivoted(ctx: ChartContext, opts: {
 
   for (const selectedId of opts.selectedIds) {
     const currentSeries = opts.seriesLookup.find(s => s.id === selectedId);
-    const stats = opts.data.find(d => d.seriesId === selectedId);
+    const stats = dataBySeriesId.get(selectedId);
 
     if (!currentSeries || !stats) continue;
 
