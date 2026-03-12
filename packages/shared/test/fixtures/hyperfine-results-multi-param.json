@@ -1,0 +1,56 @@
+{
+  "results": [
+    {
+      "command": "node --jit fast 1",
+      "parameters": { "algo": "fast", "size": "1" },
+      "mean": 0.15,
+      "stddev": 0.01,
+      "median": 0.14,
+      "user": 0.1,
+      "system": 0.02,
+      "min": 0.13,
+      "max": 0.18,
+      "times": [0.13, 0.14, 0.15, 0.18],
+      "exit_codes": [0, 0, 0, 0]
+    },
+    {
+      "command": "node --jit fast 2",
+      "parameters": { "algo": "fast", "size": "2" },
+      "mean": 0.25,
+      "stddev": 0.02,
+      "median": 0.24,
+      "user": 0.18,
+      "system": 0.03,
+      "min": 0.22,
+      "max": 0.30,
+      "times": [0.22, 0.23, 0.25, 0.30],
+      "exit_codes": [0, 0, 0, 0]
+    },
+    {
+      "command": "node --jit slow 1",
+      "parameters": { "algo": "slow", "size": "1" },
+      "mean": 0.35,
+      "stddev": 0.03,
+      "median": 0.34,
+      "user": 0.28,
+      "system": 0.04,
+      "min": 0.31,
+      "max": 0.40,
+      "times": [0.31, 0.33, 0.35, 0.40],
+      "exit_codes": [0, 0, 0, 0]
+    },
+    {
+      "command": "node --jit slow 2",
+      "parameters": { "algo": "slow", "size": "2" },
+      "mean": 0.55,
+      "stddev": 0.05,
+      "median": 0.54,
+      "user": 0.45,
+      "system": 0.06,
+      "min": 0.48,
+      "max": 0.65,
+      "times": [0.48, 0.52, 0.56, 0.65],
+      "exit_codes": [0, 0, 0, 0]
+    }
+  ]
+}

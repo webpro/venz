@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "command": "sleep 0.5",
+      "mean": 0.512,
+      "stddev": null,
+      "median": 0.510,
+      "user": 0.001,
+      "system": 0.001,
+      "min": 0.508,
+      "max": 0.520,
+      "times": null,
+      "exit_codes": [0]
+    },
+    {
+      "command": "sleep 0.6",
+      "mean": 0.615,
+      "stddev": 0.005,
+      "median": 0.613,
+      "user": 0.001,
+      "system": 0.001,
+      "min": 0.608,
+      "max": 0.625,
+      "times": null,
+      "exit_codes": [0]
+    }
+  ]
+}

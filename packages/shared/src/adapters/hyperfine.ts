@@ -34,7 +34,7 @@ function transformHyperfineWorkload(data: HyperfineResults): Results {
       parameters: data.parameters,
     },
     data: {
-      values: data.times,
+      values: data.times ?? [],
       mean: data.mean,
       median: data.median,
       stddev: data.stddev,
@@ -61,12 +61,11 @@ export function transformHyperfineData(
   const hasParameters = results.every(r => r.series.parameters && Object.keys(r.series.parameters).length > 0);
   const firstSeries = results[0].series;
   const parameters = firstSeries.parameters;
-  const parameterName = hasParameters && parameters ? Object.keys(parameters)[0] : null;
-  const command =
-    parameters &&
-    parameterName in parameters &&
-    firstSeries.command &&
-    firstSeries.command.replace(parameters[parameterName].toString(), `{${parameterName}}`);
+  const parameterNames = hasParameters && parameters ? Object.keys(parameters) : [];
+  let command = firstSeries.command ?? '';
+  for (const name of parameterNames) {
+    if (parameters) command = command.replace(parameters[name].toString(), `{${name}}`);
+  }
 
   if (existingConfig) {
     const data: SeriesData[] = [];
@@ -94,8 +93,8 @@ export function transformHyperfineData(
         ? {
             ...baseConfig,
             type: 'hyperfine-parameter',
-            parameterNames: hasParameters && parameterName ? [parameterName] : [],
-            command: command ?? '',
+            parameterNames,
+            command,
           }
         : { ...baseConfig, type: 'hyperfine' };
 
@@ -103,7 +102,7 @@ export function transformHyperfineData(
       const id = seriesId ?? series.length;
       const parameters = result.series.parameters;
       const cmd = result.series.command ?? '';
-      const label = parameterName && parameters ? parameters[parameterName].toString() : cmd.length > 12 ? cmd.slice(0, 11) + '…' : cmd || `Command ${id + 1}`;
+      const label = parameterNames.length > 0 && parameters ? parameterNames.map(n => parameters[n]).join(' ') : cmd.length > 12 ? cmd.slice(0, 11) + '…' : cmd || `Command ${id + 1}`;
 
       series.push({ ...result.series, id, configId, label: label, color: getNextAvailableColor(series) });
       data.push({ ...result.data, id, seriesId: id });
