@@ -1,7 +1,21 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
+import { transformData } from '../src/adapters/standard.ts';
 import { matchRawTitle } from './helpers.ts';
 import { C0, C1 } from '../src/colors.ts';
+
+test('transform with empty existing series', () => {
+  const result = transformData([[1, 2, 3]], {
+    configId: 0,
+    config: { id: 0, title: 'test', type: 'standard', series: [] },
+    data: [],
+  });
+
+  expect(result.config.series).toHaveLength(1);
+  expect(result.config.series[0].id).toBe(0);
+  expect(result.data).toHaveLength(1);
+  expect(result.data[0].seriesId).toBe(0);
+});
 
 test('transform and add numeric data (single)', () => {
   const input = JSON.stringify([1, 1, 1]);

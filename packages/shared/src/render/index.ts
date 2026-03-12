@@ -303,6 +303,7 @@ function renderLegend(ctx: ChartContext, width: number) {
     .attr('transform', (_, i) => `translate(0, ${isTop ? i * 25 : (i + 1 - topTen.length) * 25})`)
     .each(function (selectedId) {
       const currentSeries = (useSeriesX ? props.seriesX : props.series).find(s => s.id === selectedId);
+      if (!currentSeries) return;
       const elementColor = getColor(theme, currentSeries);
       const g = select(this);
       g.append('text').attr('x', 0).attr('y', 10).style('fill', elementColor).style('font-family', 'sans-serif').attr('text-anchor', textAnchor).text(currentSeries.label);

@@ -106,7 +106,7 @@ export function transformData(values: number[][], options: Options) {
   const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
 
   const series: Series[] = [...(existingConfig?.series ?? [])];
-  const startId = existingConfig ? Math.max(...existingConfig.series.map(s => s.id)) + 1 : (seriesId ?? 0);
+  const startId = existingConfig ? (existingConfig.series.length > 0 ? Math.max(...existingConfig.series.map(s => s.id)) + 1 : 0) : (seriesId ?? 0);
   const startSeriesId = series.length + 1;
 
   const data: SeriesData[] = existingData ?? [];
@@ -193,7 +193,7 @@ export function transformLabeledData(input: Array<[string, number | number[]]>, 
   const now = new Date();
   const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
 
-  const nextId = existingConfig ? Math.max(...existingConfig.series.map(s => s.id)) + 1 : (seriesId ?? 0);
+  const nextId = existingConfig ? (existingConfig.series.length > 0 ? Math.max(...existingConfig.series.map(s => s.id)) + 1 : 0) : (seriesId ?? 0);
 
   const [label, values] = input[0];
   const size = Array.isArray(values) ? values.length : 1;
