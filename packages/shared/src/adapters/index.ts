@@ -94,6 +94,13 @@ export function transform(
       }
 
       console.error(error);
+
+      if (typeof input === 'string') {
+        try {
+          const json = JSON.parse(input.replace(/'/g, '"').replace(/,\s*([}\]])/g, '$1'));
+          if (Array.isArray(json)) return transform(json, options);
+        } catch {}
+      }
     }
 
     return { config: undefined, data: [] };

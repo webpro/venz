@@ -80,6 +80,21 @@ test('transform labeled data (datetime)', () => {
   });
 });
 
+test('transform labeled data from JS literal', () => {
+  const input = `[
+    ['2025-04', 2],
+    ['2025-05', 3],
+    ['2025-06', 1],
+  ]`;
+
+  const output = transform(input);
+
+  expect(output.config).toBeDefined();
+  expect(output.config!.series).toHaveLength(3);
+  expect(output.config!.series.map(s => s.label)).toEqual(['2025-04', '2025-05', '2025-06']);
+  expect(output.data.map(d => d.median)).toEqual([2, 3, 1]);
+});
+
 test('transform labeled data (semver)', () => {
   const input = JSON.stringify([
     ['1.0.0', 2],
