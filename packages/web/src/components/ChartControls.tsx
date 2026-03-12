@@ -90,7 +90,7 @@ export const ChartControls = (props: ChartControlsProps) => {
               aria-label="Pivot"
               onClick={togglePivot}
               title="Pivot"
-              className={isPivoted() ? '' : 'bg-foreground! text-background!'}
+              className={isPivoted() ? 'bg-foreground! text-background!' : ''}
             >
               <Pivot split={isPivoted()} />
             </IconButton>

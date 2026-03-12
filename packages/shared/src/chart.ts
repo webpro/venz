@@ -6,8 +6,8 @@ export type PivotMode = 'none' | 'pivoted' | 'transposed' | 'transposed-pivoted'
 
 type Param = string | string[] | null | undefined;
 
-export function getPivotMode(type?: Param, p?: Param, t?: Param): PivotMode {
-  const isTransposed = t === '1';
-  const isPivoted = type === 'pivot' || p !== '1';
+export function getPivotMode(pivot?: Param, transpose?: Param): PivotMode {
+  const isPivoted = pivot === '1';
+  const isTransposed = transpose === '1';
   return isTransposed && isPivoted ? 'transposed' : isPivoted ? 'pivoted' : isTransposed ? 'transposed-pivoted' : 'none';
 }

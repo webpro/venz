@@ -44,7 +44,9 @@ function parseParams(params: URLSearchParams) {
     : typeParam === "pivot"
       ? "line"
       : "median";
-  const pivotMode = getPivotMode(typeParam, get("p"), get("t"));
+  const hasExplicitPivot = get("pivot") !== null || get("transpose") !== null;
+  const pivotMode = hasExplicitPivot ? getPivotMode(get("pivot"), get("transpose"))
+    : (chartType === 'line' || chartType === 'scatter') ? 'none' : 'pivoted';
   const lpParam = get("lp");
   const legendPosition: LegendPosition = LEGEND_POSITIONS.includes(lpParam as LegendPosition)
     ? (lpParam as LegendPosition)

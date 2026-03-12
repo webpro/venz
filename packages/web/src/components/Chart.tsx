@@ -22,12 +22,6 @@ export default function Chart() {
   const { addToast } = useToast();
   const { theme, setTheme } = useTheme();
 
-  if (searchParams.type === 'pivot') {
-    const url = new URL(window.location.href);
-    url.searchParams.set('type', 'line');
-    history.replaceState(null, '', url.pathname + url.search);
-  }
-
   const chromeless = searchParams.chrome === '0';
 
   if (chromeless) {
@@ -59,10 +53,13 @@ export default function Chart() {
     if (searchParams.ct || config()?.type !== 'standard') setSearchParams({ ct: config()?.type });
     if (searchParams.lp || legendPosition() !== 'tr') setSearchParams({ lp: legendPosition() });
     if (searchParams.br || fullRange() !== true) setSearchParams({ br: fullRange() ? '0' : '1' });
-    const t = pivotMode() === 'transposed-pivoted' || pivotMode() === 'transposed' ? '1' : undefined;
-    const p = pivotMode() === 'none' || pivotMode() === 'transposed-pivoted' ? '1' : undefined;
-    if (searchParams.p || p) setSearchParams({ p });
-    if (searchParams.t || t) setSearchParams({ t });
+    const m = pivotMode();
+    const ct = chartType();
+    const defaultPivoted = ct !== 'line' && ct !== 'scatter';
+    const isPivoted = m === 'pivoted' || m === 'transposed';
+    const isTransposed = m === 'transposed' || m === 'transposed-pivoted';
+    if (searchParams.pivot || isPivoted !== defaultPivoted) setSearchParams({ pivot: isPivoted === defaultPivoted ? undefined : (isPivoted ? '1' : '0') });
+    if (searchParams.transpose || isTransposed) setSearchParams({ transpose: isTransposed ? '1' : undefined });
     const unit = config()?.rawUnit;
     if (searchParams.unit || unit) setSearchParams({ unit });
   });

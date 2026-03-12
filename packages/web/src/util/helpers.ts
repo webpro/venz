@@ -13,9 +13,7 @@ export const cdnOrigin = import.meta.env.VITE_CDN_ORIGIN ?? (import.meta.env.DEV
 const getChartType = (value?: string | string[]): ChartType =>
   typeof value === 'string' && ['box', 'median', 'scatter', 'line', 'bar'].includes(value)
     ? (value as ChartType)
-    : value === 'pivot'
-      ? 'line'
-      : 'median';
+    : 'median';
 
 const getLegendPosition = (value?: string | string[]): LegendPosition =>
   typeof value === 'string' && ['tr', 'tl', 'br', 'bl', 'n'].includes(value) ? (value as LegendPosition) : 'tr';
@@ -50,7 +48,9 @@ export function transformFromSearchParams(searchParams: SearchParams) {
   const { config, data: seriesData } = transform(input, { initialConfig });
 
   const type = getChartType(searchParams.type);
-  const pivotMode = getPivotMode(searchParams.type, searchParams.p, searchParams.t);
+  const hasExplicitPivot = searchParams.pivot !== undefined || searchParams.transpose !== undefined;
+  const pivotMode = hasExplicitPivot ? getPivotMode(searchParams.pivot, searchParams.transpose)
+    : (type === 'line' || type === 'scatter') ? 'none' : 'pivoted';
   const legendPosition = getLegendPosition(searchParams.lp);
   const fullRange = getFullRange(searchParams.br);
 
@@ -66,8 +66,8 @@ export function createShareableUrl(searchParams: SearchParams, series: Series[],
   if (typeof searchParams.labelX === 'string') url.searchParams.set('labelX', searchParams.labelX);
   if (typeof searchParams.labelY === 'string') url.searchParams.set('labelY', searchParams.labelY);
   if (typeof searchParams.ct === 'string') url.searchParams.set('ct', searchParams.ct);
-  if (searchParams.p === '1') url.searchParams.set('p', '1');
-  if (searchParams.t === '1') url.searchParams.set('t', '1');
+  if (searchParams.pivot === '1' || searchParams.pivot === '0') url.searchParams.set('pivot', searchParams.pivot);
+  if (searchParams.transpose === '1') url.searchParams.set('transpose', '1');
   if (typeof searchParams.unit === 'string') url.searchParams.set('unit', searchParams.unit);
 
   for (const id of series) url.searchParams.append('label', id.label);

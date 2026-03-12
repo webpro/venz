@@ -6,7 +6,8 @@ import { LabeledColumns } from '../components/about/LabeledColumns';
 import { LabeledNumberSeriesJSON, LabeledNumbersJSON, NumbersJSON } from '../components/about/JSON';
 import { Hyperfine } from '../components/about/Hyperfine';
 import { Title } from '@solidjs/meta';
-import { CreateURL } from '../components/about/CreateURL';
+import { CreateChartURL } from '../components/about/CreateChartURL';
+import { CreateImageURL } from '../components/about/CreateImageURL';
 import { Mitata } from '../components/about/Mitata';
 
 export default function About() {
@@ -60,7 +61,10 @@ export default function About() {
             <Link href="#mitata">Mitata</Link>
           </li>
           <li>
-            <Link href="#url">Create URL</Link>
+            <Link href="#chart-url">Create chart URL</Link>
+          </li>
+          <li>
+            <Link href="#image-url">Create image URL</Link>
           </li>
         </ul>
 
@@ -112,11 +116,17 @@ export default function About() {
 
         <Mitata />
 
-        <h3 id="url" class="text-3xl">
-          <a href="#url">Create URL</a>
+        <h3 id="chart-url" class="text-3xl">
+          <a href="#chart-url">Create Chart URL</a>
         </h3>
 
-        <CreateURL />
+        <CreateChartURL />
+
+        <h3 id="image-url" class="text-3xl">
+          <a href="#image-url">Create Image URL</a>
+        </h3>
+
+        <CreateImageURL />
       </div>
     </Shell>
   );
