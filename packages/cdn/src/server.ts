@@ -129,7 +129,11 @@ app.get('/i/:file', async c => {
       const resvg = new Resvg(svg, {
         fitTo: { mode: 'width', value: width },
         background: bg,
-        font: { fontDirs: ['/usr/share/fonts'] },
+        font: {
+          fontDirs: ['/usr/share/fonts'],
+          defaultFontFamily: 'DejaVu Sans',
+          sansSerifFamily: 'DejaVu Sans',
+        },
       });
       const rendered = resvg.render();
       const raw = sharp(rendered.pixels, { raw: { width: rendered.width, height: rendered.height, channels: 4 } });
