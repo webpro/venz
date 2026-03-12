@@ -8,6 +8,9 @@ import type { Configuration, RawUnit, Series, SeriesData } from '../types.ts';
 import type { Theme, ChartType, LegendPosition, PivotMode, SortMode } from '../chart.ts';
 import { transpose } from '../transpose.ts';
 
+const isPointScale = (scale: unknown): scale is ReturnType<typeof scalePoint> =>
+  typeof scale === 'function' && 'step' in scale;
+
 type DisplayUnit = { label: string; convert: (raw: number) => number };
 
 function bestDisplayUnit(rawUnit: RawUnit, representative: number): DisplayUnit {
@@ -61,6 +64,7 @@ const getColor = (theme: Theme, series: Series) =>
   theme === 'high-contrast' ? 'currentColor' : series.color;
 
 const getDecimals = (values: number[]) => {
+  if (values.length === 0) return 0;
   const maxFrac = Math.max(...values.map(n => (n.toString().split('.')[1] || '').length));
   if (maxFrac === 0) return 0;
   const magnitude = Math.max(...values.map(Math.abs));
@@ -187,8 +191,9 @@ function renderLine(ctx: ChartContext, stats: SeriesData, color: string, selecte
 
 function renderBar(ctx: ChartContext, stats: SeriesData, color: string, selectedId: number) {
   const { svg, x, y, height, fmt } = ctx;
+  if (!isPointScale(x)) return;
   const xPos = x(selectedId) || x(stats.label);
-  const step = (x as ReturnType<typeof scalePoint>).step();
+  const step = x.step();
   const barWidth = Math.min(step * 0.8, 160);
 
   svg.append('rect').attr('x', xPos - barWidth / 2).attr('y', y(stats.median)).attr('width', barWidth).attr('height', height - y(stats.median)).attr('fill', color);
@@ -240,7 +245,8 @@ function renderPivoted(ctx: ChartContext, opts: {
     } else if (chartType === 'bar') {
       const groupCount = opts.selectedIds.length;
       const groupIndex = opts.selectedIds.indexOf(selectedId);
-      const step = (x as ReturnType<typeof scalePoint>).step();
+      if (!isPointScale(x)) return;
+      const step = x.step();
       const totalBarWidth = Math.min(step * 0.8, 160);
       const barWidth = totalBarWidth / groupCount;
 
