@@ -49,51 +49,57 @@ export function transform(
 
   if (input.length === 0) return { config: undefined, data: [] };
 
-  try {
-    const json = typeof input === 'string' ? JSON.parse(input) : input;
+  const result = (() => {
+    try {
+      const json = typeof input === 'string' ? JSON.parse(input) : input;
 
-    if (isHyperfineJSON(json)) {
-      return transformHyperfineData(json, configId, seriesId, config);
+      if (isHyperfineJSON(json)) {
+        return transformHyperfineData(json, configId, seriesId, config);
+      }
+
+      if (isMitataJSON(json)) {
+        return transformMitataData(json, configId, seriesId, config);
+      }
+
+      if (Array.isArray(json)) {
+        if (json.every(isLabelValueTuple)) {
+          return transformLabeledData(json, options);
+        }
+
+        if (json.every(v => typeof v === 'number')) {
+          return transformData([json], options);
+        }
+
+        if (json.every(v => Array.isArray(v) && v.every(v => typeof v === 'number'))) {
+          return transformData(json, options);
+        }
+
+        if (json.every(v => typeof v === 'string')) {
+          return transform(json.join('\n'), options);
+        }
+      }
+    } catch (error) {
+      if (typeof input === 'string') {
+        if (isLabeledRawData(input)) {
+          return transformLabeledData(parseLabeledValues(input), options);
+        }
+
+        if (isRawNumericData(input)) {
+          return transformRawData(input, options);
+        }
+
+        if (isLabeledColumnsRawData(input)) {
+          return transformLabeledColumnsData(parseLabeledColumnValues(input), options);
+        }
+      }
+
+      console.error(error);
     }
 
-    if (isMitataJSON(json)) {
-      return transformMitataData(json, configId, seriesId, config);
-    }
+    return { config: undefined, data: [] };
+  })();
 
-    if (Array.isArray(json)) {
-      if (json.every(isLabelValueTuple)) {
-        return transformLabeledData(json, options);
-      }
+  console.log(`transform ${result.config?.type ?? 'unknown'} series=${result.config?.series?.length ?? 0} data=${result.data?.length ?? 0} unit=${result.config?.rawUnit ?? 'none'}\n${result.data?.map(d => `  [${d.seriesId}] median=${d.median} min=${d.min} max=${d.max} values=${d.values.slice(0, 5).join(',')}${d.values.length > 5 ? '...' : ''}`).join('\n')}`);
 
-      if (json.every(v => typeof v === 'number')) {
-        return transformData([json], options);
-      }
-
-      if (json.every(v => Array.isArray(v) && v.every(v => typeof v === 'number'))) {
-        return transformData(json, options);
-      }
-
-      if (json.every(v => typeof v === 'string')) {
-        return transform(json.join('\n'), options);
-      }
-    }
-  } catch (error) {
-    if (typeof input === 'string') {
-      if (isLabeledRawData(input)) {
-        return transformLabeledData(parseLabeledValues(input), options);
-      }
-
-      if (isRawNumericData(input)) {
-        return transformRawData(input, options);
-      }
-
-      if (isLabeledColumnsRawData(input)) {
-        return transformLabeledColumnsData(parseLabeledColumnValues(input), options);
-      }
-    }
-
-    console.error(error);
-  }
-
-  return { config: undefined, data: [] };
+  return result;
 }
