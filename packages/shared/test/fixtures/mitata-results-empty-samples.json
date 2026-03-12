@@ -1,0 +1,38 @@
+{
+  "benchmarks": [
+    {
+      "alias": "parser",
+      "runs": [
+        {
+          "stats": {
+            "samples": [],
+            "min": 8800041,
+            "max": 9637500,
+            "p50": 8928792,
+            "avg": 8950000,
+            "ticks": 63
+          },
+          "args": {},
+          "name": "parser"
+        }
+      ]
+    },
+    {
+      "alias": "parse",
+      "runs": [
+        {
+          "stats": {
+            "samples": [],
+            "min": 9304292,
+            "max": 13999083,
+            "p50": 10004750,
+            "avg": 10475586,
+            "ticks": 63
+          },
+          "args": {},
+          "name": "parse"
+        }
+      ]
+    }
+  ]
+}

@@ -23,21 +23,21 @@ test('transform mitata json data', async () => {
           command: 'sleep 2.1s',
           configId: -1,
           id: 0,
-          label: 'Series 1',
+          label: 'sleep 2.1s',
         },
         {
           color: C1,
           command: 'sleep 2.2s',
           configId: -1,
           id: 1,
-          label: 'Series 2',
+          label: 'sleep 2.2s',
         },
         {
           color: C2,
           command: 'sleep 2.3s',
           configId: -1,
           id: 2,
-          label: 'Series 3',
+          label: 'sleep 2.3s',
         },
       ],
     },
@@ -74,6 +74,34 @@ test('transform mitata json data', async () => {
       },
     ],
   });
+});
+
+test('transform mitata json with empty samples (stats fallback)', async () => {
+  const __filename = new URL('.', import.meta.url);
+  const filePath = new URL('./fixtures/mitata-results-empty-samples.json', __filename);
+  const input = await readFile(filePath, 'utf-8');
+
+  const output = transform(input);
+
+  expect(output.config!.rawUnit).toBe('ns');
+  expect(output.config!.series).toHaveLength(2);
+  expect(output.config!.series[0].label).toBe('parser');
+  expect(output.config!.series[1].label).toBe('parse');
+
+  expect(output.data[0]).toEqual(expect.objectContaining({
+    median: 8928792,
+    mean: 8950000,
+    min: 8800041,
+    max: 9637500,
+    values: [8928792],
+  }));
+  expect(output.data[1]).toEqual(expect.objectContaining({
+    median: 10004750,
+    mean: 10475586,
+    min: 9304292,
+    max: 13999083,
+    values: [10004750],
+  }));
 });
 
 test('transform mitata json (parameterized)', async () => {

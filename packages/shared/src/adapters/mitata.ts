@@ -26,26 +26,33 @@ function truncateSamples(samples: number[]): number[] {
   return samples.slice(0, MAX_SAMPLES);
 }
 
+function statsFromRun(stats: MitataJSON['benchmarks'][0]['runs'][0]['stats']): Statistics {
+  const samples = truncateSamples(stats.samples);
+  if (samples.length > 0) return calculateStats(samples);
+  return {
+    values: [stats.p50],
+    mean: stats.avg,
+    median: stats.p50,
+    stddev: 0,
+    min: stats.min,
+    max: stats.max,
+  };
+}
+
 function transformMitataWorkload(json: MitataJSON): Results[] {
   const isParameterized = json.benchmarks[0].kind === 'multi-args' && json.benchmarks[0].args;
 
   if (isParameterized) {
-    return json.benchmarks[0].runs.map(run => {
-      const samples = truncateSamples(run.stats.samples);
-      return {
-        series: { label: run.name, parameters: run.args },
-        data: calculateStats(samples),
-      };
-    });
+    return json.benchmarks[0].runs.map(run => ({
+      series: { label: run.name, parameters: run.args },
+      data: statsFromRun(run.stats),
+    }));
   }
 
-  return json.benchmarks.map(benchmark => {
-    const samples = truncateSamples(benchmark.runs[0].stats.samples);
-    return {
-      series: { label: benchmark.alias ?? benchmark.runs[0].name },
-      data: calculateStats(samples),
-    };
-  });
+  return json.benchmarks.map(benchmark => ({
+    series: { label: benchmark.alias ?? benchmark.runs[0].name },
+    data: statsFromRun(benchmark.runs[0].stats),
+  }));
 }
 
 export function transformMitataData(
@@ -57,9 +64,9 @@ export function transformMitataData(
   const now = new Date();
   const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
 
-  const samples = json.benchmarks[0].runs[0].stats.samples;
-  const size = samples.length;
-  const rawUnit: RawUnit = Number.isInteger(samples[0]) ? 'ns' : 's';
+  const firstStats = json.benchmarks[0].runs[0].stats;
+  const size = firstStats.samples.length;
+  const rawUnit: RawUnit = size > 0 ? (Number.isInteger(firstStats.samples[0]) ? 'ns' : 's') : (Number.isInteger(firstStats.p50) ? 'ns' : 's');
 
   const results = transformMitataWorkload(json);
   const hasParameters = results.every(r => r.series.parameters && Object.keys(r.series.parameters).length > 0);
@@ -102,7 +109,7 @@ export function transformMitataData(
       const label =
         hasParameters && result.series.parameters
           ? parameterNames.map(name => result.series.parameters[name]).join(' ')
-          : `Series ${id + 1}`;
+          : result.series.label;
       const command =
         hasParameters && result.series.parameters
           ? parameterNames.reduce(
@@ -130,15 +137,16 @@ export function transformLabeledMitataData(
   const first = runs[0].json;
   const aliases = first.benchmarks.map(b => b.alias ?? b.runs[0].name);
 
-  const samples = first.benchmarks[0].runs[0].stats.samples;
-  const rawUnit: RawUnit = Number.isInteger(samples[0]) ? 'ns' : 's';
+  const firstStats = first.benchmarks[0].runs[0].stats;
+  const rawUnit: RawUnit = firstStats.samples.length > 0 ? (Number.isInteger(firstStats.samples[0]) ? 'ns' : 's') : (Number.isInteger(firstStats.p50) ? 'ns' : 's');
 
   const labeledData: Array<[string, number[]]> = runs.map(({ label, json }) => {
     const values = aliases.map(name => {
       const benchmark = json.benchmarks.find(b => (b.alias ?? b.runs[0].name) === name);
       if (!benchmark) return 0;
-      const s = benchmark.runs[0].stats.samples;
-      const sorted = s.toSorted((a, b) => a - b);
+      const s = benchmark.runs[0].stats;
+      if (s.samples.length === 0) return s.p50;
+      const sorted = s.samples.toSorted((a, b) => a - b);
       return sorted[Math.floor(sorted.length / 2)];
     });
     return [label, values];
