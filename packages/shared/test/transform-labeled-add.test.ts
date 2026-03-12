@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
 import { matchLabeledTitle } from './helpers.ts';
+import { C0, C1, C2 } from '../src/colors.ts';
 
 test('transform and add labeled data (datetime)', () => {
   const input = JSON.stringify([
@@ -26,29 +27,29 @@ test('transform and add labeled data (datetime)', () => {
       sort: 'datetime',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           id: 0,
           label: '2025-04',
         },
         {
-          color: '#ec4899',
+          color: C1,
           id: 1,
           label: '2025-05',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           id: 2,
           label: '2025-06',
         },
       ],
       seriesX: [
         {
-          color: '#8b5cf6',
+          color: C0,
           id: 0,
           label: 'Series 1',
         },
         {
-          color: '#ec4899',
+          color: C1,
           id: 1,
           label: 'Series 2',
         },

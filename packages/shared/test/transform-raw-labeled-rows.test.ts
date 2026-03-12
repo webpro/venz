@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
 import { matchLabeledTitle } from './helpers.ts';
+import { C0, C1, C2, C3 } from '../src/colors.ts';
 
 test('transform raw labeled data rows (datetime)', () => {
   const input = `
@@ -18,34 +19,34 @@ test('transform raw labeled data rows (datetime)', () => {
       sort: 'datetime',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           id: 0,
           label: '2025-04',
         },
         {
-          color: '#ec4899',
+          color: C1,
           id: 1,
           label: '2025-05',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           id: 2,
           label: '2025-06',
         },
       ],
       seriesX: [
         {
-          color: '#8b5cf6',
+          color: C0,
           id: 0,
           label: 'Series 1',
         },
         {
-          color: '#ec4899',
+          color: C1,
           id: 1,
           label: 'Series 2',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           id: 2,
           label: 'Series 3',
         },
@@ -105,34 +106,34 @@ test('transform raw labeled data rows (semver)', () => {
       sort: 'semver',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           id: 0,
           label: '1.0.0',
         },
         {
-          color: '#ec4899',
+          color: C1,
           id: 1,
           label: '1.0.1',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           id: 2,
           label: '1.0.2',
         },
       ],
       seriesX: [
         {
-          color: '#8b5cf6',
+          color: C0,
           id: 0,
           label: 'Series 1',
         },
         {
-          color: '#ec4899',
+          color: C1,
           id: 1,
           label: 'Series 2',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           id: 2,
           label: 'Series 3',
         },
@@ -192,39 +193,39 @@ C 7 8 9 10
       sort: undefined,
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           id: 0,
           label: 'A',
         },
         {
-          color: '#ec4899',
+          color: C1,
           id: 1,
           label: 'B',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           id: 2,
           label: 'C',
         },
       ],
       seriesX: [
         {
-          color: '#8b5cf6',
+          color: C0,
           id: 0,
           label: 'Series 1',
         },
         {
-          color: '#ec4899',
+          color: C1,
           id: 1,
           label: 'Series 2',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           id: 2,
           label: 'Series 3',
         },
         {
-          color: '#f97316',
+          color: C3,
           id: 3,
           label: 'Series 4',
         },

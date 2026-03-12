@@ -14,9 +14,9 @@ const buttonColorStyles = ['text-foreground', 'border', 'border-foreground', 'ro
 const buttonLinkColorStyles = [
   'text-foreground',
   'light:text-background',
-  'bg-blue-600',
-  'hover:bg-blue-700',
-  'focus:bg-blue-700',
+  'bg-accent',
+  'hover:bg-accent-hover',
+  'focus:bg-accent-hover',
   'border',
   'border-transparent',
   'rounded-sm',
@@ -53,7 +53,7 @@ export const DangerButton = (props: ParentProps<ButtonProps>) => {
   return (
     <button
       type="button"
-      class="px-4 py-2 bg-red-500 text-white rounded-sm hover:bg-red-600 high-contrast:bg-red-700 hover:high-contrast:bg-red-800"
+      class="px-4 py-2 bg-danger text-white rounded-sm hover:bg-danger-hover high-contrast:bg-red-700 hover:high-contrast:bg-red-800"
       {...props}
     />
   );

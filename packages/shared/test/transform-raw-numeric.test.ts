@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
 import { matchRawTitle } from './helpers.ts';
+import { C0, C1, C2 } from '../src/colors.ts';
 
 test('transform raw numeric data (single)', () => {
   const input = `
@@ -17,7 +18,7 @@ test('transform raw numeric data (single)', () => {
       type: 'standard',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           command: '',
           id: 0,
           label: 'Series 1',
@@ -54,19 +55,19 @@ test('transform raw numeric data (multi)', () => {
       type: 'standard',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           command: '',
           id: 0,
           label: 'Series 1',
         },
         {
-          color: '#ec4899',
+          color: C1,
           command: '',
           id: 1,
           label: 'Series 2',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           command: '',
           id: 2,
           label: 'Series 3',
@@ -118,7 +119,7 @@ test('transform raw numeric data (json string)', () => {
       type: 'standard',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           command: '',
           id: 0,
           label: 'Series 1',
@@ -150,13 +151,13 @@ test('transform raw numeric data (multi json string)', () => {
       type: 'standard',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           command: '',
           id: 0,
           label: 'Series 1',
         },
         {
-          color: '#ec4899',
+          color: C1,
           command: '',
           id: 1,
           label: 'Series 2',

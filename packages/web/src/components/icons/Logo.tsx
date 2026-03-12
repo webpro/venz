@@ -11,7 +11,7 @@ export const Logo = () => (
     }
     `}</style>
     <title>Venz logo</title>
-    <rect width="256" height="256" rx="5" fill="#f56e0f" />
+    <rect width="256" height="256" rx="5" fill="#f68a22" />
     <g stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="13">
       <line x1="32" y1="32" x2="64" y2="64" />
       <line x1="64" y1="64" x2="32" y2="96" />

@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
 import { matchLabeledTitle } from './helpers.ts';
+import { C0, C1, C2 } from '../src/colors.ts';
 
 test('transform raw column data', () => {
   const input = `
@@ -27,17 +28,17 @@ a b c
       type: 'standard',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           id: 0,
           label: 'a',
         },
         {
-          color: '#ec4899',
+          color: C1,
           id: 1,
           label: 'b',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           id: 2,
           label: 'c',
         },

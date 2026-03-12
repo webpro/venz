@@ -7,6 +7,8 @@ module.exports = {
       colors: {
         background: 'rgb(var(--background-rgb))',
         foreground: 'rgb(var(--foreground-rgb))',
+        accent: { DEFAULT: '#4e79a7', hover: '#3f6489' },
+        danger: { DEFAULT: '#e15759', hover: '#c74a4c' },
       },
       borderColor: {
         foreground: 'rgb(var(--foreground-rgb))',

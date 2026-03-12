@@ -129,7 +129,7 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
           {configs()?.map(config => {
             const isSelected = selectedConfig()?.id === config.id;
             return (
-              <ButtonLinkInverted href={`/config/${config.id}`} classList={{ 'border-blue-500': isSelected }}>
+              <ButtonLinkInverted href={`/config/${config.id}`} classList={{ 'border-accent': isSelected }}>
                 {config.title}
               </ButtonLinkInverted>
             );

@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
 import { readFile } from 'node:fs/promises';
+import { C0, C1 } from '../src/colors.ts';
 
 test('transform hyperfine json data', async () => {
   const __filename = new URL('.', import.meta.url);
@@ -17,14 +18,14 @@ test('transform hyperfine json data', async () => {
       rawUnit: 's',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           command: 'sleep 0.22',
           configId: -1,
           id: 0,
           label: 'Command 1',
         },
         {
-          color: '#ec4899',
+          color: C1,
           command: 'sleep 0.23',
           configId: -1,
           id: 1,
@@ -74,7 +75,7 @@ test('transform hyperfine json (parameterized)', async () => {
       command: 'echo {value}',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           command: 'echo 0',
           parameters: { value: '0' },
           configId: -1,
@@ -82,7 +83,7 @@ test('transform hyperfine json (parameterized)', async () => {
           label: '0',
         },
         {
-          color: '#ec4899',
+          color: C1,
           command: 'echo 1',
           parameters: { value: '1' },
           configId: -1,

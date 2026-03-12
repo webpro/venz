@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
 import { matchRawTitle } from './helpers.ts';
+import { C0, C1 } from '../src/colors.ts';
 
 test('transform and add numeric data (single)', () => {
   const input = JSON.stringify([1, 1, 1]);
@@ -17,13 +18,13 @@ test('transform and add numeric data (single)', () => {
       type: 'standard',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           command: '',
           id: 0,
           label: 'Series 1',
         },
         {
-          color: '#ec4899',
+          color: C1,
           command: '',
           id: 1,
           label: 'Series 2',

@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { transform } from '../src/adapters/index.ts';
 import { readFile } from 'node:fs/promises';
+import { C0, C1, C2, C3, C4, C5, C6, C7, C8 } from '../src/colors.ts';
 
 test('transform mitata json data', async () => {
   const __filename = new URL('.', import.meta.url);
@@ -18,21 +19,21 @@ test('transform mitata json data', async () => {
       rawUnit: 'ns',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           command: 'sleep 2.1s',
           configId: -1,
           id: 0,
           label: 'Series 1',
         },
         {
-          color: '#ec4899',
+          color: C1,
           command: 'sleep 2.2s',
           configId: -1,
           id: 1,
           label: 'Series 2',
         },
         {
-          color: '#14b8a6',
+          color: C2,
           command: 'sleep 2.3s',
           configId: -1,
           id: 2,
@@ -93,7 +94,7 @@ test('transform mitata json (parameterized)', async () => {
       command: 'look_mom_no_spaghetti {len} {len2}',
       series: [
         {
-          color: '#8b5cf6',
+          color: C0,
           configId: -1,
           id: 0,
           label: '1 4',
@@ -101,7 +102,7 @@ test('transform mitata json (parameterized)', async () => {
           parameters: { len: 1, len2: '4' },
         },
         {
-          color: '#ec4899',
+          color: C1,
           configId: -1,
           id: 1,
           label: '2 4',
@@ -109,7 +110,7 @@ test('transform mitata json (parameterized)', async () => {
           parameters: { len: 2, len2: '4' },
         },
         {
-          color: '#14b8a6',
+          color: C2,
           configId: -1,
           id: 2,
           label: '3 4',
@@ -117,7 +118,7 @@ test('transform mitata json (parameterized)', async () => {
           parameters: { len: 3, len2: '4' },
         },
         {
-          color: '#f97316',
+          color: C3,
           command: 'look_mom_no_spaghetti 1 5',
           configId: -1,
           id: 3,
@@ -128,7 +129,7 @@ test('transform mitata json (parameterized)', async () => {
           },
         },
         {
-          color: '#06b6d4',
+          color: C4,
           command: 'look_mom_no_spaghetti 2 5',
           configId: -1,
           id: 4,
@@ -139,7 +140,7 @@ test('transform mitata json (parameterized)', async () => {
           },
         },
         {
-          color: '#84cc16',
+          color: C5,
           command: 'look_mom_no_spaghetti 3 5',
           configId: -1,
           id: 5,
@@ -150,7 +151,7 @@ test('transform mitata json (parameterized)', async () => {
           },
         },
         {
-          color: '#6366f1',
+          color: C6,
           command: 'look_mom_no_spaghetti 1 6',
           configId: -1,
           id: 6,
@@ -161,7 +162,7 @@ test('transform mitata json (parameterized)', async () => {
           },
         },
         {
-          color: '#f43f5e',
+          color: C7,
           command: 'look_mom_no_spaghetti 2 6',
           configId: -1,
           id: 7,
@@ -172,7 +173,7 @@ test('transform mitata json (parameterized)', async () => {
           },
         },
         {
-          color: '#10b981',
+          color: C8,
           command: 'look_mom_no_spaghetti 3 6',
           configId: -1,
           id: 8,
