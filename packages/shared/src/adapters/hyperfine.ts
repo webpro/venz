@@ -102,7 +102,8 @@ export function transformHyperfineData(
     for (const result of results) {
       const id = seriesId ?? series.length;
       const parameters = result.series.parameters;
-      const label = parameterName && parameters ? parameters[parameterName].toString() : `Command ${id + 1}`;
+      const cmd = result.series.command ?? '';
+      const label = parameterName && parameters ? parameters[parameterName].toString() : cmd.length > 12 ? cmd.slice(0, 11) + '…' : cmd || `Command ${id + 1}`;
 
       series.push({ ...result.series, id, configId, label: label, color: getNextAvailableColor(series) });
       data.push({ ...result.data, id, seriesId: id });

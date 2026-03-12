@@ -22,14 +22,14 @@ test('transform hyperfine json data', async () => {
           command: 'sleep 0.22',
           configId: -1,
           id: 0,
-          label: 'Command 1',
+          label: 'sleep 0.22',
         },
         {
           color: C1,
           command: 'sleep 0.23',
           configId: -1,
           id: 1,
-          label: 'Command 2',
+          label: 'sleep 0.23',
         },
       ],
     },
@@ -56,6 +56,23 @@ test('transform hyperfine json data', async () => {
       },
     ],
   });
+});
+
+test('truncates long commands in labels', () => {
+  const input = JSON.stringify({
+    results: [
+      {
+        command: 'node --max-old-space-size=4096 bench.js',
+        mean: 1.5, stddev: 0.1, median: 1.5, user: 0.1, system: 0.1, min: 1.4, max: 1.6,
+        times: [1.4, 1.5, 1.6],
+        exit_codes: [0, 0, 0],
+      },
+    ],
+  });
+
+  const output = transform(input);
+  expect(output.config!.series[0].label).toBe('node --max-…');
+  expect(output.config!.series[0].command).toBe('node --max-old-space-size=4096 bench.js');
 });
 
 test('transform hyperfine json (parameterized)', async () => {
