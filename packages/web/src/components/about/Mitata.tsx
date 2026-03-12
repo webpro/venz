@@ -8,6 +8,7 @@ export const Mitata = () => {
   url.searchParams.append(
     'data',
     JSON.stringify({
+      layout: [{ name: null, types: [] }, { name: null, types: ['s'] }, { name: null, types: [] }],
       benchmarks: [
         {
           alias: 'sleep 2.1s',
