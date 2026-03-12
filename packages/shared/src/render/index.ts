@@ -498,7 +498,9 @@ export const renderSVG = (props: RenderProps) => {
 
   const labelY = props.config()?.labelY ?? (displayUnit ? `median (${displayUnit.label})` : 'median');
 
-  svg.append('text').attr('x', width / 2).attr('y', height + 10 + margin.bottom / 2).attr('text-anchor', 'middle').style('fill', 'currentColor').style('font-family', 'sans-serif').text(props.config()?.labelX ?? 'Run #');
+  const sort = props.config()?.sort;
+  const defaultLabelX = pivotMode === 'transposed' ? '' : isIndexBased ? 'sample #' : sort === 'semver' ? 'version' : sort === 'datetime' ? 'date' : '';
+  svg.append('text').attr('x', width / 2).attr('y', height + 10 + margin.bottom / 2).attr('text-anchor', 'middle').style('fill', 'currentColor').style('font-family', 'sans-serif').text(props.config()?.labelX ?? defaultLabelX);
   svg.append('text').attr('x', -height / 2).attr('y', -45).attr('transform', 'rotate(-90)').attr('text-anchor', 'middle').style('fill', 'currentColor').style('font-family', 'sans-serif').text(labelY);
 
   const ctx: ChartContext = { svg, x, y, height, props, pivotMode, fmt: formatConverted };
