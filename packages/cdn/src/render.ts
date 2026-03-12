@@ -25,10 +25,12 @@ function parseParams(params: URLSearchParams) {
         : values;
 
   const ct = get("ct");
+  const unit = get("unit");
   const initialConfig = {
     type: typeof ct === "string" && configTypes.includes(ct as any) ? ct : "standard",
     labelX: get("labelX") ?? get("lx") ?? undefined,
     labelY: get("labelY") ?? get("ly") ?? undefined,
+    rawUnit: unit === "ns" || unit === "s" ? unit : undefined,
     labels: getAll("l"),
     colors: getAll("color"),
     commands: getAll("command"),

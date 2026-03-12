@@ -63,6 +63,8 @@ export default function Chart() {
     const p = pivotMode() === 'none' || pivotMode() === 'transposed-pivoted' ? '1' : undefined;
     if (!(!searchParams.p && !p)) setSearchParams({ p });
     if (!(!searchParams.t && !t)) setSearchParams({ t });
+    const unit = config()?.rawUnit;
+    if (!(!searchParams.unit && !unit)) setSearchParams({ unit });
   });
 
   const handleSaveAsNewConfiguration = async () => {

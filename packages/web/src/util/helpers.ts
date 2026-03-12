@@ -34,6 +34,9 @@ export function transformFromSearchParams(searchParams: SearchParams) {
         ? labels.map((label, i) => [label, values[i].split(SEPARATOR).map(Number)])
         : values;
 
+  const unit = searchParams.unit;
+  const rawUnit = unit === 'ns' || unit === 's' ? unit : undefined;
+
   const initialConfig: InitialConfig = {
     type: typeof ct === 'string' && configTypes.includes(ct) ? ct : 'standard',
     labelX: Array.isArray(lx) ? lx[0] : lx,
@@ -41,6 +44,7 @@ export function transformFromSearchParams(searchParams: SearchParams) {
     labels: typeof l === 'string' ? [l] : Array.isArray(l) ? l : [],
     colors: typeof color === 'string' ? [color] : Array.isArray(color) ? color : [],
     commands: typeof command === 'string' ? [command] : Array.isArray(command) ? command : [],
+    rawUnit,
   };
 
   const { config, data: seriesData } = transform(input, { initialConfig });
@@ -64,6 +68,7 @@ export function createShareableUrl(searchParams: SearchParams, series: Series[],
   if (typeof searchParams.ct === 'string') url.searchParams.set('ct', searchParams.ct);
   if (searchParams.p === '1') url.searchParams.set('p', '1');
   if (searchParams.t === '1') url.searchParams.set('t', '1');
+  if (typeof searchParams.unit === 'string') url.searchParams.set('unit', searchParams.unit);
 
   for (const id of series) url.searchParams.append('label', id.label);
   for (const s of seriesX) url.searchParams.append('l', s.label);
