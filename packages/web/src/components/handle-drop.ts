@@ -23,7 +23,6 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
 
   const files = Array.from(event.dataTransfer?.files || []);
 
-  // Multi-file mitata: use filenames as labels for cross-version comparison
   if ((!props.chartId || props.chartId === 'chart') && files.length > 1 && files.every(f => /\.json$/.test(f.name))) {
     const entries = await Promise.all(files.map(async f => ({ name: f.name, text: await f.text() })));
     const runs: Array<{ label: string; json: MitataJSON }> = [];
