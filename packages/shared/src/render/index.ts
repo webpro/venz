@@ -132,7 +132,7 @@ function renderTooltipDot(
 
 function renderMedian(ctx: ChartContext, stats: SeriesData, color: string, selectedId: number) {
   const { svg, x, y, fmt } = ctx;
-  const radius = Math.abs(y(stats.median) - y(stats.median + stats.stddev));
+  const radius = Math.min(Math.abs(y(stats.median) - y(stats.median + stats.stddev)), ctx.height / 2);
   const cx = x(selectedId) || x(stats.label);
 
   svg.append('circle').attr('cx', cx).attr('cy', y(stats.median)).attr('r', radius).attr('fill', color).attr('fill-opacity', 0.2);
@@ -422,14 +422,17 @@ export const renderSVG = (props: RenderProps) => {
     svg.append('path').attr('d', `M -${breakWidth},${start + unit * 3} l ${breakWidth * 2},0`).attr('transform', `rotate(-10, 0, ${start + unit * 3})`).style('stroke', 'currentColor').style('stroke-width', 2);
     svg.append('path').attr('d', `M 0,${start + unit * 3} v ${unit * 2},0`).style('stroke', 'currentColor').style('stroke-width', 1);
 
+    const selected = props.data().filter(s => props.selectedSeries().includes(s.seriesId));
     const values =
       pivotMode !== 'none'
         ? pivotedData().flatMap(d => d.values)
-        : props.chartType() === 'median' || props.chartType() === 'bar'
-          ? props.data().map(s => s.median)
-          : props.data().filter(s => props.selectedSeries().includes(s.seriesId)).flatMap(s => [s.min, s.max]);
+        : props.chartType() === 'median'
+          ? selected.flatMap(s => [s.median - s.stddev, s.median + s.stddev])
+          : props.chartType() === 'bar'
+            ? props.data().map(s => s.median)
+            : selected.flatMap(s => [s.min, s.max]);
 
-    return scaleLinear().domain([Math.min(...values) * 0.9, Math.max(...values) * 1.01]).range([height, 0]).nice();
+    return scaleLinear().domain([Math.min(...values) * 0.99, Math.max(...values) * 1.01]).range([height, 0]).nice();
   };
 
   const y = props.fullRange() ? getYScale() : getYScaleWithBreak();
