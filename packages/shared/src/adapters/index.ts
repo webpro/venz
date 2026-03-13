@@ -1,5 +1,6 @@
 import { isHyperfineJSON, transformHyperfineData } from './hyperfine.ts';
 import { isMitataJSON, transformMitataData } from './mitata.ts';
+import { isTinybenchJSON, transformTinybenchData, isVitestBenchJSON, transformVitestBenchData } from './tinybench.ts';
 import {
   isLabeledColumnsRawData,
   isLabeledRawData,
@@ -46,7 +47,7 @@ export function transform(
   if (typeof input !== 'string' && typeof input !== 'object')
     throw new Error('Input must be a string or a JSON object');
 
-  if (input.length === 0) return { config: undefined, data: [] };
+  if (!input || (typeof input === 'string' && input.length === 0)) return { config: undefined, data: [] };
 
   const result = (() => {
     try {
@@ -58,6 +59,14 @@ export function transform(
 
       if (isMitataJSON(json)) {
         return transformMitataData(json, configId, seriesId, config);
+      }
+
+      if (isTinybenchJSON(json)) {
+        return transformTinybenchData(json, configId, seriesId, config);
+      }
+
+      if (isVitestBenchJSON(json)) {
+        return transformVitestBenchData(json, configId, seriesId, config);
       }
 
       if (Array.isArray(json)) {

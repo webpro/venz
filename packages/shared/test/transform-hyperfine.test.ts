@@ -97,7 +97,9 @@ test('multiple parameters combine in labels', async () => {
   const output = transform(input);
 
   expect(output.config!.type).toBe('hyperfine-parameter');
-  expect(output.config!.parameterNames).toEqual(['algo', 'size']);
+  const hpConfig = output.config!;
+  if (hpConfig.type !== 'hyperfine-parameter') throw new Error('expected hyperfine-parameter');
+  expect(hpConfig.parameterNames).toEqual(['algo', 'size']);
   expect(output.config!.series).toHaveLength(4);
   expect(output.config!.series.map(s => s.label)).toEqual(['fast 1', 'fast 2', 'slow 1', 'slow 2']);
 });

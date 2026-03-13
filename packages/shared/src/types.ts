@@ -4,6 +4,8 @@ export const configTypes = [
   'hyperfine-parameter',
   'mitata',
   'mitata-parameter',
+  'tinybench',
+  'vitest-bench',
   'list',
 ] as const;
 
@@ -11,48 +13,47 @@ export type ConfigType = (typeof configTypes)[number];
 
 export type RawUnit = 'ns' | 's';
 
-export interface BaseConfig {
+export interface BaseConfig<S extends BaseSeries = Series> {
+  id?: number;
   title: string;
   type: ConfigType;
+  sort?: 'default' | 'semver' | 'data' | 'datetime';
   labelX?: string;
   labelY?: string;
   rawUnit?: RawUnit;
-  series: Series[];
+  series: S[];
   seriesX?: Series[];
 }
 
 export interface ConfigStandard extends BaseConfig {
-  id: number;
   type: 'standard';
-  sort?: 'default' | 'semver' | 'data' | 'datetime';
 }
 
 interface HyperfineConfigDefault extends BaseConfig {
-  id: number;
   type: 'hyperfine';
 }
 
 interface HyperfineConfigParameter extends BaseConfig {
-  id: number;
   type: 'hyperfine-parameter';
   parameterNames: string[];
   command: string;
 }
 
 export interface ConfigMitataDefault extends BaseConfig {
-  id: number;
   type: 'mitata';
 }
 
 export interface ConfigMitataParameter extends BaseConfig {
-  id: number;
   type: 'mitata-parameter';
   parameterNames: string[];
   command?: string;
 }
 
+export interface ConfigTinybench extends BaseConfig {
+  type: 'tinybench' | 'vitest-bench';
+}
+
 export interface ConfigList extends BaseConfig {
-  id: number;
   type: 'list';
   sort: 'default' | 'semver' | 'data' | 'datetime';
   command?: string;
@@ -65,12 +66,11 @@ export type Configuration =
   | HyperfineConfigParameter
   | ConfigMitataDefault
   | ConfigMitataParameter
+  | ConfigTinybench
   | ConfigList
   | ConfigStandard;
 
-export interface IncomingConfig extends BaseConfig {
-  series: IncomingSeries[];
-}
+export interface IncomingConfig extends BaseConfig<IncomingSeries> {}
 
 export interface BaseSeries {
   label?: string;
@@ -89,7 +89,7 @@ export interface IncomingSeries extends BaseSeries {
 export interface Series extends IncomingSeries {
   id: number;
   label: string;
-  configId: number;
+  configId?: number;
   color: string;
 }
 
@@ -112,17 +112,19 @@ export interface SimpleCommand {
   command: string;
 }
 
+// https://github.com/sharkdp/hyperfine/blob/master/src/benchmark/benchmark_result.rs
+// https://github.com/sharkdp/hyperfine/blob/master/src/export/json.rs
 export interface HyperfineResults extends JsonObject {
   command: string;
   mean: number;
-  stddev: number;
+  stddev?: number;
   median: number;
   user: number;
   system: number;
   min: number;
   max: number;
-  times: number[];
-  exit_codes: number[];
+  times?: number[];
+  exit_codes: (number | null)[];
   parameters?: Record<string, string>;
 }
 
@@ -130,6 +132,8 @@ export interface HyperfineJSON extends JsonObject {
   results: HyperfineResults[];
 }
 
+// https://github.com/evanwashere/mitata/blob/master/src/main.mjs
+// https://github.com/evanwashere/mitata/blob/master/src/lib.mjs
 interface MitataStats extends JsonObject {
   samples: number[];
   min: number;
@@ -148,6 +152,7 @@ interface MitataRun extends JsonObject {
 interface MitataBenchmark extends JsonObject {
   alias: string;
   runs: MitataRun[];
+  kind?: 'static' | 'args' | 'multi-args';
   args?: {
     [key: string]: (string | number)[];
   };
@@ -157,7 +162,63 @@ export interface MitataJSON extends JsonObject {
   benchmarks: MitataBenchmark[];
 }
 
+// https://github.com/tinylibs/tinybench/blob/main/src/types.ts
+interface TinybenchLatencyStats extends JsonObject {
+  mean: number;
+  min: number;
+  max: number;
+  p50: number;
+  p75: number;
+  p99: number;
+  p995: number;
+  p999: number;
+  sd: number;
+  samplesCount: number;
+  samples?: number[];
+}
+
+export interface TinybenchTask extends JsonObject {
+  name?: string;
+  state: string;
+  totalTime: number;
+  latency: TinybenchLatencyStats;
+  throughput: TinybenchLatencyStats;
+}
+
+export type TinybenchJSON = TinybenchTask[];
+
+// https://github.com/vitest-dev/vitest/blob/main/packages/vitest/src/runtime/types/benchmark.ts
+// https://github.com/vitest-dev/vitest/blob/main/packages/vitest/src/node/reporters/benchmark/json-formatter.ts
+interface VitestBenchResult extends JsonObject {
+  name: string;
+  rank: number;
+  sampleCount: number;
+  median: number;
+  totalTime: number;
+  min: number;
+  max: number;
+  hz: number;
+  period: number;
+  samples: number[];
+  mean: number;
+  sd: number;
+}
+
+interface VitestBenchGroup extends JsonObject {
+  fullName: string;
+  benchmarks: VitestBenchResult[];
+}
+
+interface VitestBenchFile extends JsonObject {
+  filepath: string;
+  groups: VitestBenchGroup[];
+}
+
+export interface VitestBenchJSON extends JsonObject {
+  files: VitestBenchFile[];
+}
+
 type JsonPrimitive = string | number | boolean | null;
-export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray | undefined;
 export type JsonObject = { [key: string]: JsonValue };
 type JsonArray = JsonValue[];

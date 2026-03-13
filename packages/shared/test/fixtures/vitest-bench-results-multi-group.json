@@ -1,0 +1,57 @@
+{
+  "files": [
+    {
+      "filepath": "/home/user/project/bench/ops.bench.ts",
+      "groups": [
+        {
+          "fullName": "string ops",
+          "benchmarks": [
+            {
+              "id": "s1",
+              "name": "concat",
+              "rank": 1,
+              "sampleCount": 1000,
+              "median": 0.003,
+              "totalTime": 3000,
+              "min": 0.002,
+              "max": 0.008,
+              "hz": 333333,
+              "period": 0.003,
+              "samples": [],
+              "mean": 0.0035,
+              "sd": 0.001,
+              "p75": 0.004,
+              "p99": 0.007,
+              "p995": 0.0075,
+              "p999": 0.008
+            }
+          ]
+        },
+        {
+          "fullName": "array ops",
+          "benchmarks": [
+            {
+              "id": "a1",
+              "name": "concat",
+              "rank": 1,
+              "sampleCount": 800,
+              "median": 0.005,
+              "totalTime": 4000,
+              "min": 0.003,
+              "max": 0.012,
+              "hz": 200000,
+              "period": 0.005,
+              "samples": [],
+              "mean": 0.0055,
+              "sd": 0.002,
+              "p75": 0.006,
+              "p99": 0.011,
+              "p995": 0.0115,
+              "p999": 0.012
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "files": [
+    {
+      "filepath": "/home/user/project/bench/sort.bench.ts",
+      "groups": [
+        {
+          "fullName": "sorting",
+          "benchmarks": [
+            {
+              "id": "abc1",
+              "name": "Array.sort",
+              "rank": 1,
+              "sampleCount": 500,
+              "median": 0.042,
+              "totalTime": 2100,
+              "min": 0.035,
+              "max": 0.068,
+              "hz": 23809,
+              "period": 0.042,
+              "samples": [],
+              "mean": 0.044,
+              "variance": 0.000025,
+              "sd": 0.005,
+              "sem": 0.000224,
+              "df": 499,
+              "critical": 1.965,
+              "moe": 0.00044,
+              "rme": 1.0,
+              "p75": 0.046,
+              "p99": 0.062,
+              "p995": 0.065,
+              "p999": 0.068
+            },
+            {
+              "id": "abc2",
+              "name": "Array.toSorted",
+              "rank": 2,
+              "sampleCount": 450,
+              "median": 0.048,
+              "totalTime": 2160,
+              "min": 0.040,
+              "max": 0.075,
+              "hz": 20833,
+              "period": 0.048,
+              "samples": [],
+              "mean": 0.050,
+              "variance": 0.000036,
+              "sd": 0.006,
+              "sem": 0.000283,
+              "df": 449,
+              "critical": 1.965,
+              "moe": 0.000556,
+              "rme": 1.11,
+              "p75": 0.053,
+              "p99": 0.070,
+              "p995": 0.072,
+              "p999": 0.075
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

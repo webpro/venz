@@ -38,7 +38,7 @@ function transformHyperfineWorkload(data: HyperfineResults): Results {
       values: data.times ?? [],
       mean: data.mean,
       median: data.median,
-      stddev: data.stddev,
+      stddev: data.stddev ?? 0,
       min: data.min,
       max: data.max,
     },
