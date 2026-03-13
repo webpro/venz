@@ -1,4 +1,4 @@
-import type { Configuration, Statistics, Series, SeriesData, JsonValue, ConfigList, ConfigStandard } from '../types.ts';
+import type { Configuration, Statistics, Series, SeriesData, JsonValue } from '../types.ts';
 import { getNextAvailableColor } from '../colors.ts';
 import type { Options } from './index.ts';
 
@@ -39,7 +39,7 @@ export function isRawNumericData(input: string): boolean {
   return isOneNumberPerLine ? parseRawValues(trimmed).length > 0 : lines.some(line => parseRawValues(line).length > 0);
 }
 
-const createSeries = (id: number, configId: number, seriesNumber: number, existingSeries: Series[] = []): Series => ({
+const createSeries = (id: number, configId: number | undefined, seriesNumber: number, existingSeries: Series[] = []): Series => ({
   id,
   configId,
   label: `Series ${seriesNumber}`,
@@ -125,7 +125,7 @@ export function transformData(values: number[][], options: Options) {
     });
   }
 
-  const config: ConfigStandard = existingConfig
+  const config: Configuration = existingConfig
     ? { ...existingConfig, series }
     : { id: configId, title: `Raw data input (${timestamp})`, type: 'standard', series };
 
@@ -239,12 +239,12 @@ export function transformLabeledData(input: Array<[string, number | number[]]>, 
     });
   }
 
-  const config: ConfigStandard = existingConfig
+  const config: Configuration = existingConfig
     ? { ...existingConfig, series, seriesX }
     : {
         id: configId,
         title: `New labeled data series (${timestamp})`,
-        type: initialConfig?.type ?? 'standard',
+        type: 'standard',
         sort,
         series,
         seriesX,

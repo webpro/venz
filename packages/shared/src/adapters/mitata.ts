@@ -6,15 +6,15 @@ import type { Options } from './index.ts';
 const MAX_SAMPLES = 100_000;
 
 export function isMitataJSON(data: JsonValue): data is MitataJSON {
-  return Boolean(
-    data &&
-      typeof data === 'object' &&
-      'benchmarks' in data &&
-      Array.isArray(data.benchmarks) &&
-      typeof data.benchmarks[0] === 'object' &&
-      'runs' in data.benchmarks[0] &&
-      data.benchmarks[0].runs[0]?.stats?.samples
-  );
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+  if (!('benchmarks' in data) || !Array.isArray(data.benchmarks) || data.benchmarks.length === 0) return false;
+  const b = data.benchmarks[0];
+  if (!b || typeof b !== 'object' || Array.isArray(b)) return false;
+  if (!('runs' in b) || !Array.isArray(b.runs) || b.runs.length === 0) return false;
+  const run = b.runs[0];
+  if (!run || typeof run !== 'object' || Array.isArray(run)) return false;
+  if (!('stats' in run) || !run.stats || typeof run.stats !== 'object' || Array.isArray(run.stats)) return false;
+  return 'samples' in run.stats && Array.isArray(run.stats.samples);
 }
 
 interface Results {
@@ -105,17 +105,18 @@ export function transformMitataData(
 
     for (const result of results) {
       const id = seriesId ?? series.length;
+      const params = result.series.parameters;
       const label =
-        hasParameters && result.series.parameters
-          ? parameterNames.map(name => result.series.parameters[name]).join(' ')
-          : result.series.label;
+        hasParameters && params
+          ? parameterNames.map(name => params[name]).join(' ')
+          : result.series.label ?? '';
       const command =
-        hasParameters && result.series.parameters
+        hasParameters && params && commandTemplate
           ? parameterNames.reduce(
-              (acc, name) => acc.replace(`\{${name}\}`, result.series.parameters[name].toString()),
+              (acc, name) => acc.replace(`\{${name}\}`, params[name].toString()),
               commandTemplate
             )
-          : result.series.label;
+          : result.series.label ?? '';
 
       if (!hasParameters) delete result.series.parameters;
 
