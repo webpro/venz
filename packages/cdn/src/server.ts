@@ -4,7 +4,7 @@ import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { Resvg } from '@resvg/resvg-js';
 import sharp from 'sharp';
-import { renderChart } from './render.ts';
+import { renderChart, THEME_FG } from './render.ts';
 
 const favicon = readFileSync(new URL('favicon.svg', import.meta.url));
 
@@ -126,7 +126,11 @@ app.get('/i/:file', async c => {
       image = svg;
     } else {
       const bg = THEME_BG[theme];
-      const resvg = new Resvg(svg, {
+      const rasterSvg = svg
+        .replaceAll('currentColor', THEME_FG[theme])
+        .replace(/font-size:\s*(\d+)px/g, (_, s) => `font-size:${Math.round(Number(s) * 1.6)}px`)
+        .replace(/font-size="(\d+)"/g, (_, s) => `font-size="${Math.round(Number(s) * 1.6)}"`);
+      const resvg = new Resvg(rasterSvg, {
         fitTo: { mode: 'width', value: width },
         background: bg,
         font: {

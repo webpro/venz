@@ -5,7 +5,7 @@ import { configTypes, type ConfigType, type RawUnit, type SeriesData } from "@ve
 import { getPivotMode } from "@venz/shared/chart";
 import type { Theme, ChartType, LegendPosition } from "@venz/shared/chart";
 
-const THEME_FG: Record<Theme, string> = { dark: "#fff", light: "#000", "high-contrast": "#ff0" };
+export const THEME_FG: Record<Theme, string> = { dark: "#fff", light: "#000", "high-contrast": "#ff0" };
 
 const CHART_TYPES: ChartType[] = ["box", "median", "scatter", "line", "bar"];
 const LEGEND_POSITIONS: LegendPosition[] = ["tr", "tl", "br", "bl", "n"];
@@ -37,7 +37,7 @@ function parseParams(params: URLSearchParams) {
     labelY: get("labelY") ?? get("ly") ?? undefined,
     rawUnit,
     labels: getAll("l"),
-    colors: getAll("color"),
+    colors: getAll("color").map(c => /^[0-9a-fA-F]{3,8}$/.test(c) ? `#${c}` : c),
     commands: getAll("command"),
   };
 
@@ -51,6 +51,7 @@ function parseParams(params: URLSearchParams) {
       : "median";
   const hasExplicitPivot = get("pivot") !== null || get("transpose") !== null;
   const pivotMode = hasExplicitPivot ? getPivotMode(get("pivot"), get("transpose"))
+    : typeParam === "pivot" ? 'pivoted'
     : (chartType === 'line' || chartType === 'scatter') ? 'none' : 'pivoted';
   const lpParam = get("lp");
   const legendPosition: LegendPosition = LEGEND_POSITIONS.includes(lpParam as LegendPosition)
@@ -104,14 +105,9 @@ export function renderChart(
 
   renderSVG(props);
 
-  const fg = THEME_FG[theme];
   svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   svg.setAttribute("viewBox", `${-padding} ${-padding} ${width} ${height}`);
   svg.setAttribute("font-size", "16px");
 
-  return svg
-    .toString()
-    .replaceAll("currentColor", fg)
-    .replace(/font-size:\s*(\d+)px/g, (_, s) => `font-size:${Math.round(Number(s) * 1.6)}px`)
-    .replace(/font-size="(\d+)"/g, (_, s) => `font-size="${Math.round(Number(s) * 1.6)}"`);
+  return svg.toString();
 }
