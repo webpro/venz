@@ -121,7 +121,7 @@ app.get('/i/:file', async c => {
   try {
     const svg = renderChart(params, width, height, padding, theme);
 
-    let image: string | Buffer;
+    let image: string | Uint8Array<ArrayBuffer>;
     if (ext === 'svg') {
       image = svg;
     } else {
@@ -137,13 +137,15 @@ app.get('/i/:file', async c => {
       });
       const rendered = resvg.render();
       const raw = sharp(rendered.pixels, { raw: { width: rendered.width, height: rendered.height, channels: 4 } });
+      let buf: Buffer;
       if (ext === 'png') {
-        image = await raw.png().toBuffer();
+        buf = await raw.png().toBuffer();
       } else if (ext === 'webp') {
-        image = await raw.webp({ lossless: true }).toBuffer();
+        buf = await raw.webp({ lossless: true }).toBuffer();
       } else {
-        image = await raw.avif({ lossless: true }).toBuffer();
+        buf = await raw.avif({ lossless: true }).toBuffer();
       }
+      image = new Uint8Array(buf);
     }
 
     if (!isDev) cache.set(key, image);

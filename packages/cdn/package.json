@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node src/server.ts",
     "dev": "node --watch src/server.ts",
+    "typecheck": "tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p tsconfig.worker.json",
     "deploy": "wrangler deploy"
   },
   "dependencies": {

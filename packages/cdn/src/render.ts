@@ -1,7 +1,7 @@
 import { parseHTML } from "linkedom";
 import { renderSVG, type RenderProps } from "@venz/shared/render";
 import { transform, SEPARATOR } from "@venz/shared/adapter";
-import { configTypes, type SeriesData } from "@venz/shared/types";
+import { configTypes, type ConfigType, type RawUnit, type SeriesData } from "@venz/shared/types";
 import { getPivotMode } from "@venz/shared/chart";
 import type { Theme, ChartType, LegendPosition } from "@venz/shared/chart";
 
@@ -25,12 +25,17 @@ function parseParams(params: URLSearchParams) {
         : values;
 
   const ct = get("ct");
+  const isConfigType = (s: string | null): s is ConfigType => {
+    for (const t of configTypes) if (t === s) return true;
+    return false;
+  };
   const unit = get("unit");
+  const rawUnit: RawUnit | undefined = unit === "ns" || unit === "s" ? unit : undefined;
   const initialConfig = {
-    type: typeof ct === "string" && configTypes.includes(ct as any) ? ct : "standard",
+    type: isConfigType(ct) ? ct : ("standard" satisfies ConfigType),
     labelX: get("labelX") ?? get("lx") ?? undefined,
     labelY: get("labelY") ?? get("ly") ?? undefined,
-    rawUnit: unit === "ns" || unit === "s" ? unit : undefined,
+    rawUnit,
     labels: getAll("l"),
     colors: getAll("color"),
     commands: getAll("command"),
