@@ -98,10 +98,16 @@ app.get('/i/:file', async c => {
   const padParam = Number(params.get('pad')) || 0;
   const padding = PADDINGS.includes(padParam) ? padParam : 0;
   const themeParam = params.get('theme');
-  const theme = THEMES.includes(themeParam as any) ? (themeParam as typeof THEMES[number]) : 'dark';
+  const explicitTheme = THEMES.includes(themeParam as any) ? (themeParam as typeof THEMES[number]) : null;
+  const theme = explicitTheme ?? 'dark';
 
   for (const key of ['w', 'h', 'q', 'pad', 'chrome']) params.delete(key);
-  if (!params.has('theme')) params.set('theme', theme);
+  if (ext === 'svg') {
+    if (explicitTheme) params.set('theme', explicitTheme);
+    else params.delete('theme');
+  } else if (!params.has('theme')) {
+    params.set('theme', theme);
+  }
 
   const key = cacheKey(ext, params, width, height, padding, quality);
   const tag = etag(key);
@@ -119,7 +125,7 @@ app.get('/i/:file', async c => {
   }
 
   try {
-    const svg = renderChart(params, width, height, padding, theme);
+    const svg = renderChart(params, width, height, padding, ext === 'svg' ? explicitTheme : theme);
 
     let image: string | Uint8Array<ArrayBuffer>;
     if (ext === 'svg') {

@@ -60,7 +60,7 @@ export const CreateImageURL = () => {
           <ul class="list-inside list-disc pl-8">
             <li>color theme</li>
             <li>
-              default: <code>dark</code>
+              default: <code>dark</code> (raster); SVG auto-adapts to viewer/parent unless set
             </li>
             <li>
               values: <code>dark</code>, <code>light</code>, <code>high-contrast</code>

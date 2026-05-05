@@ -51,7 +51,8 @@ export const ChartControls = (props: ChartControlsProps) => {
 
   const { theme } = useTheme();
 
-  const ogImageUrl = (ext: string) => `${cdnOrigin}/i/chart.${ext}?pad=24&${props.getShareableUrl()}&theme=${theme()}`;
+  const ogImageUrl = (ext: string) =>
+    `${cdnOrigin}/i/chart.${ext}?${props.getShareableUrl()}${ext === 'svg' ? '' : `&theme=${theme()}`}`;
 
   return (
     <div class="flex justify-end gap-4">
