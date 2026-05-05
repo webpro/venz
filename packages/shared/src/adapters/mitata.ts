@@ -1,4 +1,13 @@
-import type { Configuration, IncomingSeries, JsonValue, MitataJSON, RawUnit, Series, SeriesData, Statistics } from '../types.ts';
+import type {
+  Configuration,
+  IncomingSeries,
+  JsonValue,
+  MitataJSON,
+  RawUnit,
+  Series,
+  SeriesData,
+  Statistics,
+} from '../types.ts';
 import { getNextAvailableColor } from '../colors.ts';
 import { calculateStats, formatTimestamp, transformLabeledData } from './standard.ts';
 import type { Options } from './index.ts';
@@ -65,7 +74,8 @@ export function transformMitataData(
 
   const firstStats = json.benchmarks[0].runs[0].stats;
   const size = firstStats.samples.length;
-  const rawUnit: RawUnit = size > 0 ? (Number.isInteger(firstStats.samples[0]) ? 'ns' : 's') : (Number.isInteger(firstStats.p50) ? 'ns' : 's');
+  const rawUnit: RawUnit =
+    size > 0 ? (Number.isInteger(firstStats.samples[0]) ? 'ns' : 's') : Number.isInteger(firstStats.p50) ? 'ns' : 's';
 
   const results = transformMitataWorkload(json);
   const hasParameters = results.every(r => r.series.parameters && Object.keys(r.series.parameters).length > 0);
@@ -107,16 +117,11 @@ export function transformMitataData(
       const id = seriesId ?? series.length;
       const params = result.series.parameters;
       const label =
-        hasParameters && params
-          ? parameterNames.map(name => params[name]).join(' ')
-          : result.series.label ?? '';
+        hasParameters && params ? parameterNames.map(name => params[name]).join(' ') : (result.series.label ?? '');
       const command =
         hasParameters && params && commandTemplate
-          ? parameterNames.reduce(
-              (acc, name) => acc.replace(`\{${name}\}`, params[name].toString()),
-              commandTemplate
-            )
-          : result.series.label ?? '';
+          ? parameterNames.reduce((acc, name) => acc.replace(`{${name}}`, params[name].toString()), commandTemplate)
+          : (result.series.label ?? '');
 
       if (!hasParameters) delete result.series.parameters;
 
@@ -130,15 +135,19 @@ export function transformMitataData(
   }
 }
 
-export function transformLabeledMitataData(
-  runs: Array<{ label: string; json: MitataJSON }>,
-  options: Options = {},
-) {
+export function transformLabeledMitataData(runs: Array<{ label: string; json: MitataJSON }>, options: Options = {}) {
   const first = runs[0].json;
   const aliases = first.benchmarks.map(b => b.alias ?? b.runs[0].name);
 
   const firstStats = first.benchmarks[0].runs[0].stats;
-  const rawUnit: RawUnit = firstStats.samples.length > 0 ? (Number.isInteger(firstStats.samples[0]) ? 'ns' : 's') : (Number.isInteger(firstStats.p50) ? 'ns' : 's');
+  const rawUnit: RawUnit =
+    firstStats.samples.length > 0
+      ? Number.isInteger(firstStats.samples[0])
+        ? 'ns'
+        : 's'
+      : Number.isInteger(firstStats.p50)
+        ? 'ns'
+        : 's';
 
   const labeledData: Array<[string, number[]]> = runs.map(({ label, json }) => {
     const values = aliases.map(name => {

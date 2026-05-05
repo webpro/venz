@@ -19,7 +19,6 @@ export { SEPARATOR, calculateStats } from './standard.ts';
 
 export { generateCommand } from './hyperfine.ts';
 
-
 export type InitialConfig = {
   type?: ConfigType;
   labelX?: string;
@@ -114,7 +113,9 @@ export function transform(
     return { config: undefined, data: [] };
   })();
 
-  console.log(`transform ${result.config?.type ?? 'unknown'} series=${result.config?.series?.length ?? 0} data=${result.data?.length ?? 0} unit=${result.config?.rawUnit ?? 'none'}\n${result.data?.map(d => `  [${d.seriesId}] median=${d.median} min=${d.min} max=${d.max} values=${d.values.slice(0, 5).join(',')}${d.values.length > 5 ? '...' : ''}`).join('\n')}`);
+  console.log(
+    `transform ${result.config?.type ?? 'unknown'} series=${result.config?.series?.length ?? 0} data=${result.data?.length ?? 0} unit=${result.config?.rawUnit ?? 'none'}\n${result.data?.map(d => `  [${d.seriesId}] median=${d.median} min=${d.min} max=${d.max} values=${d.values.slice(0, 5).join(',')}${d.values.length > 5 ? '...' : ''}`).join('\n')}`
+  );
 
   return result;
 }

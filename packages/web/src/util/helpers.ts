@@ -8,7 +8,8 @@ const MAX_URL_LENGTH = 15_000;
 export const generateNumbers = () => Array.from({ length: 10 }, () => Math.floor(Math.random() * 100) + 1);
 
 export const origin = import.meta.env.DEV ? 'http://localhost:3000' : 'https://try.venz.dev';
-export const cdnOrigin = import.meta.env.VITE_CDN_ORIGIN ?? (import.meta.env.DEV ? 'http://localhost:3001' : 'https://cdn.venz.dev');
+export const cdnOrigin =
+  import.meta.env.VITE_CDN_ORIGIN ?? (import.meta.env.DEV ? 'http://localhost:3001' : 'https://cdn.venz.dev');
 
 const getChartType = (value?: string | string[]): ChartType =>
   typeof value === 'string' && ['box', 'median', 'scatter', 'line', 'bar'].includes(value)
@@ -49,15 +50,23 @@ export function transformFromSearchParams(searchParams: SearchParams) {
 
   const type = getChartType(searchParams.type);
   const hasExplicitPivot = searchParams.pivot !== undefined || searchParams.transpose !== undefined;
-  const pivotMode = hasExplicitPivot ? getPivotMode(searchParams.pivot, searchParams.transpose)
-    : (type === 'line' || type === 'scatter') ? 'none' : 'pivoted';
+  const pivotMode = hasExplicitPivot
+    ? getPivotMode(searchParams.pivot, searchParams.transpose)
+    : type === 'line' || type === 'scatter'
+      ? 'none'
+      : 'pivoted';
   const legendPosition = getLegendPosition(searchParams.lp);
   const fullRange = getFullRange(searchParams.br);
 
   return { type, pivotMode, legendPosition, fullRange, config, data: seriesData };
 }
 
-export function createShareableUrl(searchParams: SearchParams, series: Series[], seriesX: Series[], data: SeriesData[]): [number, URL] {
+export function createShareableUrl(
+  searchParams: SearchParams,
+  series: Series[],
+  seriesX: Series[],
+  data: SeriesData[]
+): [number, URL] {
   const url = new URL('/', origin);
 
   if (typeof searchParams.type === 'string') url.searchParams.set('type', searchParams.type);

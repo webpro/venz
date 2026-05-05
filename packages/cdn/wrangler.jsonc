@@ -1,40 +1,40 @@
 {
-	"name": "venz-cdn",
-	"account_id": "2a89625197605034a7e0aae5af99b6cf",
-	"main": "src/worker.ts",
-	"compatibility_date": "2026-03-10",
-	"routes": [
-		{
-			"pattern": "cdn.venz.dev",
-			"custom_domain": true
-		}
-	],
-	"containers": [
-		{
-			"class_name": "CdnContainer",
-			"image": "../../Containerfile",
-			"instance_type": "basic",
-			"max_instances": 1
-		}
-	],
-	"durable_objects": {
-		"bindings": [
-			{
-				"class_name": "CdnContainer",
-				"name": "CDN_CONTAINER"
-			}
-		]
-	},
-	"migrations": [
-		{
-			"new_sqlite_classes": ["CdnContainer"],
-			"tag": "v1"
-		}
-	],
+  "name": "venz-cdn",
+  "account_id": "2a89625197605034a7e0aae5af99b6cf",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-03-10",
+  "routes": [
+    {
+      "pattern": "cdn.venz.dev",
+      "custom_domain": true,
+    },
+  ],
+  "containers": [
+    {
+      "class_name": "CdnContainer",
+      "image": "../../Containerfile",
+      "instance_type": "basic",
+      "max_instances": 1,
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "CdnContainer",
+        "name": "CDN_CONTAINER",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "new_sqlite_classes": ["CdnContainer"],
+      "tag": "v1",
+    },
+  ],
   "observability": {
     "logs": {
       "enabled": true,
-      "invocation_logs": true
-    }
-	}
+      "invocation_logs": true,
+    },
+  },
 }

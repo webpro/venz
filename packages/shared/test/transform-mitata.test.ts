@@ -88,20 +88,24 @@ test('transform mitata json with empty samples (stats fallback)', async () => {
   expect(output.config!.series[0].label).toBe('parser');
   expect(output.config!.series[1].label).toBe('parse');
 
-  expect(output.data[0]).toEqual(expect.objectContaining({
-    median: 8928792,
-    mean: 8950000,
-    min: 8800041,
-    max: 9637500,
-    values: [8928792],
-  }));
-  expect(output.data[1]).toEqual(expect.objectContaining({
-    median: 10004750,
-    mean: 10475586,
-    min: 9304292,
-    max: 13999083,
-    values: [10004750],
-  }));
+  expect(output.data[0]).toEqual(
+    expect.objectContaining({
+      median: 8928792,
+      mean: 8950000,
+      min: 8800041,
+      max: 9637500,
+      values: [8928792],
+    })
+  );
+  expect(output.data[1]).toEqual(
+    expect.objectContaining({
+      median: 10004750,
+      mean: 10475586,
+      min: 9304292,
+      max: 13999083,
+      values: [10004750],
+    })
+  );
 });
 
 test('transform mitata json (parameterized)', async () => {

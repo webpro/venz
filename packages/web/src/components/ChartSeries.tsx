@@ -35,7 +35,8 @@ export const ChartSeries = (props: Props) => {
   };
 
   const hasSeriesX = () => props.seriesX.length > 0;
-  const useSeriesX = () => hasSeriesX() && (props.pivotMode() === 'pivoted' || props.pivotMode() === 'transposed-pivoted');
+  const useSeriesX = () =>
+    hasSeriesX() && (props.pivotMode() === 'pivoted' || props.pivotMode() === 'transposed-pivoted');
   const data = () => (useSeriesX() ? transpose(props.data()) : props.data());
   const series = () => (useSeriesX() ? props.seriesX : props.series);
   const selectedSeries = () => (useSeriesX() ? props.selectedSeriesX() : props.selectedSeries());
@@ -91,7 +92,6 @@ export const ChartSeries = (props: Props) => {
 
       <For each={seriesWithStats()}>
         {(s, i) => {
-
           return (
             <label
               for={`toggle-visibility-${i()}`}

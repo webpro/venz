@@ -14,7 +14,7 @@ export const NumbersJSON = () => {
       [5, 4, 6],
       [4, 5, 3],
       [3, 6, 4],
-    ]),
+    ])
   );
 
   return (
@@ -55,7 +55,7 @@ export const LabeledNumbersJSON = () => {
       ['Bananas', 5],
       ['Apples', 4],
       ['Oranges', 3],
-    ]),
+    ])
   );
 
   return (
@@ -88,7 +88,7 @@ export const LabeledNumberSeriesJSON = () => {
       ['Bananas', [5, 4, 6]],
       ['Apples', [4, 5, 3]],
       ['Oranges', [3, 6, 4]],
-    ]),
+    ])
   );
 
   return (

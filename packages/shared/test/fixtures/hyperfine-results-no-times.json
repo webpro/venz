@@ -4,11 +4,11 @@
       "command": "sleep 0.5",
       "mean": 0.512,
       "stddev": null,
-      "median": 0.510,
+      "median": 0.51,
       "user": 0.001,
       "system": 0.001,
       "min": 0.508,
-      "max": 0.520,
+      "max": 0.52,
       "times": null,
       "exit_codes": [0]
     },

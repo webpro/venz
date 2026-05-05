@@ -108,13 +108,39 @@ const ConfigurationForm: Component<{ isNew?: boolean }> = props => {
   const isEmptyCommand = (cmd: { command?: string }) => !cmd.command?.trim();
   const isEmptySeries = (cmd: { command?: string; label?: string }) => !cmd.command?.trim() && !cmd.label?.trim();
 
-  createEffect(() => autoGrowCommands(series, s => setSeries(s), isEmptySeries, () => ({ label: '', command: '', color: getNextAvailableColor(series) })));
-  createEffect(() => autoGrowCommands(prepare, p => setPrepare(p), isEmptyCommand, () => ({ command: '' })));
-  createEffect(() => autoGrowCommands(build, b => setBuild(b), isEmptyCommand, () => ({ command: '' })));
+  createEffect(() =>
+    autoGrowCommands(
+      series,
+      s => setSeries(s),
+      isEmptySeries,
+      () => ({ label: '', command: '', color: getNextAvailableColor(series) })
+    )
+  );
+  createEffect(() =>
+    autoGrowCommands(
+      prepare,
+      p => setPrepare(p),
+      isEmptyCommand,
+      () => ({ command: '' })
+    )
+  );
+  createEffect(() =>
+    autoGrowCommands(
+      build,
+      b => setBuild(b),
+      isEmptyCommand,
+      () => ({ command: '' })
+    )
+  );
   createEffect(() => {
     series.forEach((cmd, cmdIndex) => {
       const prep = cmd.prepare || [];
-      autoGrowCommands(prep, p => setSeries(cmdIndex, 'prepare', p), isEmptyCommand, () => ({ command: '' }));
+      autoGrowCommands(
+        prep,
+        p => setSeries(cmdIndex, 'prepare', p),
+        isEmptyCommand,
+        () => ({ command: '' })
+      );
     });
   });
 

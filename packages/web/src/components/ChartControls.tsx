@@ -69,35 +69,52 @@ export const ChartControls = (props: ChartControlsProps) => {
         onChange={props.setChartType}
       />
 
-      {props.hasSeriesX && (() => {
-        const m = () => props.pivotMode();
-        const isTransposed = () => m() === 'transposed-pivoted' || m() === 'transposed';
-        const isPivoted = () => m() === 'pivoted' || m() === 'transposed';
-        const toggleTranspose = () =>
-          props.setPivotMode(m => m === 'none' ? 'transposed-pivoted' : m === 'transposed-pivoted' ? 'none' : m === 'pivoted' ? 'transposed' : 'pivoted');
-        const togglePivot = () =>
-          props.setPivotMode(m => m === 'none' ? 'pivoted' : m === 'pivoted' ? 'none' : m === 'transposed-pivoted' ? 'transposed' : 'transposed-pivoted');
-        return (
-          <>
-            <IconButton
-              aria-label="Transpose"
-              onClick={toggleTranspose}
-              title="Transpose"
-              className={isTransposed() ? 'bg-foreground! text-background!' : ''}
-            >
-              <Transpose />
-            </IconButton>
-            <IconButton
-              aria-label="Pivot"
-              onClick={togglePivot}
-              title="Pivot"
-              className={isPivoted() ? 'bg-foreground! text-background!' : ''}
-            >
-              <Pivot split={isPivoted()} />
-            </IconButton>
-          </>
-        );
-      })()}
+      {props.hasSeriesX &&
+        (() => {
+          const m = () => props.pivotMode();
+          const isTransposed = () => m() === 'transposed-pivoted' || m() === 'transposed';
+          const isPivoted = () => m() === 'pivoted' || m() === 'transposed';
+          const toggleTranspose = () =>
+            props.setPivotMode(m =>
+              m === 'none'
+                ? 'transposed-pivoted'
+                : m === 'transposed-pivoted'
+                  ? 'none'
+                  : m === 'pivoted'
+                    ? 'transposed'
+                    : 'pivoted'
+            );
+          const togglePivot = () =>
+            props.setPivotMode(m =>
+              m === 'none'
+                ? 'pivoted'
+                : m === 'pivoted'
+                  ? 'none'
+                  : m === 'transposed-pivoted'
+                    ? 'transposed'
+                    : 'transposed-pivoted'
+            );
+          return (
+            <>
+              <IconButton
+                aria-label="Transpose"
+                onClick={toggleTranspose}
+                title="Transpose"
+                className={isTransposed() ? 'bg-foreground! text-background!' : ''}
+              >
+                <Transpose />
+              </IconButton>
+              <IconButton
+                aria-label="Pivot"
+                onClick={togglePivot}
+                title="Pivot"
+                className={isPivoted() ? 'bg-foreground! text-background!' : ''}
+              >
+                <Pivot split={isPivoted()} />
+              </IconButton>
+            </>
+          );
+        })()}
 
       <Dropdown
         label="Sort mode"

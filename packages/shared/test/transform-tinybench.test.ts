@@ -41,14 +41,16 @@ test('transform tinybench json with empty samples (stats fallback)', async () =>
   expect(output.config!.series[0].label).toBe('1');
   expect(output.config!.series[1].label).toBe('2');
 
-  expect(output.data[0]).toEqual(expect.objectContaining({
-    values: [3800],
-    mean: 4000,
-    median: 3800,
-    stddev: 700,
-    min: 3200,
-    max: 5500,
-  }));
+  expect(output.data[0]).toEqual(
+    expect.objectContaining({
+      values: [3800],
+      mean: 4000,
+      median: 3800,
+      stddev: 700,
+      min: 3200,
+      max: 5500,
+    })
+  );
 });
 
 test('uses name field when present', () => {
@@ -58,8 +60,32 @@ test('uses name field when present', () => {
       state: 'completed',
       totalTime: 100,
       period: 0.01,
-      latency: { mean: 0.01, min: 0.008, max: 0.012, p50: 0.01, p75: 0.011, p99: 0.012, p995: 0.012, p999: 0.012, sd: 0.001, samplesCount: 3, samples: [0.008, 0.01, 0.012] },
-      throughput: { mean: 100000, min: 83333, max: 125000, p50: 100000, p75: 112500, p99: 124000, p995: 124500, p999: 125000, sd: 20000, samplesCount: 3, samples: [83333, 100000, 125000] },
+      latency: {
+        mean: 0.01,
+        min: 0.008,
+        max: 0.012,
+        p50: 0.01,
+        p75: 0.011,
+        p99: 0.012,
+        p995: 0.012,
+        p999: 0.012,
+        sd: 0.001,
+        samplesCount: 3,
+        samples: [0.008, 0.01, 0.012],
+      },
+      throughput: {
+        mean: 100000,
+        min: 83333,
+        max: 125000,
+        p50: 100000,
+        p75: 112500,
+        p99: 124000,
+        p995: 124500,
+        p999: 125000,
+        sd: 20000,
+        samplesCount: 3,
+        samples: [83333, 100000, 125000],
+      },
     },
   ]);
 
@@ -73,8 +99,32 @@ test('filters out non-completed tasks', () => {
       state: 'completed',
       totalTime: 100,
       period: 0.01,
-      latency: { mean: 0.01, min: 0.008, max: 0.012, p50: 0.01, p75: 0.011, p99: 0.012, p995: 0.012, p999: 0.012, sd: 0.001, samplesCount: 3, samples: [0.008, 0.01, 0.012] },
-      throughput: { mean: 100000, min: 83333, max: 125000, p50: 100000, p75: 112500, p99: 124000, p995: 124500, p999: 125000, sd: 20000, samplesCount: 3, samples: [83333, 100000, 125000] },
+      latency: {
+        mean: 0.01,
+        min: 0.008,
+        max: 0.012,
+        p50: 0.01,
+        p75: 0.011,
+        p99: 0.012,
+        p995: 0.012,
+        p999: 0.012,
+        sd: 0.001,
+        samplesCount: 3,
+        samples: [0.008, 0.01, 0.012],
+      },
+      throughput: {
+        mean: 100000,
+        min: 83333,
+        max: 125000,
+        p50: 100000,
+        p75: 112500,
+        p99: 124000,
+        p995: 124500,
+        p999: 125000,
+        sd: 20000,
+        samplesCount: 3,
+        samples: [83333, 100000, 125000],
+      },
     },
     {
       state: 'errored',

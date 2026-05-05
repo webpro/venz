@@ -39,7 +39,12 @@ export function isRawNumericData(input: string): boolean {
   return isOneNumberPerLine ? parseRawValues(trimmed).length > 0 : lines.some(line => parseRawValues(line).length > 0);
 }
 
-const createSeries = (id: number, configId: number | undefined, seriesNumber: number, existingSeries: Series[] = []): Series => ({
+const createSeries = (
+  id: number,
+  configId: number | undefined,
+  seriesNumber: number,
+  existingSeries: Series[] = []
+): Series => ({
   id,
   configId,
   label: `Series ${seriesNumber}`,
@@ -55,7 +60,7 @@ export function isLabeledColumnsRawData(input: string): boolean {
       .filter(line => line.trim());
     const labels = lines[0].split(SEPARATOR).filter(label => label.trim());
     const values = lines[2].split(SEPARATOR).filter(value => value.trim());
-    return labels.every(value => /\w/.test(value)) && values.every(value => /^[\d\.]+$/.test(value));
+    return labels.every(value => /\w/.test(value)) && values.every(value => /^[\d.]+$/.test(value));
   } catch {
     return false;
   }
@@ -108,7 +113,11 @@ export function transformData(values: number[][], options: Options) {
   const timestamp = formatTimestamp();
 
   const series: Series[] = [...(existingConfig?.series ?? [])];
-  const startId = existingConfig ? (existingConfig.series.length > 0 ? Math.max(...existingConfig.series.map(s => s.id)) + 1 : 0) : (seriesId ?? 0);
+  const startId = existingConfig
+    ? existingConfig.series.length > 0
+      ? Math.max(...existingConfig.series.map(s => s.id)) + 1
+      : 0
+    : (seriesId ?? 0);
   const startSeriesId = series.length + 1;
 
   const data: SeriesData[] = existingData ?? [];
@@ -193,7 +202,11 @@ export function transformLabeledData(input: Array<[string, number | number[]]>, 
   const { configId, seriesId, config: existingConfig, data: existingData, initialConfig } = options;
   const timestamp = formatTimestamp();
 
-  const nextId = existingConfig ? (existingConfig.series.length > 0 ? Math.max(...existingConfig.series.map(s => s.id)) + 1 : 0) : (seriesId ?? 0);
+  const nextId = existingConfig
+    ? existingConfig.series.length > 0
+      ? Math.max(...existingConfig.series.map(s => s.id)) + 1
+      : 0
+    : (seriesId ?? 0);
 
   const [label, values] = input[0];
   const size = Array.isArray(values) ? values.length : 1;

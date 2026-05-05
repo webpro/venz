@@ -1,4 +1,4 @@
-import { createSignal, Match, Show, Switch, type Accessor } from 'solid-js';
+import { createSignal, Match, Switch, type Accessor } from 'solid-js';
 import { Link } from './Button';
 import { generateCommand } from '@venz/shared/adapter';
 import type { Configuration } from '@venz/shared/types';

@@ -1,4 +1,12 @@
-import type { Configuration, JsonValue, Series, SeriesData, Statistics, TinybenchJSON, VitestBenchJSON } from '../types.ts';
+import type {
+  Configuration,
+  JsonValue,
+  Series,
+  SeriesData,
+  Statistics,
+  TinybenchJSON,
+  VitestBenchJSON,
+} from '../types.ts';
 import { getNextAvailableColor } from '../colors.ts';
 import { calculateStats, formatTimestamp } from './standard.ts';
 
@@ -18,6 +26,7 @@ function msToNsStats(stats: MsStats): Statistics {
   const raw = stats.samples;
   if (raw && raw.length > 0) {
     const samples = raw.length > MAX_SAMPLES ? raw.slice(0, MAX_SAMPLES) : raw;
+    // eslint-disable-next-line unicorn/no-new-array
     const nsValues = new Array<number>(samples.length);
     for (let i = 0; i < samples.length; i++) nsValues[i] = Math.round(samples[i] * MS_TO_NS);
     return calculateStats(nsValues);
@@ -38,13 +47,13 @@ function msToNsStats(stats: MsStats): Statistics {
 export function isTinybenchJSON(data: JsonValue): data is TinybenchJSON {
   return Boolean(
     Array.isArray(data) &&
-      data.length > 0 &&
-      typeof data[0] === 'object' &&
-      data[0] &&
-      'latency' in data[0] &&
-      typeof data[0].latency === 'object' &&
-      data[0].latency &&
-      'mean' in data[0].latency
+    data.length > 0 &&
+    typeof data[0] === 'object' &&
+    data[0] &&
+    'latency' in data[0] &&
+    typeof data[0].latency === 'object' &&
+    data[0].latency &&
+    'mean' in data[0].latency
   );
 }
 

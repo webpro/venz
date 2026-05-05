@@ -17,7 +17,7 @@ export const LabeledColumns = () => {
   literal.searchParams.set('lp', 'br');
   literal.searchParams.set(
     'data',
-    'col-A col-B col-C\n 1.2    2    2.5\n 1.1    1.9  2.4\n1.15    1.8  2.4\n0.98    2.2  2.6',
+    'col-A col-B col-C\n 1.2    2    2.5\n 1.1    1.9  2.4\n1.15    1.8  2.4\n0.98    2.2  2.6'
   );
 
   return (

@@ -34,7 +34,9 @@ export const handleDrop = (props: HandleDropProps) => async (event: DragEvent) =
   const isGeneric = !props.chartId || props.chartId === 'chart';
 
   if (isGeneric) {
-    const entries = await Promise.all(files.map(async f => ({ label: f.name.replace(/\.[^.]+$/, ''), text: await f.text() })));
+    const entries = await Promise.all(
+      files.map(async f => ({ label: f.name.replace(/\.[^.]+$/, ''), text: await f.text() }))
+    );
 
     const labeled = entries.length > 1 ? transformLabeled(entries) : null;
     if (labeled?.config) {

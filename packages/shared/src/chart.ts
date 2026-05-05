@@ -9,5 +9,11 @@ type Param = string | string[] | null | undefined;
 export function getPivotMode(pivot?: Param, transpose?: Param): PivotMode {
   const isPivoted = pivot === '1';
   const isTransposed = transpose === '1';
-  return isTransposed && isPivoted ? 'transposed' : isPivoted ? 'pivoted' : isTransposed ? 'transposed-pivoted' : 'none';
+  return isTransposed && isPivoted
+    ? 'transposed'
+    : isPivoted
+      ? 'pivoted'
+      : isTransposed
+        ? 'transposed-pivoted'
+        : 'none';
 }

@@ -58,7 +58,8 @@ export default function Chart() {
     const defaultPivoted = ct !== 'line' && ct !== 'scatter';
     const isPivoted = m === 'pivoted' || m === 'transposed';
     const isTransposed = m === 'transposed' || m === 'transposed-pivoted';
-    if (searchParams.pivot || isPivoted !== defaultPivoted) setSearchParams({ pivot: isPivoted === defaultPivoted ? undefined : (isPivoted ? '1' : '0') });
+    if (searchParams.pivot || isPivoted !== defaultPivoted)
+      setSearchParams({ pivot: isPivoted === defaultPivoted ? undefined : isPivoted ? '1' : '0' });
     if (searchParams.transpose || isTransposed) setSearchParams({ transpose: isTransposed ? '1' : undefined });
     const unit = config()?.rawUnit;
     if (searchParams.unit || unit) setSearchParams({ unit });
@@ -73,6 +74,7 @@ export default function Chart() {
     }
   };
 
+  // eslint-disable-next-line no-unassigned-vars -- assigned via JSX ref={svgRef}
   let svgRef!: SVGSVGElement;
 
   const chartId = () => (isGenericChart(params.id) ? undefined : Number(params.id));

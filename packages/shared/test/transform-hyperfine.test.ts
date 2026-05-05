@@ -63,7 +63,13 @@ test('truncates long commands in labels', () => {
     results: [
       {
         command: 'node --max-old-space-size=4096 bench.js',
-        mean: 1.5, stddev: 0.1, median: 1.5, user: 0.1, system: 0.1, min: 1.4, max: 1.6,
+        mean: 1.5,
+        stddev: 0.1,
+        median: 1.5,
+        user: 0.1,
+        system: 0.1,
+        min: 1.4,
+        max: 1.6,
         times: [1.4, 1.5, 1.6],
         exit_codes: [0, 0, 0],
       },
@@ -84,7 +90,7 @@ test('handles null times gracefully', async () => {
 
   expect(output.config!.series).toHaveLength(2);
   expect(output.config!.series[0].label).toBe('sleep 0.5');
-  expect(output.data[0].median).toBe(0.510);
+  expect(output.data[0].median).toBe(0.51);
   expect(output.data[0].values).toEqual([]);
   expect(output.data[1].median).toBe(0.613);
 });

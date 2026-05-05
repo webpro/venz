@@ -14,12 +14,12 @@ import type {
 export function isHyperfineJSON(data: JsonValue): data is HyperfineJSON {
   return Boolean(
     data &&
-      typeof data === 'object' &&
-      'results' in data &&
-      Array.isArray(data.results) &&
-      data.results[0] &&
-      typeof data.results[0] === 'object' &&
-      'exit_codes' in data.results[0]
+    typeof data === 'object' &&
+    'results' in data &&
+    Array.isArray(data.results) &&
+    data.results[0] &&
+    typeof data.results[0] === 'object' &&
+    'exit_codes' in data.results[0]
   );
 }
 
@@ -99,7 +99,12 @@ export function transformHyperfineData(
       const id = seriesId ?? series.length;
       const parameters = result.series.parameters;
       const cmd = result.series.command ?? '';
-      const label = parameterNames.length > 0 && parameters ? parameterNames.map(n => parameters[n]).join(' ') : cmd.length > 12 ? cmd.slice(0, 11) + '…' : cmd || `Command ${id + 1}`;
+      const label =
+        parameterNames.length > 0 && parameters
+          ? parameterNames.map(n => parameters[n]).join(' ')
+          : cmd.length > 12
+            ? cmd.slice(0, 11) + '…'
+            : cmd || `Command ${id + 1}`;
 
       series.push({ ...result.series, id, configId, label: label, color: getNextAvailableColor(series) });
       data.push({ ...result.data, id, seriesId: id });

@@ -26,12 +26,14 @@ export default function ChartPage() {
 
   return (
     <Shell>
-      {hasData && <>
-        <Meta property="og:image:width" content="1200" />
-        <Meta property="og:image:height" content="630" />
-        <Meta property="og:image:type" content="image/webp" />
-        <Meta name="twitter:card" content="summary_large_image" />
-      </>}
+      {hasData && (
+        <>
+          <Meta property="og:image:width" content="1200" />
+          <Meta property="og:image:height" content="630" />
+          <Meta property="og:image:type" content="image/webp" />
+          <Meta name="twitter:card" content="summary_large_image" />
+        </>
+      )}
       <Chart />
     </Shell>
   );

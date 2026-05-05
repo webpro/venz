@@ -66,7 +66,7 @@ app.get('/', c => {
   return c.redirect('https://try.venz.dev', 301);
 });
 
-app.get('/favicon.svg', c => {
+app.get('/favicon.svg', () => {
   return new Response(favicon, {
     headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800, immutable' },
   });
@@ -76,7 +76,14 @@ app.get('/favicon.ico', c => c.redirect('/favicon.svg', 301));
 
 const PADDINGS = [0, 12, 24];
 
-function cacheKey(file: string, params: URLSearchParams, width: number, height: number, padding: number, quality: number) {
+function cacheKey(
+  file: string,
+  params: URLSearchParams,
+  width: number,
+  height: number,
+  padding: number,
+  quality: number
+) {
   const sorted = [...params].sort((a, b) => a[0].localeCompare(b[0]));
   return `${file}:${width}x${height}:p${padding}:q${quality}:${new URLSearchParams(sorted)}`;
 }
@@ -98,7 +105,7 @@ app.get('/i/:file', async c => {
   const padParam = Number(params.get('pad')) || 0;
   const padding = PADDINGS.includes(padParam) ? padParam : 0;
   const themeParam = params.get('theme');
-  const explicitTheme = THEMES.includes(themeParam as any) ? (themeParam as typeof THEMES[number]) : null;
+  const explicitTheme = THEMES.includes(themeParam as any) ? (themeParam as (typeof THEMES)[number]) : null;
   const theme = explicitTheme ?? 'dark';
 
   for (const key of ['w', 'h', 'q', 'pad', 'chrome']) params.delete(key);

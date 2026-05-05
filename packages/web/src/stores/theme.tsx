@@ -8,14 +8,10 @@ const ThemeContext = createContext<ThemeContextType>();
 
 export function ThemeProvider(props: ParentProps) {
   const [theme, setTheme] = createSignal<Theme>(
-    (typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : 'dark') as Theme || 'dark'
+    ((typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : 'dark') as Theme) || 'dark'
   );
 
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      {props.children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={{ theme, setTheme }}>{props.children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {

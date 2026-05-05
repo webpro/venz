@@ -18,23 +18,27 @@ test('transform vitest bench json data', async () => {
     { color: C1, command: 'Array.toSorted', configId: -1, id: 1, label: 'Array.toSorted' },
   ]);
 
-  expect(output.data[0]).toEqual(expect.objectContaining({
-    values: [42000],
-    mean: 44000,
-    median: 42000,
-    stddev: 5000,
-    min: 35000,
-    max: 68000,
-  }));
+  expect(output.data[0]).toEqual(
+    expect.objectContaining({
+      values: [42000],
+      mean: 44000,
+      median: 42000,
+      stddev: 5000,
+      min: 35000,
+      max: 68000,
+    })
+  );
 
-  expect(output.data[1]).toEqual(expect.objectContaining({
-    values: [48000],
-    mean: 50000,
-    median: 48000,
-    stddev: 6000,
-    min: 40000,
-    max: 75000,
-  }));
+  expect(output.data[1]).toEqual(
+    expect.objectContaining({
+      values: [48000],
+      mean: 50000,
+      median: 48000,
+      stddev: 6000,
+      min: 40000,
+      max: 75000,
+    })
+  );
 });
 
 test('prefixes names when multiple groups', async () => {

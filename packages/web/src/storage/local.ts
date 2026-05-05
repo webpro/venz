@@ -1,4 +1,4 @@
-import type { Configuration, SeriesData, Series } from '@venz/shared/types';
+import type { Configuration, SeriesData } from '@venz/shared/types';
 import type { StorageAdapter } from './index.js';
 import { migrations } from './migrations.js';
 import { demoConfigurations } from './demo.js';
@@ -86,7 +86,7 @@ export class LocalStorageAdapter implements StorageAdapter {
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(this.configTableName, 'readwrite');
       const store = transaction.objectStore(this.configTableName);
-      const { id, ...data } = o(config);
+      const { id: _id, ...data } = o(config);
       const request = store.add(data);
       request.onsuccess = () => resolve({ id: Number(request.result) });
       request.onerror = () => reject(request.error);

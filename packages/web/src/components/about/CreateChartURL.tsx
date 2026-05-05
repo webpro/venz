@@ -1,4 +1,4 @@
-import { origin, cdnOrigin } from '../../util/helpers';
+import { origin } from '../../util/helpers';
 import { Wink } from '../Button';
 
 export const CreateChartURL = () => {

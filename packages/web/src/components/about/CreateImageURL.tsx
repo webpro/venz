@@ -1,5 +1,4 @@
 import { origin, cdnOrigin } from '../../util/helpers';
-import { Wink } from '../Button';
 
 export const CreateImageURL = () => {
   const url = new URL('/', origin);
