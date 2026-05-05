@@ -24,7 +24,7 @@ export const CreateImageURL = () => {
         <li>All chart URL parameters (above) are supported</li>
       </ul>
 
-      <h4 class="text-lg mt-2">Additional image parameters</h4>
+      <h4 class="text-2xl mt-4">Additional image parameters</h4>
 
       <ul class="list-inside list-disc pl-4">
         <li>
@@ -48,9 +48,18 @@ export const CreateImageURL = () => {
         <li>
           <code>q</code>
           <ul class="list-inside list-disc pl-8">
-            <li>image quality (webp/jpg only)</li>
+            <li>image quality (webp/avif only; png is lossless)</li>
             <li>
-              default: <code>90</code>, range: <code>1</code>-<code>100</code>
+              default: lossless; setting <code>q</code> switches to lossy, range: <code>1</code>-<code>100</code>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>pad</code>
+          <ul class="list-inside list-disc pl-8">
+            <li>outer padding in pixels (clamped to half the smaller dimension)</li>
+            <li>
+              default: <code>0</code>
             </li>
           </ul>
         </li>
@@ -70,7 +79,7 @@ export const CreateImageURL = () => {
 
       <p>Example:</p>
       <p>
-        <code class="break-all">{cdnOrigin}/i/chart.png?type=bar&data=3,2,3,4&data=4,3,2,5&theme=dark</code>
+        <code class="break-all">{cdnOrigin}/i/chart.png?type=line&data=3,2,3,4&data=4,3,2,5</code>
       </p>
     </>
   );

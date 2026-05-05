@@ -15,7 +15,7 @@ export const CreateChartURL = () => {
         Example: <Wink url={url} />
       </p>
 
-      <h4 class="text-xl">URL parameters</h4>
+      <h4 class="text-2xl mt-4">URL parameters</h4>
 
       <ul class="list-inside list-disc pl-4">
         <li>
@@ -185,7 +185,7 @@ export const CreateChartURL = () => {
           </ul>
         </li>
       </ul>
-      <h4 class="text-xl">Example code snippets to create URL</h4>
+      <h4 class="text-2xl mt-4">Example code snippets to create URL</h4>
       <pre class="border p-4">{`
 const url = new URL('/', 'https://try.venz.dev');
 url.searchParams.set('type', 'line');
