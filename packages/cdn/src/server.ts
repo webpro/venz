@@ -74,18 +74,16 @@ app.get('/favicon.svg', () => {
 
 app.get('/favicon.ico', c => c.redirect('/favicon.svg', 301));
 
-const PADDINGS = [0, 12, 24];
-
 function cacheKey(
   file: string,
   params: URLSearchParams,
   width: number,
   height: number,
   padding: number,
-  quality: number
+  qKey: string
 ) {
   const sorted = [...params].sort((a, b) => a[0].localeCompare(b[0]));
-  return `${file}:${width}x${height}:p${padding}:q${quality}:${new URLSearchParams(sorted)}`;
+  return `${file}:${width}x${height}:p${padding}:${qKey}:${new URLSearchParams(sorted)}`;
 }
 
 function etag(key: string) {
@@ -101,9 +99,11 @@ app.get('/i/:file', async c => {
   const params = new URL(c.req.url).searchParams;
   const width = Math.min(Number(params.get('w')) || VIEWPORT.width, 3840);
   const height = Math.min(Number(params.get('h')) || VIEWPORT.height, 2160);
-  const quality = Math.min(Math.max(Number(params.get('q')) || 90, 1), 100);
-  const padParam = Number(params.get('pad')) || 0;
-  const padding = PADDINGS.includes(padParam) ? padParam : 0;
+  const qParam = params.get('q');
+  const qNum = Number(qParam);
+  const explicitQuality =
+    qParam !== null && Number.isFinite(qNum) ? Math.min(Math.max(qNum, 1), 100) : null;
+  const padding = Math.max(0, Math.min(Number(params.get('pad')) || 0, Math.floor(Math.min(width, height) / 2)));
   const themeParam = params.get('theme');
   const explicitTheme = THEMES.includes(themeParam as any) ? (themeParam as (typeof THEMES)[number]) : null;
   const theme = explicitTheme ?? 'dark';
@@ -116,7 +116,8 @@ app.get('/i/:file', async c => {
     params.set('theme', theme);
   }
 
-  const key = cacheKey(ext, params, width, height, padding, quality);
+  const qKey = explicitQuality !== null ? `q${explicitQuality}` : 'lossless';
+  const key = cacheKey(ext, params, width, height, padding, qKey);
   const tag = etag(key);
   const cacheControl = isDev ? 'no-store' : `public, max-age=${CACHE_MAX_AGE}, immutable`;
 
@@ -158,9 +159,9 @@ app.get('/i/:file', async c => {
       if (ext === 'png') {
         buf = await raw.png().toBuffer();
       } else if (ext === 'webp') {
-        buf = await raw.webp({ lossless: true }).toBuffer();
+        buf = await raw.webp(explicitQuality !== null ? { quality: explicitQuality } : { lossless: true }).toBuffer();
       } else {
-        buf = await raw.avif({ lossless: true }).toBuffer();
+        buf = await raw.avif(explicitQuality !== null ? { quality: explicitQuality } : { lossless: true }).toBuffer();
       }
       image = new Uint8Array(buf);
     }
