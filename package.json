@@ -5,13 +5,13 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260505.1",
-    "@types/node": "^24.12.0",
-    "@typescript/native-preview": "7.0.0-dev.20260505.1",
-    "knip": "^6.11.0",
-    "oxfmt": "^0.47.0",
-    "oxlint": "^1.62.0",
-    "wrangler": "^4.87.0"
+    "@cloudflare/workers-types": "^5.20260908.1",
+    "@types/node": "^24.13.3",
+    "knip": "^6.35.0",
+    "oxfmt": "^0.67.0",
+    "oxlint": "^1.82.0",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.130.0"
   },
   "scripts": {
     "dev": "pnpm run -F @venz/web -F @venz/cdn dev",
@@ -19,5 +19,5 @@
     "lint": "oxlint",
     "knip": "knip"
   },
-  "packageManager": "pnpm@10.33.3"
+  "packageManager": "pnpm@12.3.4"
 }

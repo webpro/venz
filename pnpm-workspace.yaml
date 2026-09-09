@@ -1,9 +1,14 @@
 packages:
   - packages/*
 
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - '@tailwindcss/oxide'
-  - esbuild
-  - sharp
-  - workerd
+allowBuilds:
+  '@parcel/watcher': true
+  '@tailwindcss/oxide': true
+  esbuild: true
+  sharp: true
+  workerd: true
+
+minimumReleaseAgeExclude:
+  - knip@6.35.0
+  - miniflare@5.20260908.0-alpha
+  - wrangler@4.130.0
