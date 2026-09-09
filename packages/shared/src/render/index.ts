@@ -102,9 +102,12 @@ function renderTooltipDot(
         g.append('circle').attr('r', 12).attr('fill', 'transparent').attr('class', 'hit-area');
       }
 
-      g.append('circle').attr('r', 3).attr('fill', color).attr('class', 'visible-dot');
+      const dot = g.append('circle').attr('r', 3).attr('fill', color).attr('class', 'visible-dot');
 
-      if (!interactive) return;
+      if (!interactive) {
+        dot.append('title').text(d);
+        return;
+      }
 
       const isFirst = i === 0;
       const isLast = i === values.length - 1;
