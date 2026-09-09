@@ -1,21 +1,24 @@
 {
   "name": "@venz/web",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "dev": "vinxi dev",
-    "build": "vinxi build",
-    "start": "vinxi start",
-    "deploy": "vinxi build && wrangler pages deploy"
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "wrangler pages dev --cwd ../..",
+    "deploy": "vite build && wrangler pages deploy --cwd ../.."
   },
   "dependencies": {
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^1.0.0",
-    "@solidjs/start": "^1.3.2",
-    "@tailwindcss/postcss": "4.3.3",
+    "@solidjs/start": "^2.0.4",
+    "@tailwindcss/vite": "4.3.3",
     "@venz/shared": "workspace:*",
-    "postcss": "^8.5.28",
+    "nitro": "3.0.260903-beta",
     "solid-js": "^1.9.15",
     "tailwindcss": "4.3.3",
-    "vinxi": "^0.5.11"
+    "vite": "^8.2.2"
   }
 }

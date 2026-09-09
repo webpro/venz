@@ -3,6 +3,8 @@
 The source code of the charting thing that runs on [try.venz.dev][1],
 with chart image rendering at [cdn.venz.dev][2].
 
+Use Node.js 24 or newer.
+
 ```sh
 pnpm install
 pnpm dev
@@ -22,7 +24,7 @@ pnpm dev
 
 ## Tech
 
-- [SolidStart][5], [D3][6], [Tailwind][7], [vinxi][8], [IndexedDB][9]
+- [SolidStart][5], [D3][6], [Tailwind][7], [Vite][8], [Nitro][16], [IndexedDB][9]
 - [Hono][10] + [resvg][11] + [sharp][12] on [Cloudflare Workers + Containers][13] (CDN)
 
 Aims for good accessibility with light, dark and high-contrast modes and full
@@ -56,7 +58,7 @@ Seeing issues or want to improve it? Pull requests are welcome!
 [5]: https://start.solidjs.com
 [6]: https://d3js.org
 [7]: https://tailwindcss.com
-[8]: https://github.com/nksaraf/vinxi
+[8]: https://vite.dev
 [9]: https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
 [10]: https://hono.dev
 [11]: https://github.com/yisibl/resvg-js
@@ -64,3 +66,4 @@ Seeing issues or want to improve it? Pull requests are welcome!
 [13]: https://developers.cloudflare.com/workers/
 [14]: https://github.com/sharkdp/hyperfine
 [15]: ./LICENSE
+[16]: https://nitro.build
