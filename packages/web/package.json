@@ -13,12 +13,12 @@
   "dependencies": {
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^1.0.0",
-    "@solidjs/start": "^2.0.4",
+    "@solidjs/start": "^2.0.6",
     "@tailwindcss/vite": "4.3.3",
     "@venz/shared": "workspace:*",
     "nitro": "3.0.260903-beta",
-    "solid-js": "^1.9.15",
+    "solid-js": "^1.9.17",
     "tailwindcss": "4.3.3",
-    "vite": "^8.2.2"
+    "vite": "^8.3.3"
   }
 }
