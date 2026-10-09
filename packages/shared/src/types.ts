@@ -114,23 +114,45 @@ export interface SimpleCommand {
 
 // https://github.com/sharkdp/hyperfine/blob/master/src/benchmark/benchmark_result.rs
 // https://github.com/sharkdp/hyperfine/blob/master/src/export/json.rs
-export interface HyperfineResults extends JsonObject {
-  command: string;
+export interface HyperfineStatistics extends JsonObject {
   mean: number;
-  stddev?: number;
+  stddev?: number | null;
   median: number;
-  user: number;
-  system: number;
   min: number;
   max: number;
-  times?: number[];
+}
+
+export interface HyperfineResults extends HyperfineStatistics {
+  command: string;
+  user: number;
+  system: number;
+  times?: number[] | null;
   exit_codes: (number | null)[];
   parameters?: Record<string, string>;
 }
 
-export interface HyperfineJSON extends JsonObject {
+interface HyperfineV2Results extends JsonObject {
+  command: string;
+  name?: string;
+  parameters?: Record<string, { value: string }>;
+  measurements: {
+    time_wall_clock: { value: number; unit: 'second' };
+    exit_code: number | null;
+  }[];
+  summary: { time_wall_clock: HyperfineStatistics };
+}
+
+interface HyperfineV1JSON extends JsonObject {
+  schema_version?: never;
   results: HyperfineResults[];
 }
+
+interface HyperfineV2JSON extends JsonObject {
+  schema_version: 2;
+  results: HyperfineV2Results[];
+}
+
+export type HyperfineJSON = HyperfineV1JSON | HyperfineV2JSON;
 
 // https://github.com/evanwashere/mitata/blob/master/src/main.mjs
 // https://github.com/evanwashere/mitata/blob/master/src/lib.mjs

@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "metadata": {
+    "hyperfine_version": "2.0.0",
+    "start_time": "2026-10-09T12:00:00Z",
+    "platform": { "os": "linux", "architecture": "x86_64" }
+  },
+  "primary_metric": "time_wall_clock",
+  "results": [
+    {
+      "command": "echo 0",
+      "name": "value 0",
+      "parameters": { "value": { "value": "0" } },
+      "measurements": [
+        {
+          "time_wall_clock": { "value": 0.22, "unit": "second" },
+          "time_cpu": { "value": 0.0002, "unit": "second" },
+          "time_user": { "value": 0.0001, "unit": "second" },
+          "time_system": { "value": 0.0001, "unit": "second" },
+          "exit_code": 0
+        },
+        {
+          "time_wall_clock": { "value": 0.22, "unit": "second" },
+          "time_cpu": { "value": 0.0002, "unit": "second" },
+          "time_user": { "value": 0.0001, "unit": "second" },
+          "time_system": { "value": 0.0001, "unit": "second" },
+          "exit_code": 0
+        },
+        {
+          "time_wall_clock": { "value": 0.22, "unit": "second" },
+          "time_cpu": { "value": 0.0002, "unit": "second" },
+          "time_user": { "value": 0.0001, "unit": "second" },
+          "time_system": { "value": 0.0001, "unit": "second" },
+          "exit_code": 0
+        }
+      ],
+      "summary": {
+        "time_wall_clock": {
+          "unit": "second",
+          "count": 3,
+          "mean": 0.22,
+          "stddev": 0,
+          "median": 0.22,
+          "min": 0.22,
+          "max": 0.22
+        },
+        "time_cpu": {
+          "unit": "second",
+          "count": 3,
+          "mean": 0.0002,
+          "stddev": 0,
+          "median": 0.0002,
+          "min": 0.0002,
+          "max": 0.0002
+        },
+        "time_user": {
+          "unit": "second",
+          "count": 3,
+          "mean": 0.0001,
+          "stddev": 0,
+          "median": 0.0001,
+          "min": 0.0001,
+          "max": 0.0001
+        },
+        "time_system": {
+          "unit": "second",
+          "count": 3,
+          "mean": 0.0001,
+          "stddev": 0,
+          "median": 0.0001,
+          "min": 0.0001,
+          "max": 0.0001
+        }
+      }
+    },
+    {
+      "command": "echo 1",
+      "name": "value 1",
+      "parameters": { "value": { "value": "1" } },
+      "measurements": [
+        {
+          "time_wall_clock": { "value": 0.23, "unit": "second" },
+          "time_cpu": { "value": 0.0002, "unit": "second" },
+          "time_user": { "value": 0.0001, "unit": "second" },
+          "time_system": { "value": 0.0001, "unit": "second" },
+          "exit_code": 0
+        },
+        {
+          "time_wall_clock": { "value": 0.23, "unit": "second" },
+          "time_cpu": { "value": 0.0002, "unit": "second" },
+          "time_user": { "value": 0.0001, "unit": "second" },
+          "time_system": { "value": 0.0001, "unit": "second" },
+          "exit_code": 0
+        },
+        {
+          "time_wall_clock": { "value": 0.23, "unit": "second" },
+          "time_cpu": { "value": 0.0002, "unit": "second" },
+          "time_user": { "value": 0.0001, "unit": "second" },
+          "time_system": { "value": 0.0001, "unit": "second" },
+          "exit_code": 0
+        }
+      ],
+      "summary": {
+        "time_wall_clock": {
+          "unit": "second",
+          "count": 3,
+          "mean": 0.23,
+          "stddev": 0,
+          "median": 0.23,
+          "min": 0.23,
+          "max": 0.23
+        },
+        "time_cpu": {
+          "unit": "second",
+          "count": 3,
+          "mean": 0.0002,
+          "stddev": 0,
+          "median": 0.0002,
+          "min": 0.0002,
+          "max": 0.0002
+        },
+        "time_user": {
+          "unit": "second",
+          "count": 3,
+          "mean": 0.0001,
+          "stddev": 0,
+          "median": 0.0001,
+          "min": 0.0001,
+          "max": 0.0001
+        },
+        "time_system": {
+          "unit": "second",
+          "count": 3,
+          "mean": 0.0001,
+          "stddev": 0,
+          "median": 0.0001,
+          "min": 0.0001,
+          "max": 0.0001
+        }
+      }
+    }
+  ]
+}

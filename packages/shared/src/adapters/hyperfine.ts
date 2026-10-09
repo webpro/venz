@@ -1,7 +1,7 @@
 import { getNextAvailableColor } from '../colors.ts';
 import { formatTimestamp } from './standard.ts';
 import type {
-  HyperfineResults,
+  HyperfineStatistics,
   HyperfineJSON,
   Series,
   Configuration,
@@ -19,7 +19,9 @@ export function isHyperfineJSON(data: JsonValue): data is HyperfineJSON {
     Array.isArray(data.results) &&
     data.results[0] &&
     typeof data.results[0] === 'object' &&
-    'exit_codes' in data.results[0]
+    ('schema_version' in data && data.schema_version === 2
+      ? 'summary' in data.results[0] && 'measurements' in data.results[0]
+      : 'exit_codes' in data.results[0])
   );
 }
 
@@ -28,20 +30,14 @@ interface Results {
   data: Statistics;
 }
 
-function transformHyperfineWorkload(data: HyperfineResults): Results {
+function transformHyperfineStatistics(data: HyperfineStatistics, values: number[]): Statistics {
   return {
-    series: {
-      command: data.command,
-      parameters: data.parameters,
-    },
-    data: {
-      values: data.times ?? [],
-      mean: data.mean,
-      median: data.median,
-      stddev: data.stddev ?? 0,
-      min: data.min,
-      max: data.max,
-    },
+    values,
+    mean: data.mean,
+    median: data.median,
+    stddev: data.stddev ?? 0,
+    min: data.min,
+    max: data.max,
   };
 }
 
@@ -53,7 +49,25 @@ export function transformHyperfineData(
 ) {
   const timestamp = formatTimestamp();
 
-  const results = json.results.map(transformHyperfineWorkload);
+  const results: Results[] =
+    json.schema_version === 2
+      ? json.results.map(result => ({
+          series: {
+            command: result.command,
+            label: result.name,
+            parameters:
+              result.parameters &&
+              Object.fromEntries(Object.entries(result.parameters).map(([name, parameter]) => [name, parameter.value])),
+          },
+          data: transformHyperfineStatistics(
+            result.summary.time_wall_clock,
+            result.measurements.map(measurement => measurement.time_wall_clock.value)
+          ),
+        }))
+      : json.results.map(result => ({
+          series: { command: result.command, parameters: result.parameters },
+          data: transformHyperfineStatistics(result, result.times ?? []),
+        }));
 
   const hasParameters = results.every(r => r.series.parameters && Object.keys(r.series.parameters).length > 0);
   const firstSeries = results[0].series;
@@ -98,13 +112,13 @@ export function transformHyperfineData(
     for (const result of results) {
       const id = seriesId ?? series.length;
       const parameters = result.series.parameters;
-      const cmd = result.series.command ?? '';
+      const name = result.series.label ?? result.series.command ?? '';
       const label =
         parameterNames.length > 0 && parameters
           ? parameterNames.map(n => parameters[n]).join(' ')
-          : cmd.length > 12
-            ? cmd.slice(0, 11) + '…'
-            : cmd || `Command ${id + 1}`;
+          : name.length > 12
+            ? name.slice(0, 11) + '…'
+            : name || `Command ${id + 1}`;
 
       series.push({ ...result.series, id, configId, label: label, color: getNextAvailableColor(series) });
       data.push({ ...result.data, id, seriesId: id });
