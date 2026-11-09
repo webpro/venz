@@ -663,9 +663,10 @@ export const renderSVG = (props: RenderProps) => {
 
     const values = getYValuesForSelection(true);
 
+    // The scale starts above the break marks, so the lowest values never overlap them
     return scaleLinear()
       .domain([Math.min(...values) * 0.99, Math.max(...values) * 1.01])
-      .range([height, 0])
+      .range([start, 0])
       .nice();
   };
 
