@@ -7,6 +7,7 @@ import { compare, valid } from 'semver';
 import type { Configuration, RawUnit, Series, SeriesData } from '../types.ts';
 import type { Theme, ChartType, LegendPosition, PivotMode, SortMode } from '../chart.ts';
 import { transpose } from '../transpose.ts';
+import { getYValues } from './y-values.ts';
 
 interface XScale {
   (value: number | string): number;
@@ -613,21 +614,18 @@ export const renderSVG = (props: RenderProps) => {
     });
   }
 
-  const pivotedData = () => {
-    const m = pivotMode;
-    return m === 'pivoted' || m === 'transposed-pivoted' ? transpose(props.data()) : props.data();
-  };
+  const getYValuesForSelection = (isBreak: boolean) =>
+    getYValues({
+      data: props.data(),
+      chartType,
+      pivotMode,
+      selectedSeries: props.selectedSeries(),
+      selectedSeriesX: props.selectedSeriesX(),
+      isBreak,
+    });
 
   const getYScale = () => {
-    const selected = props.data().filter(s => props.selectedSeries().includes(s.seriesId));
-    const values =
-      pivotMode !== 'none'
-        ? pivotedData().flatMap(d => d.values)
-        : chartType === 'median'
-          ? selected.map(s => s.median + s.stddev)
-          : chartType === 'bar'
-            ? props.data().map(s => s.median)
-            : selected.flatMap(s => s.max);
+    const values = getYValuesForSelection(false);
 
     return scaleLinear()
       .domain([0, Math.max(...values) * 1.05])
@@ -663,15 +661,7 @@ export const renderSVG = (props: RenderProps) => {
       .style('stroke', 'currentColor')
       .style('stroke-width', 1);
 
-    const selected = props.data().filter(s => props.selectedSeries().includes(s.seriesId));
-    const values =
-      pivotMode !== 'none'
-        ? pivotedData().flatMap(d => d.values)
-        : chartType === 'median'
-          ? selected.flatMap(s => [s.median - s.stddev, s.median + s.stddev])
-          : chartType === 'bar'
-            ? props.data().map(s => s.median)
-            : selected.flatMap(s => [s.min, s.max]);
+    const values = getYValuesForSelection(true);
 
     return scaleLinear()
       .domain([Math.min(...values) * 0.99, Math.max(...values) * 1.01])
