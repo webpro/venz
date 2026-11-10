@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["src/server.ts", "src/render.ts"]
+  "include": ["src/server.ts", "src/render.ts", "test/**/*.ts"]
 }
