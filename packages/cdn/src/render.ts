@@ -1,70 +1,9 @@
 import { parseHTML } from 'linkedom';
 import { renderSVG, type RenderProps } from '@venz/shared/render';
-import { transform, SEPARATOR } from '@venz/shared/adapter';
-import { configTypes, type ConfigType, type RawUnit, type SeriesData } from '@venz/shared/types';
-import { getPivotMode } from '@venz/shared/chart';
-import type { Theme, ChartType, LegendPosition } from '@venz/shared/chart';
+import { parseChartParams } from '@venz/shared/spec';
+import type { Theme } from '@venz/shared/chart';
 
 export const THEME_FG: Record<Theme, string> = { dark: '#fff', light: '#000', 'high-contrast': '#ff0' };
-
-const CHART_TYPES: ChartType[] = ['box', 'median', 'scatter', 'line', 'bar'];
-const LEGEND_POSITIONS: LegendPosition[] = ['tr', 'tl', 'br', 'bl', 'n'];
-
-function parseParams(params: URLSearchParams) {
-  const getAll = (key: string) => params.getAll(key);
-  const get = (key: string) => params.get(key);
-
-  const labels = getAll('label');
-  const values = getAll('data');
-
-  const input =
-    values.length === 1 && (values[0].startsWith('{') || values[0].startsWith('['))
-      ? values[0]
-      : labels.length === values.length
-        ? labels.map((label, i) => [label, values[i].split(SEPARATOR).map(Number)])
-        : values;
-
-  const ct = get('ct');
-  const isConfigType = (s: string | null): s is ConfigType => {
-    for (const t of configTypes) if (t === s) return true;
-    return false;
-  };
-  const unit = get('unit');
-  const rawUnit: RawUnit | undefined = unit === 'ns' || unit === 's' ? unit : undefined;
-  const initialConfig = {
-    type: isConfigType(ct) ? ct : ('standard' satisfies ConfigType),
-    labelX: get('labelX') ?? get('lx') ?? undefined,
-    labelY: get('labelY') ?? get('ly') ?? undefined,
-    rawUnit,
-    labels: getAll('l'),
-    colors: getAll('color').map(c => (/^[0-9a-fA-F]{3,8}$/.test(c) ? `#${c}` : c)),
-    commands: getAll('command'),
-  };
-
-  const { config, data } = transform(input, { initialConfig });
-
-  const typeParam = get('type');
-  const chartType: ChartType = CHART_TYPES.includes(typeParam as ChartType)
-    ? (typeParam as ChartType)
-    : typeParam === 'pivot'
-      ? 'line'
-      : 'median';
-  const hasExplicitPivot = get('pivot') !== null || get('transpose') !== null;
-  const pivotMode = hasExplicitPivot
-    ? getPivotMode(get('pivot'), get('transpose'))
-    : typeParam === 'pivot'
-      ? 'pivoted'
-      : chartType === 'line' || chartType === 'scatter'
-        ? 'none'
-        : 'pivoted';
-  const lpParam = get('lp');
-  const legendPosition: LegendPosition = LEGEND_POSITIONS.includes(lpParam as LegendPosition)
-    ? (lpParam as LegendPosition)
-    : 'tr';
-  const fullRange = get('br') !== '1';
-
-  return { chartType, pivotMode, legendPosition, fullRange, config, data };
-}
 
 export function renderChart(
   params: URLSearchParams,
@@ -73,7 +12,7 @@ export function renderChart(
   padding: number,
   theme: Theme | null
 ): string {
-  const { chartType, pivotMode, legendPosition, fullRange, config, data } = parseParams(params);
+  const { chartType, pivotMode, legendPosition, fullRange, config, data } = parseChartParams(params);
 
   const innerWidth = width - 2 * padding;
   const innerHeight = height - 2 * padding;
@@ -93,7 +32,7 @@ export function renderChart(
   const props: RenderProps = {
     svgRef: svg as unknown as SVGSVGElement,
     config: () => config,
-    data: () => data as SeriesData[],
+    data: () => data,
     series,
     selectedSeries: () => selectedSeries,
     seriesX,

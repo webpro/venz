@@ -1,6 +1,7 @@
 import { createEffect, createResource, createSignal, onCleanup, Show } from 'solid-js';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { renderSVG } from '@venz/shared/render';
+import { parseChartParams } from '@venz/shared/spec';
 import { Button, ButtonLink } from './Button';
 import { storage } from '../storage';
 import { useToast } from '../stores/toast';
@@ -10,7 +11,7 @@ import { ChartSeries } from './ChartSeries';
 import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
-import { createShareableUrl, transformFromSearchParams } from '../util/helpers';
+import { createShareableUrl, toURLSearchParams } from '../util/helpers';
 import type { PivotMode, SortMode } from '../types';
 
 export const isGenericChart = (id: string | undefined) => !id || id === 'chart';
@@ -34,9 +35,9 @@ export default function Chart() {
     }
   }
 
-  const fromUrl = transformFromSearchParams(searchParams);
+  const fromUrl = parseChartParams(toURLSearchParams(searchParams));
 
-  const [chartType, setChartType] = createSignal(fromUrl.type);
+  const [chartType, setChartType] = createSignal(fromUrl.chartType);
   const [pivotMode, setPivotMode] = createSignal<PivotMode>(fromUrl.pivotMode);
   const [config, setConfig] = createSignal(fromUrl.config);
   const [series, setSeries] = createStore(fromUrl.config?.series ?? []);

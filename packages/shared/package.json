@@ -6,7 +6,8 @@
     "./types": "./src/types.ts",
     "./chart": "./src/chart.ts",
     "./colors": "./src/colors.ts",
-    "./transpose": "./src/transpose.ts"
+    "./transpose": "./src/transpose.ts",
+    "./spec": "./src/spec/index.ts"
   },
   "type": "module",
   "scripts": {

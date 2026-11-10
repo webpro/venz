@@ -1,7 +1,5 @@
-import { transform, SEPARATOR, type InitialConfig } from '@venz/shared/adapter';
-import { configTypes, type Series, type SeriesData } from '@venz/shared/types';
-import { getPivotMode } from '@venz/shared/chart';
-import type { ChartType, LegendPosition, SearchParams } from '../types';
+import type { Series, SeriesData } from '@venz/shared/types';
+import type { SearchParams } from '../types';
 
 const MAX_URL_LENGTH = 15_000;
 
@@ -11,55 +9,13 @@ export const origin = import.meta.env.DEV ? 'http://localhost:3000' : 'https://t
 export const cdnOrigin =
   import.meta.env.VITE_CDN_ORIGIN ?? (import.meta.env.DEV ? 'http://localhost:3001' : 'https://cdn.venz.dev');
 
-const getChartType = (value?: string | string[]): ChartType =>
-  typeof value === 'string' && ['box', 'median', 'scatter', 'line', 'bar'].includes(value)
-    ? (value as ChartType)
-    : 'median';
-
-const getLegendPosition = (value?: string | string[]): LegendPosition =>
-  typeof value === 'string' && ['tr', 'tl', 'br', 'bl', 'n'].includes(value) ? (value as LegendPosition) : 'tr';
-
-const getFullRange = (value?: string | string[]): boolean =>
-  typeof value === 'string' && value === '1' ? false : true;
-
-export function transformFromSearchParams(searchParams: SearchParams) {
-  const { label, data, labelY: ly, labelX: lx, l, color, command, ct } = searchParams;
-  const labels = typeof label === 'string' ? [label] : Array.isArray(label) ? label : [];
-  const values = typeof data === 'string' ? [data] : Array.isArray(data) ? data : [];
-  const input =
-    values.length === 1 && (values[0].startsWith('{') || values[0].startsWith('['))
-      ? values[0]
-      : labels.length === values.length
-        ? labels.map((label, i) => [label, values[i].split(SEPARATOR).map(Number)])
-        : values;
-
-  const unit = searchParams.unit;
-  const rawUnit = unit === 'ns' || unit === 's' ? unit : undefined;
-
-  const initialConfig: InitialConfig = {
-    type: typeof ct === 'string' && configTypes.includes(ct) ? ct : 'standard',
-    labelX: Array.isArray(lx) ? lx[0] : lx,
-    labelY: Array.isArray(ly) ? ly[0] : ly,
-    labels: typeof l === 'string' ? [l] : Array.isArray(l) ? l : [],
-    colors: typeof color === 'string' ? [color] : Array.isArray(color) ? color : [],
-    commands: typeof command === 'string' ? [command] : Array.isArray(command) ? command : [],
-    rawUnit,
-  };
-
-  const { config, data: seriesData } = transform(input, { initialConfig });
-
-  const type = getChartType(searchParams.type);
-  const hasExplicitPivot = searchParams.pivot !== undefined || searchParams.transpose !== undefined;
-  const pivotMode = hasExplicitPivot
-    ? getPivotMode(searchParams.pivot, searchParams.transpose)
-    : type === 'line' || type === 'scatter'
-      ? 'none'
-      : 'pivoted';
-  const legendPosition = getLegendPosition(searchParams.lp);
-  const fullRange = getFullRange(searchParams.br);
-
-  return { type, pivotMode, legendPosition, fullRange, config, data: seriesData };
-}
+/** Search params of @solidjs/router as URLSearchParams, with repeated keys as repeated entries again */
+export const toURLSearchParams = (searchParams: SearchParams) => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams))
+    for (const item of Array.isArray(value) ? value : value === undefined ? [] : [value]) params.append(key, item);
+  return params;
+};
 
 export function createShareableUrl(
   searchParams: SearchParams,
