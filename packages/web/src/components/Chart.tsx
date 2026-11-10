@@ -1,7 +1,15 @@
 import { createEffect, createResource, createSignal, onCleanup, Show } from 'solid-js';
-import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
+import { useLocation, useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { renderSVG } from '@venz/shared/render';
-import { parseChartParams } from '@venz/shared/spec';
+import {
+  fromPivotMode,
+  getVersion,
+  readV2,
+  toChart,
+  upgradeV1,
+  writeV2,
+  type ChartSpec,
+} from '@venz/shared/spec';
 import { Button, ButtonLink } from './Button';
 import { storage } from '../storage';
 import { useToast } from '../stores/toast';
@@ -11,31 +19,37 @@ import { ChartSeries } from './ChartSeries';
 import { DropZone } from './DropZone';
 import { ChartControls } from './ChartControls';
 import { handleDrop, handleGlobalPaste } from './handle-drop';
-import { createShareableUrl, toURLSearchParams } from '../util/helpers';
+import { createShareableUrl, prettyQuery, toURLSearchParams } from '../util/helpers';
 import type { PivotMode, SortMode } from '../types';
 
 export const isGenericChart = (id: string | undefined) => !id || id === 'chart';
 
 export default function Chart() {
   const params = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { addToast } = useToast();
   const { theme, setTheme } = useTheme();
 
-  const chromeless = searchParams.chrome === '0';
+  // v1 links render as before, through their v2 equivalent
+  const urlSpec = () => {
+    const query = toURLSearchParams(searchParams);
+    return readV2(getVersion(query) === 1 ? upgradeV1(query) : query);
+  };
+  const fromUrlSpec = urlSpec();
+  const chromeless = fromUrlSpec.embed;
 
   if (chromeless) {
     document.body.style.transition = 'none';
     document.documentElement.style.transition = 'none';
-    if (searchParams.theme) {
-      const t = searchParams.theme as 'dark' | 'light' | 'high-contrast';
-      setTheme(t);
-      document.documentElement.className = t;
+    if (fromUrlSpec.theme) {
+      setTheme(fromUrlSpec.theme);
+      document.documentElement.className = fromUrlSpec.theme;
     }
   }
 
-  const fromUrl = parseChartParams(toURLSearchParams(searchParams));
+  const fromUrl = toChart(fromUrlSpec);
 
   const [chartType, setChartType] = createSignal(fromUrl.chartType);
   const [pivotMode, setPivotMode] = createSignal<PivotMode>(fromUrl.pivotMode);
@@ -49,21 +63,22 @@ export default function Chart() {
   const [sortMode, setSortMode] = createSignal<SortMode>('original');
   const [legendPosition, setLegendPosition] = createSignal(fromUrl.legendPosition);
 
+  /** The chart in the address bar, with the current view settings */
+  const viewSpec = (): ChartSpec => ({
+    ...urlSpec(),
+    type: chartType(),
+    ...fromPivotMode(pivotMode()),
+    legend: legendPosition(),
+    zero: fullRange(),
+    unit: config()?.rawUnit,
+  });
+
+  // Keep the address bar in sync with the view, in v2 (which also upgrades v1 links)
   createEffect(() => {
-    if (searchParams.type || chartType() !== 'median') setSearchParams({ type: chartType() });
-    if (searchParams.ct || config()?.type !== 'standard') setSearchParams({ ct: config()?.type });
-    if (searchParams.lp || legendPosition() !== 'tr') setSearchParams({ lp: legendPosition() });
-    if (searchParams.br || fullRange() !== true) setSearchParams({ br: fullRange() ? '0' : '1' });
-    const m = pivotMode();
-    const ct = chartType();
-    const defaultPivoted = ct !== 'line' && ct !== 'scatter';
-    const isPivoted = m === 'pivoted' || m === 'transposed';
-    const isTransposed = m === 'transposed' || m === 'transposed-pivoted';
-    if (searchParams.pivot || isPivoted !== defaultPivoted)
-      setSearchParams({ pivot: isPivoted === defaultPivoted ? undefined : isPivoted ? '1' : '0' });
-    if (searchParams.transpose || isTransposed) setSearchParams({ transpose: isTransposed ? '1' : undefined });
-    const unit = config()?.rawUnit;
-    if (searchParams.unit || unit) setSearchParams({ unit });
+    const query = writeV2(viewSpec()).toString();
+    const current = new URLSearchParams(location.search).toString();
+    if (query !== current)
+      navigate(query ? `${location.pathname}?${query}` : location.pathname, { replace: true, scroll: false });
   });
 
   const handleSaveAsNewConfiguration = async () => {
@@ -130,14 +145,14 @@ export default function Chart() {
   });
 
   const getShareableUrl = () => {
-    const [, url] = createShareableUrl(searchParams, series, seriesX, data());
-    return decodeURIComponent(url.searchParams.toString());
+    const [, url] = createShareableUrl(viewSpec(), series, seriesX, data());
+    return prettyQuery(url.searchParams);
   };
 
   const handleShare = () => {
-    const [loss, url] = createShareableUrl(searchParams, series, seriesX, data());
+    const [loss, url] = createShareableUrl(viewSpec(), series, seriesX, data());
     const relative = loss * 100;
-    const prettyUrl = url.origin + '?' + decodeURIComponent(url.searchParams.toString());
+    const prettyUrl = url.origin + '?' + prettyQuery(url.searchParams);
     navigator.clipboard.writeText(prettyUrl);
     addToast(`URL copied to clipboard (${relative === 0 ? 'no' : `${relative.toFixed(2)}%`} data loss)`);
   };

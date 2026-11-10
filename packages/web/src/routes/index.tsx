@@ -1,5 +1,6 @@
 import { clientOnly } from '@solidjs/start';
-import { useSearchParams, useLocation } from '@solidjs/router';
+import { useLocation } from '@solidjs/router';
+import { getVersion, readSpec, upgradeV1 } from '@venz/shared/spec';
 import { Meta } from '@solidjs/meta';
 import Shell from '../components/Shell';
 import { cdnOrigin } from '../util/helpers';
@@ -8,16 +9,16 @@ import { useSetOgImage } from '../stores/og-image';
 const Chart = clientOnly(() => import('../components/Chart'));
 
 export default function ChartPage() {
-  const [searchParams] = useSearchParams();
   const location = useLocation();
-  const chromeless = searchParams.chrome === '0';
   const setOgImage = useSetOgImage();
 
   const params = new URLSearchParams(location.search);
-  params.delete('chrome');
+  const chromeless = readSpec(params).embed;
   const hasData = params.has('data');
   if (hasData) {
-    setOgImage(`${cdnOrigin}/i/chart.webp?pad=24&${params}`);
+    const image = getVersion(params) === 1 ? upgradeV1(params) : new URLSearchParams(params);
+    image.delete('embed');
+    setOgImage(`${cdnOrigin}/i/chart.webp?pad=24&${image}`);
   }
 
   if (chromeless) {

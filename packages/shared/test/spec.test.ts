@@ -137,6 +137,7 @@ test.each([
     'type=box&lp=n&br=1&ct=hyperfine&t=1&lx=run&color=f80&chrome=0&theme=dark&label=a&label=b&data=1*2&data=3*4',
     'type=box&by=col&legend=none&zero=0&labelX=run&embed=1&theme=dark&color=f80&row=a&row=b&data=1*2&data=3*4',
   ],
+  ['type=bar&pivot=1', 'type=bar&by=col&samples=0'],
   [
     'type=pivot&w=800&h=400&q=80&pad=24&ref=x&label=a&l=x&l=y&data=1*2',
     'type=line&by=col&row=a&col=x&col=y&data=1*2&w=800&h=400&q=80&pad=24',

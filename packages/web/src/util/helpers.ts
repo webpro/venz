@@ -1,3 +1,4 @@
+import { writeV2, type ChartSpec } from '@venz/shared/spec';
 import type { Series, SeriesData } from '@venz/shared/types';
 import type { SearchParams } from '../types';
 
@@ -17,27 +18,30 @@ export const toURLSearchParams = (searchParams: SearchParams) => {
   return params;
 };
 
+/** Query string of a URL, readable: only characters with a meaning in a query stay encoded */
+export const prettyQuery = (params: URLSearchParams) =>
+  decodeURIComponent(params.toString().replace(/%(23|25|26|2B|3D)/gi, '%25$1'));
+
+/** Chart page URL with the chart and its data, capped in length (truncating the values) */
 export function createShareableUrl(
-  searchParams: SearchParams,
+  spec: ChartSpec,
   series: Series[],
   seriesX: Series[],
   data: SeriesData[]
 ): [number, URL] {
   const url = new URL('/', origin);
 
-  if (typeof searchParams.type === 'string') url.searchParams.set('type', searchParams.type);
-  if (typeof searchParams.lp === 'string') url.searchParams.set('lp', searchParams.lp);
-  if (typeof searchParams.br === 'string') url.searchParams.set('br', searchParams.br);
-  if (typeof searchParams.labelX === 'string') url.searchParams.set('labelX', searchParams.labelX);
-  if (typeof searchParams.labelY === 'string') url.searchParams.set('labelY', searchParams.labelY);
-  if (typeof searchParams.ct === 'string') url.searchParams.set('ct', searchParams.ct);
-  if (searchParams.pivot === '1' || searchParams.pivot === '0') url.searchParams.set('pivot', searchParams.pivot);
-  if (searchParams.transpose === '1') url.searchParams.set('transpose', '1');
-  if (typeof searchParams.unit === 'string') url.searchParams.set('unit', searchParams.unit);
-
-  for (const id of series) url.searchParams.append('label', id.label);
-  for (const s of seriesX) url.searchParams.append('l', s.label);
-  for (const id of series) if (typeof id.command === 'string') url.searchParams.append('command', id.command);
+  const isGenerated = seriesX.every((s, i) => s.label === `Series ${i + 1}`);
+  const params = writeV2({
+    ...spec,
+    rows: series.map(s => s.label),
+    cols: isGenerated ? [] : seriesX.map(s => s.label),
+    commands: series.flatMap(s => (typeof s.command === 'string' ? [s.command] : [])),
+    data: [],
+    embed: false,
+    theme: undefined,
+  });
+  url.search = params.toString();
 
   const remainingLength = MAX_URL_LENGTH - url.toString().length;
   const maxValuesLength = Math.floor(remainingLength / series.length);

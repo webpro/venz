@@ -52,8 +52,9 @@ const IMAGE_PARAMS = ['w', 'h', 'q', 'pad'];
 /** The v2 equivalent of v1 chart or image URL parameters, rendering the same chart */
 export function upgradeV1(params: URLSearchParams): URLSearchParams {
   const spec = readV1(params);
-  // Without columns (unlabeled rows, tool output), the renderer swaps `by` and uses samples: write what it draws
-  if (!spec.samples && !toChart(spec).config?.seriesX?.length) {
+  // Without columns (unlabeled rows, tool output), the renderer swaps `by` and uses samples: write what it draws.
+  // Without data (saved charts on the chart page), the columns are unknown.
+  if (!spec.samples && spec.data.length > 0 && !toChart(spec).config?.seriesX?.length) {
     spec.by = spec.by === 'row' ? 'col' : 'row';
     spec.samples = true;
   }

@@ -20,6 +20,7 @@ import { Clipboard } from './icons/Clipboard';
 import { Link } from './icons/Link';
 import { cdnOrigin } from '../util/helpers';
 import { useTheme } from '../stores/theme';
+import { fromPivotMode, toPivotMode } from '@venz/shared/spec';
 
 type ChartControlsProps = {
   svgRef: SVGSVGElement;
@@ -71,46 +72,30 @@ export const ChartControls = (props: ChartControlsProps) => {
 
       {props.hasSeriesX &&
         (() => {
-          const m = () => props.pivotMode();
-          const isTransposed = () => m() === 'transposed-pivoted' || m() === 'transposed';
-          const isPivoted = () => m() === 'pivoted' || m() === 'transposed';
-          const toggleTranspose = () =>
-            props.setPivotMode(m =>
-              m === 'none'
-                ? 'transposed-pivoted'
-                : m === 'transposed-pivoted'
-                  ? 'none'
-                  : m === 'pivoted'
-                    ? 'transposed'
-                    : 'pivoted'
-            );
-          const togglePivot = () =>
-            props.setPivotMode(m =>
-              m === 'none'
-                ? 'pivoted'
-                : m === 'pivoted'
-                  ? 'none'
-                  : m === 'transposed-pivoted'
-                    ? 'transposed'
-                    : 'transposed-pivoted'
-            );
+          const view = () => fromPivotMode(props.pivotMode());
+          const isByCol = () => view().by === 'col';
+          const isSamples = () => view().samples;
+          const toggleBy = () => props.setPivotMode(toPivotMode(isByCol() ? 'row' : 'col', isSamples()));
+          const toggleSamples = () => props.setPivotMode(toPivotMode(view().by, !isSamples()));
           return (
             <>
               <IconButton
-                aria-label="Transpose"
-                onClick={toggleTranspose}
-                title="Transpose"
-                className={isTransposed() ? 'bg-foreground! text-background!' : ''}
+                aria-label="Series per column"
+                aria-pressed={isByCol()}
+                onClick={toggleBy}
+                title="Series per column"
+                className={isByCol() ? 'bg-foreground! text-background!' : ''}
               >
                 <Transpose />
               </IconButton>
               <IconButton
-                aria-label="Pivot"
-                onClick={togglePivot}
-                title="Pivot"
-                className={isPivoted() ? 'bg-foreground! text-background!' : ''}
+                aria-label="Values as samples"
+                aria-pressed={isSamples()}
+                onClick={toggleSamples}
+                title="Values as samples"
+                className={isSamples() ? 'bg-foreground! text-background!' : ''}
               >
-                <Pivot split={isPivoted()} />
+                <Pivot split={!isSamples()} />
               </IconButton>
             </>
           );
