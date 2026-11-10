@@ -16,11 +16,22 @@ pnpm dev
 - `@venz/cdn` is the image API at [cdn.venz.dev][2]
 - `@venz/shared` has chart rendering, adapters, types
 
+## Docs
+
+- URL parameters with live examples: [try.venz.dev/about][17]
+
 ## CDN
 
 - Serves `svg`/`png`/`webp`/`avif` via `/i/chart.{ext}?…`
 - Example: [chart.svg?type=bar\&data=4\*3\&data=2\*4][3]
 - Docs: [https://try.venz.dev/about#image-url][4]
+
+## URL versions
+
+- Chart and image URLs use format version 2, parsed in `packages/shared/src/spec`
+- URLs with a version 1 parameter (`label`, `l`, `pivot`, `lp`, …) redirect (301) to their version 2 equivalent, on
+  the chart page and the CDN
+- `packages/cdn/test/__snapshots__/v1` holds reference renderings of v1 URLs: their v2 equivalents must render the same
 
 ## Tech
 
@@ -53,7 +64,7 @@ Seeing issues or want to improve it? Pull requests are welcome!
 
 [1]: https://try.venz.dev
 [2]: https://cdn.venz.dev
-[3]: https://cdn.venz.dev/i/chart.svg?type=line&lp=br&data=5*4*6&data=4*5*3&data=3*6*4
+[3]: https://cdn.venz.dev/i/chart.svg?type=bar&data=4*3&data=2*4
 [4]: https://try.venz.dev/about#image-url
 [5]: https://start.solidjs.com
 [6]: https://d3js.org
@@ -67,3 +78,4 @@ Seeing issues or want to improve it? Pull requests are welcome!
 [14]: https://github.com/sharkdp/hyperfine
 [15]: ./LICENSE
 [16]: https://nitro.build
+[17]: https://try.venz.dev/about#chart-url

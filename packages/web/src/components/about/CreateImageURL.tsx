@@ -1,11 +1,6 @@
-import { origin, cdnOrigin } from '../../util/helpers';
+import { cdnOrigin } from '../../util/helpers';
 
 export const CreateImageURL = () => {
-  const url = new URL('/', origin);
-  url.searchParams.set('type', 'line');
-  url.searchParams.append('data', '3;2;3;4;2;5');
-  url.searchParams.append('data', '4;3;2;5;6;4');
-
   return (
     <>
       <p>Generate chart images directly via URL. Append chart parameters as query strings to the image endpoint.</p>
@@ -21,7 +16,9 @@ export const CreateImageURL = () => {
         <li>
           Supported formats: <code>.svg</code>, <code>.png</code>, <code>.webp</code>, <code>.avif</code>
         </li>
-        <li>All chart URL parameters (above) are supported</li>
+        <li>
+          All chart URL parameters (above) are supported, except <code>embed</code>
+        </li>
       </ul>
 
       <h4 class="text-2xl mt-4">Additional image parameters</h4>
@@ -79,7 +76,7 @@ export const CreateImageURL = () => {
 
       <p>Example:</p>
       <p>
-        <code class="break-all">{cdnOrigin}/i/chart.png?type=line&data=3,2,3,4&data=4,3,2,5</code>
+        <code class="break-all">{cdnOrigin}/i/chart.png?type=line&data=3*2*3*4&data=4*3*2*5</code>
       </p>
     </>
   );

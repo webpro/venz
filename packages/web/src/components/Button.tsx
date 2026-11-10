@@ -1,5 +1,6 @@
 import { A, type AnchorProps } from '@solidjs/router';
 import { splitProps, type ParentProps } from 'solid-js';
+import { prettyQuery } from '../util/helpers';
 
 type ButtonProps = {
   className?: string;
@@ -82,7 +83,7 @@ export const Link = (props: ParentProps<AnchorProps>) => <A class="underline" {.
 
 export const Wink = (props: { url: URL }) => {
   const href = props.url.toString();
-  const text = props.url.origin + '?' + decodeURIComponent(props.url.searchParams.toString());
+  const text = props.url.origin + '?' + prettyQuery(props.url.searchParams);
   return (
     <A
       class="underline decoration-neutral-400 underline-offset-6 hover:decoration-neutral-300 wrap-anywhere"

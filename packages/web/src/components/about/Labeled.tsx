@@ -4,17 +4,16 @@ import { Wink } from '../Button';
 export const Labeled = () => {
   const url = new URL('/', origin);
   url.searchParams.set('type', 'line');
-  url.searchParams.set('t', '1');
-  url.searchParams.set('lp', 'br');
-  url.searchParams.set('br', '1');
-  url.searchParams.append('label', '2025-01');
-  url.searchParams.append('label', '2025-02');
-  url.searchParams.append('label', '2025-03');
-  url.searchParams.append('label', '2025-04');
-  url.searchParams.append('data', [150, 150, 160].join(','));
-  url.searchParams.append('data', [120, 110, 120].join(','));
-  url.searchParams.append('data', [180, 180, 210].join(','));
-  url.searchParams.append('data', [170, 190, 180].join(','));
+  url.searchParams.set('legend', 'br');
+  url.searchParams.set('zero', '0');
+  url.searchParams.append('row', '2025-01');
+  url.searchParams.append('row', '2025-02');
+  url.searchParams.append('row', '2025-03');
+  url.searchParams.append('row', '2025-04');
+  url.searchParams.append('data', [150, 150, 160].join('*'));
+  url.searchParams.append('data', [120, 110, 120].join('*'));
+  url.searchParams.append('data', [180, 180, 210].join('*'));
+  url.searchParams.append('data', [170, 190, 180].join('*'));
 
   return (
     <>

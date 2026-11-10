@@ -4,7 +4,7 @@ import { Link, Wink } from '../Button';
 export const Hyperfine = () => {
   const url = new URL('/', origin);
   url.searchParams.set('type', 'median');
-  url.searchParams.set('br', '1');
+  url.searchParams.set('zero', '0');
   url.searchParams.append(
     'data',
     JSON.stringify({

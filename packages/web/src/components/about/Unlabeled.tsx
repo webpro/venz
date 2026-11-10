@@ -5,13 +5,13 @@ export const Unlabeled = () => {
   const randomNumbers = generateNumbers();
   const url = new URL('/', origin);
   url.searchParams.set('type', 'line');
-  url.searchParams.append('data', randomNumbers.join(','));
+  url.searchParams.append('data', randomNumbers.join('*'));
 
   const moreNumbers = generateNumbers();
   const addUrl = new URL('/', origin);
   addUrl.searchParams.set('type', 'line');
-  addUrl.searchParams.append('data', randomNumbers.join(','));
-  addUrl.searchParams.append('data', moreNumbers.join(','));
+  addUrl.searchParams.append('data', randomNumbers.join('*'));
+  addUrl.searchParams.append('data', moreNumbers.join('*'));
 
   return (
     <>

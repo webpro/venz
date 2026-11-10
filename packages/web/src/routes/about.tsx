@@ -55,6 +55,9 @@ export default function About() {
             <Link href="#json-labeled">JSON with labels and numbers</Link>
           </li>
           <li>
+            <Link href="#json-labeled-series">JSON with labels and numbers series</Link>
+          </li>
+          <li>
             <Link href="#hyperfine">Hyperfine</Link>
           </li>
           <li>
@@ -98,8 +101,8 @@ export default function About() {
 
         <LabeledNumbersJSON />
 
-        <h3 id="json-labeled" class="text-3xl">
-          <a href="#json-labeled">JSON with labels and numbers series</a>
+        <h3 id="json-labeled-series" class="text-3xl">
+          <a href="#json-labeled-series">JSON with labels and numbers series</a>
         </h3>
 
         <LabeledNumberSeriesJSON />
