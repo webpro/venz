@@ -4,6 +4,7 @@ import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { Resvg } from '@resvg/resvg-js';
 import sharp from 'sharp';
+import { getV1Redirect } from './redirect.ts';
 import { renderChart, THEME_FG } from './render.ts';
 
 const favicon = readFileSync(new URL('favicon.svg', import.meta.url));
@@ -74,14 +75,7 @@ app.get('/favicon.svg', () => {
 
 app.get('/favicon.ico', c => c.redirect('/favicon.svg', 301));
 
-function cacheKey(
-  file: string,
-  params: URLSearchParams,
-  width: number,
-  height: number,
-  padding: number,
-  qKey: string
-) {
+function cacheKey(file: string, params: URLSearchParams, width: number, height: number, padding: number, qKey: string) {
   const sorted = [...params].sort((a, b) => a[0].localeCompare(b[0]));
   return `${file}:${width}x${height}:p${padding}:${qKey}:${new URLSearchParams(sorted)}`;
 }
@@ -96,19 +90,26 @@ app.get('/i/:file', async c => {
   const ext = match[1];
   const format = FORMATS[ext];
 
-  const params = new URL(c.req.url).searchParams;
+  const url = new URL(c.req.url);
+  const cacheControl = isDev ? 'no-store' : `public, max-age=${CACHE_MAX_AGE}, immutable`;
+
+  // v1 URLs moved permanently to their v2 equivalent
+  const location = getV1Redirect(url);
+  if (location)
+    return new Response(null, { status: 301, headers: { Location: location, 'Cache-Control': cacheControl } });
+
+  const params = url.searchParams;
   const width = Math.min(Number(params.get('w')) || VIEWPORT.width, 3840);
   const height = Math.min(Number(params.get('h')) || VIEWPORT.height, 2160);
   const qParam = params.get('q');
   const qNum = Number(qParam);
-  const explicitQuality =
-    qParam !== null && Number.isFinite(qNum) ? Math.min(Math.max(qNum, 1), 100) : null;
+  const explicitQuality = qParam !== null && Number.isFinite(qNum) ? Math.min(Math.max(qNum, 1), 100) : null;
   const padding = Math.max(0, Math.min(Number(params.get('pad')) || 0, Math.floor(Math.min(width, height) / 2)));
   const themeParam = params.get('theme');
   const explicitTheme = THEMES.includes(themeParam as any) ? (themeParam as (typeof THEMES)[number]) : null;
   const theme = explicitTheme ?? 'dark';
 
-  for (const key of ['w', 'h', 'q', 'pad', 'chrome']) params.delete(key);
+  for (const key of ['w', 'h', 'q', 'pad', 'embed']) params.delete(key);
   if (ext === 'svg') {
     if (explicitTheme) params.set('theme', explicitTheme);
     else params.delete('theme');
@@ -119,7 +120,6 @@ app.get('/i/:file', async c => {
   const qKey = explicitQuality !== null ? `q${explicitQuality}` : 'lossless';
   const key = cacheKey(ext, params, width, height, padding, qKey);
   const tag = etag(key);
-  const cacheControl = isDev ? 'no-store' : `public, max-age=${CACHE_MAX_AGE}, immutable`;
 
   if (c.req.header('if-none-match') === tag) {
     return new Response(null, { status: 304, headers: { ETag: tag, 'Cache-Control': cacheControl } });

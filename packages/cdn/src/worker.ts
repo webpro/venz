@@ -43,7 +43,8 @@ export default {
 
     const response = await getStub(env).fetch(request);
 
-    if (response.status === 200 && response.headers.get('cache-control')?.includes('max-age=')) {
+    const cacheable = response.status === 200 || response.status === 301;
+    if (cacheable && response.headers.get('cache-control')?.includes('max-age=')) {
       ctx.waitUntil(cache.put(request, response.clone()));
     }
 

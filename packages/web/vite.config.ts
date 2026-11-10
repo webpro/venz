@@ -4,7 +4,7 @@ import { nitro } from 'nitro/vite';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [tailwindcss(), solidStart(), nitro()],
+  plugins: [tailwindcss(), solidStart({ middleware: './src/middleware.ts' }), nitro()],
   optimizeDeps: {
     entries: ['src/**/*.{ts,tsx}'],
     include: ['@solidjs/start > @jridgewell/trace-mapping'],

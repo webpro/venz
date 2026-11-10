@@ -1,7 +1,7 @@
 {
   "workspaces": {
     "packages/web": {
-      "entry": ["src/app.tsx", "src/entry-*.tsx", "src/routes/**/*.{ts,tsx}"],
+      "entry": ["src/app.tsx", "src/entry-*.tsx", "src/middleware.ts", "src/routes/**/*.{ts,tsx}"],
       "vite": {
         "config": []
       }
