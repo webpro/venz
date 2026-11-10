@@ -1,7 +1,9 @@
 import { expect, test } from 'vitest';
+import { readFileSync } from 'node:fs';
 import {
   fromPivotMode,
   getVersion,
+  parseChartParams,
   readV1,
   readV2,
   toPivotMode,
@@ -111,6 +113,40 @@ test('writes what it reads', () => {
   expect(writeV2(readV2(params(query))).toString()).toBe(query);
 });
 
+test('applies chart parameters to unlabeled rows in v2', () => {
+  const { config, pivotMode } = parseChartParams(
+    params('type=line&labelY=duration&unit=ns&color=f00&command=a&col=x&col=y&data=1*2&data=3*4')
+  );
+  expect(pivotMode).toBe('transposed');
+  expect(config).toMatchObject({ labelY: 'duration', rawUnit: 'ns' });
+  expect(config?.series.map(s => [s.color, s.command])).toEqual([
+    ['#f00', 'a'],
+    ['#f28e2c', ''],
+  ]);
+  expect(config?.seriesX?.map(s => [s.id, s.label, s.color])).toEqual([
+    [0, 'x', '#f00'],
+    [1, 'y', '#f28e2c'],
+  ]);
+});
+
+test('gives any data columns in v2', () => {
+  expect(parseChartParams(params('by=col&data=1*2*3')).config?.seriesX?.map(s => s.label)).toEqual([
+    'Series 1',
+    'Series 2',
+    'Series 3',
+  ]);
+  const hyperfine = readFileSync(new URL('fixtures/hyperfine-results.json', import.meta.url), 'utf8');
+  const query = new URLSearchParams({ labelY: 'duration', data: hyperfine });
+  expect(parseChartParams(query).config).toMatchObject({ labelY: 'duration', rawUnit: 's' });
+});
+
+test('keeps v1 ignoring chart parameters for unlabeled rows', () => {
+  const { config } = parseChartParams(params('type=line&labelY=duration&unit=ns&l=x&data=1*2&data=3*4'));
+  expect(config?.labelY).toBeUndefined();
+  expect(config?.rawUnit).toBeUndefined();
+  expect(config?.seriesX).toBeUndefined();
+});
+
 test('reads v1 aliases', () => {
   expect(readV1(params('type=pivot&lx=x&ly=y&color=f80&chrome=0'))).toMatchObject({
     type: 'line',
@@ -133,6 +169,7 @@ test.each([
     'type=bar&by=col&labelY=duration+%28s%29&row=astro&row=query&col=v5.88.0&col=v6.0.0&data=4*2&data=3.8*1.7',
   ],
   ['type=bar&data=1*2&data=3*4', 'type=bar&data=1*2&data=3*4'],
+  ['type=line&labelY=y&unit=ns&color=f00&l=x&l=y&data=1*2&data=3*4', 'type=line&data=1*2&data=3*4'],
   [
     'type=box&lp=n&br=1&ct=hyperfine&t=1&lx=run&color=f80&chrome=0&theme=dark&label=a&label=b&data=1*2&data=3*4',
     'type=box&by=col&legend=none&zero=0&labelX=run&embed=1&theme=dark&color=f80&row=a&row=b&data=1*2&data=3*4',
