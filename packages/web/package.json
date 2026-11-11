@@ -11,14 +11,14 @@
     "deploy": "vite build && wrangler pages deploy --cwd ../.."
   },
   "dependencies": {
-    "@solidjs/meta": "^0.29.4",
-    "@solidjs/router": "^1.0.0",
-    "@solidjs/start": "^2.0.6",
-    "@tailwindcss/vite": "4.3.3",
+    "@solidjs/meta": "^0.29.8",
+    "@solidjs/router": "^1.0.1",
+    "@solidjs/start": "^2.2.2",
+    "@tailwindcss/vite": "4.3.5",
     "@venz/shared": "workspace:*",
-    "nitro": "3.0.260903-beta",
-    "solid-js": "^1.9.17",
-    "tailwindcss": "4.3.3",
-    "vite": "^8.3.3"
+    "nitro": "3.0.261103-rc",
+    "solid-js": "^1.9.18",
+    "tailwindcss": "4.3.5",
+    "vite": "^8.3.7"
   }
 }
